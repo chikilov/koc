@@ -4,46 +4,46 @@ class Model_Log extends MY_Model {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->DB_INS = $this->load->database("koc_play_log", TRUE);
+		$this->DB_LOG = $this->load->database("koc_play_log", TRUE);
 
-		$this->DB_INS->trans_strict(FALSE);
+		$this->DB_LOG->trans_strict(FALSE);
 
-		$this->DB_INS->query("SET NAMES utf8");
+		$this->DB_LOG->query("SET NAMES utf8");
 	}
 
 	public function __destruct() {
-		$this->DB_INS->close();
+		$this->DB_LOG->close();
 	}
 
 	public function onStartTransaction()
 	{
-		$this->DB_INS->trans_start();
+		$this->DB_LOG->trans_start();
 	}
 
 	public function onCompleteTransaction()
     {
-        $this->DB_INS->trans_complete();
+        $this->DB_LOG->trans_complete();
     }
 
 	public function onBeginTransaction()
 	{
-		$this->DB_INS->trans_begin();
+		$this->DB_LOG->trans_begin();
 	}
 
 	public function onRollbackTransaction()
 	{
-		$this->DB_INS->trans_rollback();
+		$this->DB_LOG->trans_rollback();
 	}
 
 	public function onEndTransaction( $result )
 	{
-		if ($this->DB_INS->trans_status() === FALSE || $result === FALSE)
+		if ($this->DB_LOG->trans_status() === FALSE || $result === FALSE)
 		{
-		    $this->DB_INS->trans_rollback();
+		    $this->DB_LOG->trans_rollback();
 		}
 		else
 		{
-		    $this->DB_INS->trans_commit();
+		    $this->DB_LOG->trans_commit();
 		}
 	}
 
@@ -53,8 +53,8 @@ class Model_Log extends MY_Model {
 		$query .= "( '".$pid."', '".$logtype."', '".$logcontent."', now() ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
+		$this->DB_LOG->query($query);
+		return $this->DB_LOG->affected_rows();
 	}
 }
 ?>

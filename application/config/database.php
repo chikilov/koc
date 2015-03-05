@@ -73,6 +73,8 @@ if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 
 	$db['login']['dbdriver'] = 'mysql';
 	$db['login']['pconnect'] = TRUE;
+	$db['log']['dbdriver'] = 'mysql';
+	$db['log']['pconnect'] = TRUE;
 	$db['default']['dbdriver'] = 'mysql';
 	$db['default']['pconnect'] = TRUE;
 	$db['default_sel']['dbdriver'] = 'mysql';
@@ -105,6 +107,8 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
 
 	$db['login']['dbdriver'] = 'mysql';
 	$db['login']['pconnect'] = TRUE;
+	$db['log']['dbdriver'] = 'mysql';
+	$db['log']['pconnect'] = TRUE;
 	$db['default']['dbdriver'] = 'mysql';
 	$db['default']['pconnect'] = TRUE;
 	$db['default_sel']['dbdriver'] = 'mysql';
@@ -138,6 +142,8 @@ else if ( ENVIRONMENT == 'development' )
 
 	$db['login']['dbdriver'] = 'mysqli';
 	$db['login']['pconnect'] = TRUE;
+	$db['log']['dbdriver'] = 'mysqli';
+	$db['log']['pconnect'] = TRUE;
 	$db['default']['dbdriver'] = 'mysqli';
 	$db['default']['pconnect'] = FALSE;
 	$db['default_sel']['dbdriver'] = 'mysqli';

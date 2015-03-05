@@ -35,14 +35,17 @@ if (
 )
 {
 	define('ENVIRONMENT', 'production');
+	define('SERVERGROUP', '1');
 }
 else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
 {
 	define('ENVIRONMENT', 'staging');
+	define('SERVERGROUP', '');
 }
 else
 {
 	define('ENVIRONMENT', 'development');
+	define('SERVERGROUP', '');
 }
 
 

@@ -1,0 +1,33 @@
+@charset "utf-8";
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary, time, mark, audio, video { margin:0; padding:0;  border:0; outline:0;vertical-align:baseline; background:transparent;}/*font-size:100%*/
+body { line-height:1.2;font-family:'돋움',Dotum,'굴림',Gulim,Tahoma, Geneva, sans-serif,verdana;font-size:12px;-webkit-text-size-adjust: none; }/**/
+article,aside,details,figcaption,figure, footer,header,hgroup,menu,nav,section {display:block;} /* delete vertical-align */
+body,html{width:100%;background:#fff; color:#333; height:100%;min-height:100%;}
+ol,ul,li{list-style:none;}
+blockquote,q{quotes:none;}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none;}
+table{border-collapse:collapse;border-spacing:0;table-layout:fixed;}
+dt{display:block;}
+a{cursor:pointer; text-decoration:none; color:#333;}
+a:hover{color:#666;text-decoration:underline;}
+hr{display:none;}
+input, select, img {vertical-align:middle;}
+input, select, textarea {font-family:'돋움',Dotum,'굴림',Gulim,Tahoma, Geneva, sans-serif,verdana;}
+caption, legend {visibility:hidden;width:0;height:0;line-height:0;font-size:0;overflow:hidden;}
+button {cursor:pointer; }
+
+.popWrap { width:100%; font-family:Arial,'돋움'; font-size:12px; }
+.popWrap .header { position:relative; background:#999; height:30px; border-bottom:1px solid #666}
+.popWrap .header h1 { font-size:16px; padding:5px 10px; text-align:center; color:#fff}
+.popWrap .header .winClose { position:absolute; top:0; right:0; font-size:16px; padding:6px; border-left:1px solid #666; text-decoration:none; font-weight:bold; color:#fff}
+.popWrap .contents {}
+.popWrap .contents h2 { font-size:14px; font-weight:normal;  background:#e3e3e3; padding:2px 0 1px 7px; border-bottom:1px solid #ccc}
+.popWrap .contents img { background:#333}
+.popWrap .contents .txtBox { width:100%;}
+.popWrap .contents .txtBox li { padding:5px 5px 5px 15px; border-bottom:1px solid #ccc; min-height:10px;}
+.popWrap .contents .imgBox { width:100%}
+.popWrap .contents .imgBox li { padding:5px; border-bottom:1px solid #ccc}
+.popWrap .footer { width:100%; overflow:hidden; background:#efefef; padding:5px 0}
+.popWrap .footer .closeToday { float:left; display:inline-block; margin-left:7px}
+.popWrap .footer span { vertical-align:middle}
+.popWrap .footer .closeBtn{ float:right; margin-right:7px; padding:1px 4px ; font-family:Arial,'돋움'; font-size:12px; border-radius:3px; border:1px solid #333; background:#fff}

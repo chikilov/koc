@@ -1,0 +1,59 @@
+@charset "utf-8";
+@import "reset.css";
+@import "admin_module.css";
+
+/* layout */
+body { width:100%; min-width:1200px; height:auto; min-height:890px; max-width:100%; background:url('../images/bg_lnb.gif') repeat-y;}
+#wrap { width:100%; height:100%; overflow:auto;}
+#lnb { width:190px; min-height:auto; min-height:500px; position:absolute; left:0;}
+#contents { min-height:500px; padding-left:210px; padding-right:30px;  margin-bottom:20px;}
+#contents .section {position:relative; }
+#contents .con { margin-top:20px;}
+.section { width:100%; background:#fff;}
+
+h1 {}
+/* lnb */
+#lnb { }
+#lnb ul { width:90%; overflow:hidden; font-size:12px; font-weight:bold}
+#lnb ul:first-child { margin-top:10px}
+#lnb ul li { background:#3d82ab; margin-bottom:10px; padding:3px 0; border-radius:0 4px 4px 0;}
+#lnb ul li a { display:block; padding:7px 0 7px 10px; color:#fff; text-decoration:none; border-bottom:1px solid #4f4f4f}
+#lnb ul li.on,#lnb ul li.on a { background:#efefef; color:#000; border-color:#fff}
+#lnb ul li.on ul { border-color:#d5d4d4}
+#lnb ul li ul { width:100%; padding:5px 0; margin-bottom:0; border-top:1px solid #599bb3; font-size:12px; font-weight:normal}
+#lnb ul li ul li { padding:0; margin-bottom:0; border:0; border-radius:0}
+#lnb ul li ul li a { border-bottom:0; padding:3px 0 3px 10px;}
+#lnb ul li ul li a:before{ content:"- "}
+#lnb .itemOne a{ border-bottom:0;}
+#lnb ul li ul li.on a { font-weight:bold; text-decoration:underline; border-color:#fff}
+
+/* sub nav */
+.subNav { width:100%; overflow:hidden; margin:30px 0 10px 0;}
+.subNav li { float:left; min-width:80px; padding:6px 7px 5px 7px; margin-bottom:5px; border:1px solid #000; border-right:0; text-align:center;}
+.subNav li:last-child { border-right:1px solid #000;}
+.subNav li:hover { background:#e8e8e8}
+.subNav li a { display:block;}
+.subNav li a:hover { text-decoration:none}
+.subNav li.on { font-weight:bold;  background:#333;}
+.subNav li.on a { color:#fff;}
+
+/* login */
+.loginCon { position:relative; width:100%;}
+.loginArea { position:absolute; top:100px; left:50%; margin-left:-300px; background:#e8e8e8; width:500px; height:220px; border:1px solid #ddd; }
+.loginArea .container .fLBox { width:35%; height:220px; background:url('../images/img_login.png') no-repeat center;}
+.loginArea .container .fRBox { width:60%; margin:10px;}
+.loginArea table { width:95%; margin-bottom:10px; margin-top:20px;}
+.loginArea table th { text-align:left; vertical-align:middle;  height:25px; padding-top:3px;}
+.loginArea table td { height:23px; padding:2px 0;}
+.loginArea p { width:95%; padding-bottom:10px; border-bottom:1px solid #ccc;}
+.loginArea .joinBtn { margin-left:15px; font-weight:bold; text-decoration:underline;}
+
+/* main */
+.mainCon { width:100%;}
+.mainView { width:750px; overflow:hidden; border-bottom:2px solid #2e4664; text-align:center; margin:0 auto;}
+.mainView table { width:100%; border-left:1px solid #3299bb; }
+.mainView table th { background:#3299bb; color:#fff; height:25px; padding:8px 0 7px 0; vertical-align:middle; border-right:1px solid #fff; border-bottom:2px solid #2e4664}
+.mainView table th:last-child { border-right:1px solid #3299bb;}
+.mainView table td { border-bottom:1px solid #3299bb; border-right:1px solid #3299bb; height:25px;  padding:8px 0 7px 0; padding-left:10px;  vertical-align:middle;}
+.mainView table td a { font-weight:bold; text-decoration:underline; color:#3d3d3d}
+.mainView table tr:last-child td { border-bottom:0}

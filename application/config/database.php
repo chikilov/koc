@@ -48,12 +48,17 @@
 $active_group = '';
 $active_record = TRUE;
 
-if ( ENVIRONMENT == 'production' )
+if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 {
 	//login single
 	$db['login']['hostname'] = '172.19.172.69';
 	$db['login']['username'] = 'webuser';
 	$db['login']['password'] = 'dudrud0612@';
+	//log single
+	$db['login']['hostname'] = '172.18.55.239';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612@';
+
 	$db['default']['hostname'] = '172.18.45.247';
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud0612@';
@@ -75,6 +80,38 @@ if ( ENVIRONMENT == 'production' )
 	$db['default_ins']['dbdriver'] = 'mysql';
 	$db['default_ins']['pconnect'] = TRUE;
 }
+else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
+{
+	//login single
+	$db['login']['hostname'] = '172.19.172.69';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612@';
+	//log single
+	$db['login']['hostname'] = '172.18.55.239';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612@';
+
+	$db['default']['hostname'] = '172.18.47.229';
+	$db['default']['username'] = 'webuser';
+	$db['default']['password'] = 'dudrud0612@';
+	//replication slave
+	$db['default_sel']['hostname'] = '172.18.56.250';
+	$db['default_sel']['username'] = 'webuser';
+	$db['default_sel']['password'] = 'dudrud0612@';
+	//replication master
+	$db['default_ins']['hostname'] = '172.18.45.122';
+	$db['default_ins']['username'] = 'webuser';
+	$db['default_ins']['password'] = 'dudrud0612@';
+
+	$db['login']['dbdriver'] = 'mysql';
+	$db['login']['pconnect'] = TRUE;
+	$db['default']['dbdriver'] = 'mysql';
+	$db['default']['pconnect'] = TRUE;
+	$db['default_sel']['dbdriver'] = 'mysql';
+	$db['default_sel']['pconnect'] = TRUE;
+	$db['default_ins']['dbdriver'] = 'mysql';
+	$db['default_ins']['pconnect'] = TRUE;
+}
 else if ( ENVIRONMENT == 'development' )
 {
 	// getsebool -a |grep httpd 외부에서 데이터베이스 접근하도록 설정되어있는 지 확인
@@ -82,6 +119,11 @@ else if ( ENVIRONMENT == 'development' )
 	$db['login']['hostname'] = '101.79.109.239';
 	$db['login']['username'] = 'root';
 	$db['login']['password'] = 'dudrud';
+	//log single
+	$db['login']['hostname'] = '101.79.109.239';
+	$db['login']['username'] = 'root';
+	$db['login']['password'] = 'dudrud';
+
 	$db['default']['hostname'] = '101.79.109.239';
 	$db['default']['username'] = 'root';
 	$db['default']['password'] = 'dudrud';
@@ -131,6 +173,12 @@ $db['login']['cache_on'] = FALSE;
 $db['login']['cachedir'] = '';
 $db['login']['char_set'] = 'utf8';
 $db['login']['dbcollat'] = 'utf8_general_ci';
+$db['log']['dbprefix'] = '';
+$db['log']['db_debug'] = FALSE;
+$db['log']['cache_on'] = FALSE;
+$db['log']['cachedir'] = '';
+$db['log']['char_set'] = 'utf8';
+$db['log']['dbcollat'] = 'utf8_general_ci';
 $db['default']['dbprefix'] = '';
 $db['default']['db_debug'] = FALSE;
 $db['default']['cache_on'] = FALSE;
@@ -153,6 +201,10 @@ $db['default_ins']['dbcollat'] = 'utf8_general_ci';
 //20150224 loginserver add
 $db['koc_play_login'] = $db['login'];
 $db['koc_play_login']['database'] = 'koc_account';
+
+//20150224 loginserver add
+$db['koc_play_log'] = $db['log'];
+$db['koc_play_log']['database'] = 'koc_play';
 
 //20141210rep	$db['koc_mail'] = $db['default'];
 $db['koc_mail_sel'] = $db['default_sel'];

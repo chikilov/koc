@@ -376,8 +376,8 @@ EOF;
 	const MAX_DEL_FRIEND					= 10;	// 일일 친구삭제 수
 	const MAX_UPGRADE						= 5;	// 기본 최대 강화수치
 	const MAX_LEVEL							= 30;	// 기본 최대 강화수치
-	const MAX_INC_LIMIT_CHAR				= 100;	// 최대 캐릭터 슬롯
-	const MAX_INC_LIMIT_ITEM				= 100;	// 최대 아이템 슬롯
+	const MAX_INC_LIMIT_CHAR				= 50;	// 최대 캐릭터 증가 슬롯
+	const MAX_INC_LIMIT_ITEM				= 40;	// 최대 아이템 증가 슬롯
 
 	const MAX_ENERGY_POINTS					= 10;	// 기본 행성전 에너지
 	const MAX_MODES_PVB						= 10;	// 기본 PVB 에너지
@@ -490,6 +490,8 @@ EOF;
 
 	//const for event
 	const UPGRADE_DIS_EVENT_PRODUCT			= "upgrade";
+	//첫구매 이벤트 진행 여부 true or false
+	const VALID_FIRST_BUY_EVENT				= false;
 
 	//const for achieve
 	const ACHIEVE_REPEATE_FOR_DAILY			= "DAILY";
@@ -544,7 +546,7 @@ EOF;
 		{
 			if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
 			{
-				if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+				if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 				{
 					$_POST["data"] = $_POST["data"];
 				}
@@ -557,7 +559,7 @@ EOF;
 			{
 				if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 				{
-					if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+					if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 					{
 						$_POST["data"] = $_POST["data"];
 					}
@@ -666,18 +668,9 @@ EOF;
 					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
 
-/*
-					if ( $_SERVER["REMOTE_ADDR"] == "101.79.109.238" || $_SERVER["REMOTE_ADDR"] == "101.79.109.221" )
-					{
-						$strrrr = $this->rsa_encrypt_array( $strReturn );
-						echo $strrrr;
-						echo "<br /><br /><br /><br /><br /><br /><br />";
-						echo $this->rsa_decrypt_array($strrrr);
-						return false;
-*/
 					if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
 					{
-						if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+						if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 						{
 							$_POST["data"] = $_POST["data"];
 						}
@@ -690,7 +683,7 @@ EOF;
 					{
 						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 							{
 								$strReturn = $strReturn;
 							}
@@ -704,16 +697,6 @@ EOF;
 							$strReturn = $this->enc( $strReturn );
 						}
 					}
-/*
-						echo $strrrr;
-						echo "<br /><br /><br /><br />";
-						echo $this->dec($strrrr, null);
-					}
-					else
-					{
-						$strReturn = $this->enc( $strReturn );
-					}
-*/
 				break;
 
 				case 'staging':
@@ -839,7 +822,8 @@ EOF;
         {
             $called_name = $_SERVER['REQUEST_URI'];
         }
-     	$this->dbPlay->requestLog( $pid, $called_name, $logcontent );
+		$this->load->model("api/Model_Log", "dbLog");
+     	$this->dbLog->requestLog( $pid, $called_name, $logcontent );
     }
 
 	function verifyPackage( $package )
@@ -1230,14 +1214,17 @@ EOF;
 							}
 						}
 					}
-					//첫구매 2월 28일까지
+					//첫구매
 					if ( array_key_exists( "category", $arrayProduct ) )
 					{
 						if ( $arrayProduct["category"] == "CASH" )
 						{
-							if ( $this->dbPlay->requestFirstBuyCheck( $sid )->result_array()[0]["is_first"] && date("Ymd") < "20150301" )
+							if ( MY_Controller::VALID_FIRST_BUY_EVENT )
 							{
-								$this->dbMail->sendMail( $sid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct["attach_value"], false );
+								if ( $this->dbPlay->requestFirstBuyCheck( $sid )->result_array()[0]["is_first"] )
+								{
+									$this->dbMail->sendMail( $sid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct["attach_value"], false );
+								}
 							}
 						}
 					}

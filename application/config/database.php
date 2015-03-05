@@ -51,9 +51,9 @@ $active_record = TRUE;
 if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 {
 	//login single
-	$db['login']['hostname'] = '172.19.172.69';
-	$db['login']['username'] = 'webuser';
-	$db['login']['password'] = 'dudrud0612@';
+	$db['log']['hostname'] = '172.19.172.69';
+	$db['log']['username'] = 'webuser';
+	$db['log']['password'] = 'dudrud0612@';
 	//log single
 	$db['login']['hostname'] = '172.18.55.239';
 	$db['login']['username'] = 'webuser';
@@ -87,9 +87,9 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
 	$db['login']['username'] = 'webuser';
 	$db['login']['password'] = 'dudrud0612@';
 	//log single
-	$db['login']['hostname'] = '172.18.55.239';
-	$db['login']['username'] = 'webuser';
-	$db['login']['password'] = 'dudrud0612@';
+	$db['log']['hostname'] = '172.18.55.239';
+	$db['log']['username'] = 'webuser';
+	$db['log']['password'] = 'dudrud0612@';
 
 	$db['default']['hostname'] = '172.18.47.229';
 	$db['default']['username'] = 'webuser';
@@ -120,9 +120,9 @@ else if ( ENVIRONMENT == 'development' )
 	$db['login']['username'] = 'root';
 	$db['login']['password'] = 'dudrud';
 	//log single
-	$db['login']['hostname'] = '101.79.109.239';
-	$db['login']['username'] = 'root';
-	$db['login']['password'] = 'dudrud';
+	$db['log']['hostname'] = '101.79.109.239';
+	$db['log']['username'] = 'root';
+	$db['log']['password'] = 'dudrud';
 
 	$db['default']['hostname'] = '101.79.109.239';
 	$db['default']['username'] = 'root';

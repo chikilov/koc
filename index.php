@@ -65,6 +65,13 @@ else if (
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '2');
 }
+else if (
+	$_SERVER['HTTP_HOST'] == 'm.koclogin.tntgame.co.kr'
+)
+{
+	define('ENVIRONMENT', 'production');
+	define('SERVERGROUP', '2');
+}
 else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
 {
 	define('ENVIRONMENT', 'staging');

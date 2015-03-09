@@ -6,6 +6,9 @@ class MY_Model extends CI_Model {
 		parent::__construct();
 		if ( ENVIRONMENT == 'production' )
 		{
+			error_reporting(E_ALL);
+			ini_set('display_errors', TRUE);
+			ini_set('display_startup_errors', TRUE);
 		}
 		else if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'staging' )
 		{

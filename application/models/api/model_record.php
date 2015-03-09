@@ -111,10 +111,38 @@ class Model_Record extends MY_Model {
 		$query .= "basic_reward_type = '".$basic_reward_type."', ";
 		$query .= "basic_reward_value = '".$basic_reward_value."', ";
 		$query .= "random_reward_id = '".$random_reward_id."', ";
-		$query .= "random_reward_pattern = '".$random_reward_pattern."', ";
-		$query .= "random_reward_seq = '".$random_reward_seq."', ";
-		$query .= "random_reward_type = '".$random_reward_type."', ";
-		$query .= "random_reward_value = '".$random_reward_value."', ";
+		if ( $random_reward_pattern == "" || $random_reward_pattern == null )
+		{
+			$query .= "random_reward_pattern = null, ";
+		}
+		else
+		{
+			$query .= "random_reward_pattern = '".$random_reward_pattern."', ";
+		}
+		if ( $random_reward_seq == "" || $random_reward_seq == null )
+		{
+			$query .= "random_reward_seq = null, ";
+		}
+		else
+		{
+			$query .= "random_reward_seq = '".$random_reward_seq."', ";
+		}
+		if ( $random_reward_type == "" || $random_reward_type == null )
+		{
+			$query .= "random_reward_type = null, ";
+		}
+		else
+		{
+			$query .= "random_reward_type = '".$random_reward_type."', ";
+		}
+		if ( $random_reward_value == "" || $random_reward_value == null )
+		{
+			$query .= "random_reward_value = null, ";
+		}
+		else
+		{
+			$query .= "random_reward_value = '".$random_reward_value."', ";
+		}
 		if ( $random_reward_idx )
 		{
 			$query .= "random_reward_idx = '".$random_reward_idx."', ";

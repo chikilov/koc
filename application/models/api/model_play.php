@@ -154,7 +154,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPVPEquipment( $pid )
 	{
-		$query = "select concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, c.refid as op, d.refid as pilot_0, e.refid as pilot_1, f.refid as pilot_2 ";
+		$query = "select if(a.affiliate_name is null or a.affiliate_name = '', a.name, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')')) as name, ";
+		$query .= "c.refid as op, d.refid as pilot_0, e.refid as pilot_1, f.refid as pilot_2 ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as c on a.operator = c.idx ";
@@ -1266,7 +1267,8 @@ class Model_Play extends MY_Model {
 	public function requestRecomFriendList( $pid, $searchVal )
 	{
 		$query = "select f.pid, f.name, if(f.show_prof, f.prof_img, '') as prof_img, f.refid, f.inc_fri, f.friendCount from ( ";
-		$query .= "select a.pid, a.show_prof, a.prof_img, concat(a.name, '(', ifnull(a.affiliate_name, '-'), ')') as name, d.refid, a.inc_fri, count(e.fid) as friendCount ";
+		$query .= "select a.pid, a.show_prof, a.prof_img, if(a.affiliate_name is null or a.affiliate_name = '', a.name, concat(a.name, '(', a.affiliate_name, ')')) as name, ";
+		$query .= "d.refid, a.inc_fri, count(e.fid) as friendCount ";
 		$query .= "from koc_play.player_basic as a left outer join ( ";
 		$query .= "select fid from koc_play.player_friend where pid = '".$pid."' and friend_status < 2 ) as b on a.pid = b.fid ";
 		$query .= "left outer join koc_play.player_team as c on a.pid = c.pid and c.team_seq = 0 ";
@@ -1289,7 +1291,8 @@ class Model_Play extends MY_Model {
 	{
 		if ( $status == 1 )
 		{
-			$query = "select a.fid, concat(a.fname, '(', a.faffiliate_name, ')') as fname, a.fprof_img, a.login_datetime, ";
+			$query = "select a.fid, if(a.faffiliate_name is null or a.faffiliate_name = '', a.fname, concat(a.fname, '(', a.faffiliate_name, ')')) as fname, ";
+			$query .= "a.fprof_img, a.login_datetime, ";
 			$query .= "ifnull(a.last_present_time, '1900-01-01 00:00:00') as last_present_time, c.refid ";
 			$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a ";
 			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.fid = b.pid and b.team_seq = 0 ";
@@ -1298,7 +1301,8 @@ class Model_Play extends MY_Model {
 		}
 		else
 		{
-			$query = "select a.pid as fid, concat(b.name, '(', b.affiliate_name, ')') as fname, a.fprof_img, b.login_datetime, ";
+			$query = "select a.pid as fid, if(b.affiliate_name is null or b.affiliate_name = '', b.name, concat(b.name, '(', b.affiliate_name, ')')) as fname, ";
+			$query .= "b.prof_img as fprof_img, b.login_datetime, ";
 			$query .= "ifnull(last_present_time, '1900-01-01 00:00:00') as last_present_time, d.refid ";
 			$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
 			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";

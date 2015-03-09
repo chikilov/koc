@@ -26,42 +26,34 @@ class Con_CouponView extends MY_Controller {
 		{
 			$coupon_id = $_POST["coupon_id"];
 			$pid = $_POST["pid"];
-			if ( $coupon_id == "" || $coupon_id == null )
+			$couponInfo = $this->dbAdmin->couponVerify( $coupon_id, $pid )->result_array();
+			// 쿠폰 정보가 올바르지 않은 경우
+			if ( empty( $couponInfo ) )
 			{
-				$coupon_id = "";
 				$result = "NONE";
 			}
 			else
 			{
-				$couponInfo = $this->dbAdmin->couponVerify( $coupon_id, $pid )->result_array();
-				// 쿠폰 정보가 올바르지 않은 경우
-				if ( empty( $couponInfo ) )
+				// 이미 사용된 쿠폰인 경우
+				if ( $couponInfo[0]["coupon_user_id"] > 0 )
 				{
-					$result = "NONE";
+					$result = "DUPLICATE";
 				}
 				else
 				{
-					// 이미 사용된 쿠폰인 경우
-					if ( $couponInfo[0]["coupon_user_id"] > 0 )
+					//해당 그룹내 쿠폰 이미 사용일 경우
+					if ( $couponInfo[0]["result"] == "DUPLICATE" )
 					{
 						$result = "DUPLICATE";
 					}
 					else
 					{
-						//해당 그룹내 쿠폰 이미 사용일 경우
-						if ( $couponInfo[0]["result"] == "DUPLICATE" )
+						foreach( $couponInfo as $row )
 						{
-							$result = "DUPLICATE";
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::COUPON_SEND_TITLE, $row["reward_type"], $row["reward_value"], MY_Controller::NORMAL_EXPIRE_TERM );
 						}
-						else
-						{
-							foreach( $couponInfo as $row )
-							{
-								$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::COUPON_SEND_TITLE, $row["reward_type"], $row["reward_value"], MY_Controller::NORMAL_EXPIRE_TERM );
-							}
-							$this->dbAdmin->requestCouponStatusUpdate( $pid, $couponInfo[0]["group_id"], $couponInfo[0]["coupon_type"], $coupon_id );
-							$result = "SUCCESS";
-						}
+						$this->dbAdmin->requestCouponStatusUpdate( $pid, $couponInfo[0]["group_id"], $couponInfo[0]["coupon_type"], $coupon_id );
+						$result = "SUCCESS";
 					}
 				}
 			}

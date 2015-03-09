@@ -50,12 +50,12 @@ $active_record = TRUE;
 
 if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 {
-	//login single
-	$db['log']['hostname'] = '172.19.172.69';
+	//log single
+	$db['log']['hostname'] = '172.18.55.239';
 	$db['log']['username'] = 'webuser';
 	$db['log']['password'] = 'dudrud0612@';
-	//log single
-	$db['login']['hostname'] = '172.18.55.239';
+	//login single
+	$db['login']['hostname'] = '172.19.172.69';
 	$db['login']['username'] = 'webuser';
 	$db['login']['password'] = 'dudrud0612@';
 
@@ -84,24 +84,24 @@ if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 }
 else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
 {
-	//login single
-	$db['login']['hostname'] = '172.19.172.69';
-	$db['login']['username'] = 'webuser';
-	$db['login']['password'] = 'dudrud0612@';
 	//log single
 	$db['log']['hostname'] = '172.18.55.239';
 	$db['log']['username'] = 'webuser';
 	$db['log']['password'] = 'dudrud0612@';
+	//login single
+	$db['login']['hostname'] = '172.19.172.69';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612@';
 
 	$db['default']['hostname'] = '172.18.47.229';
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud0612@';
 	//replication slave
-	$db['default_sel']['hostname'] = '172.18.56.250';
+	$db['default_sel']['hostname'] = '172.18.45.122';
 	$db['default_sel']['username'] = 'webuser';
 	$db['default_sel']['password'] = 'dudrud0612@';
 	//replication master
-	$db['default_ins']['hostname'] = '172.18.45.122';
+	$db['default_ins']['hostname'] = '172.18.47.229';
 	$db['default_ins']['username'] = 'webuser';
 	$db['default_ins']['password'] = 'dudrud0612@';
 
@@ -174,31 +174,31 @@ else if ( ENVIRONMENT == 'staging' )
 	$db['default_ins']['pconnect'] = TRUE;
 }
 $db['login']['dbprefix'] = '';
-$db['login']['db_debug'] = FALSE;
+$db['login']['db_debug'] = TRUE;
 $db['login']['cache_on'] = FALSE;
 $db['login']['cachedir'] = '';
 $db['login']['char_set'] = 'utf8';
 $db['login']['dbcollat'] = 'utf8_general_ci';
 $db['log']['dbprefix'] = '';
-$db['log']['db_debug'] = FALSE;
+$db['log']['db_debug'] = TRUE;
 $db['log']['cache_on'] = FALSE;
 $db['log']['cachedir'] = '';
 $db['log']['char_set'] = 'utf8';
 $db['log']['dbcollat'] = 'utf8_general_ci';
 $db['default']['dbprefix'] = '';
-$db['default']['db_debug'] = FALSE;
+$db['default']['db_debug'] = TRUE;
 $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = '';
 $db['default']['char_set'] = 'utf8';
 $db['default']['dbcollat'] = 'utf8_general_ci';
 $db['default_sel']['dbprefix'] = '';
-$db['default_sel']['db_debug'] = FALSE;
+$db['default_sel']['db_debug'] = TRUE;
 $db['default_sel']['cache_on'] = FALSE;
 $db['default_sel']['cachedir'] = '';
 $db['default_sel']['char_set'] = 'utf8';
 $db['default_sel']['dbcollat'] = 'utf8_general_ci';
 $db['default_ins']['dbprefix'] = '';
-$db['default_ins']['db_debug'] = FALSE;
+$db['default_ins']['db_debug'] = TRUE;
 $db['default_ins']['cache_on'] = FALSE;
 $db['default_ins']['cachedir'] = '';
 $db['default_ins']['char_set'] = 'utf8';

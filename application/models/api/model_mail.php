@@ -4,7 +4,6 @@ class Model_Mail extends MY_Model {
 	public function __construct()
 	{
 		parent::__construct();
-//20141210rep	$this->DB_API = $this->load->database("koc_mail", TRUE);
 		$this->DB_SEL = $this->load->database("koc_mail_sel", TRUE);
 		$this->DB_INS = $this->load->database("koc_mail_ins", TRUE);
 
@@ -15,11 +14,9 @@ class Model_Mail extends MY_Model {
 		 * 각각의 그룹은 독립적으로 실행되기때문에 각 그룹내에서만 성공여부에따라서 커밋,롤백 하게 됩니다.
 		 * 즉 그룹간에는 서로 영향이 없습니다.
 		 */
-//20141210rep	$this->DB_API->trans_strict(FALSE);
 		$this->DB_SEL->trans_strict(FALSE);
 		$this->DB_INS->trans_strict(FALSE);
 
-//20141210rep	$this->DB_API->query("SET NAMES utf8");
 		$this->DB_SEL->query("SET NAMES utf8");
 		$this->DB_INS->query("SET NAMES utf8");
 	}
@@ -36,7 +33,6 @@ class Model_Mail extends MY_Model {
 	 */
 	public function onStartTransaction()
 	{
-//20141210rep	$this->DB_API->trans_start();
 		$this->DB_INS->trans_start();
 	}
 
@@ -46,7 +42,6 @@ class Model_Mail extends MY_Model {
 	*/
 	public function onCompleteTransaction()
     {
-//20141210rep	$this->DB_API->trans_complete();
 		$this->DB_INS->trans_complete();
     }
 
@@ -56,7 +51,6 @@ class Model_Mail extends MY_Model {
 	*/
 	public function onBeginTransaction()
 	{
-//20141210rep	$this->DB_API->trans_begin();
 		$this->DB_INS->trans_begin();
 	}
 
@@ -65,7 +59,6 @@ class Model_Mail extends MY_Model {
 	*/
 	public function onRollbackTransaction()
 	{
-//20141210rep	$this->DB_API->trans_rollback();
 		$this->DB_INS->trans_rollback();
 	}
 
@@ -74,14 +67,6 @@ class Model_Mail extends MY_Model {
 	*/
 	public function onEndTransaction( $result )
 	{
-//20141210rep	if ($this->DB_API->trans_status() === FALSE || $result === FALSE)
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_rollback();
-//20141210rep	}
-//20141210rep	else
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_commit();
-//20141210rep	}
 		if ($this->DB_INS->trans_status() === FALSE || $result === FALSE)
 		{
 		    $this->DB_INS->trans_rollback();
@@ -162,14 +147,7 @@ class Model_Mail extends MY_Model {
 	public function sendMail( $pid, $sid, $title, $type, $value, $expire_term )
 	{
 		$query = "insert into koc_mail.".MY_Controller::TBL_MAIL." ( pid, sid, title, attach_type, attach_value, is_receive, send_date, receive_date, expire_date ) values ( ";
-		$query .= "'".$pid."', ";
-		$query .= "'".$sid."', ";
-		$query .= "'".$title."', ";
-		$query .= "'".$type."', ";
-		$query .= "'".$value."', ";
-		$query .= "0, ";
-		$query .= "now(), ";
-		$query .= "null, ";
+		$query .= "'".$pid."', '".$sid."', '".$title."', '".$type."', '".$value."', 0, now(), null, ";
 		if ( $expire_term )
 		{
 			$query .= "date_add(now(), interval '".$expire_term."' hour) ";

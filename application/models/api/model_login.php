@@ -126,24 +126,6 @@ class Model_Login extends MY_Model {
 		return $this->DB_LOGIN->query($query);
 	}
 
-	public function getLastPackage( $pid )
-	{
-		$query = "select package from koc_account.".MY_Controller::TBL_PACKAGE_LOG." where pid = '".$pid."' order by logging_datetime desc limit 1";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		return $this->DB_LOGIN->query($query);
-	}
-
-	public function insertPackage( $pid, $package )
-	{
-		$query = "insert into koc_account.".MY_Controller::TBL_PACKAGE_LOG." ( pid, package, logging_datetime ) values (";
-		$query .= "'".$pid."', '".$package."', sysdate())";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_LOGIN->query($query);
-		return $this->DB_LOGIN->affected_rows();
-	}
-
 	public function requestDupMacaddr( $macaddr )
 	{
 		$query = "select pid, name, limit_type, limit_start, limit_end, 0 as helpcount ";

@@ -4,7 +4,6 @@ class Model_Rank extends MY_Model {
 	public function __construct()
 	{
 		parent::__construct();
-//20141210rep	$this->DB_API = $this->load->database("koc_rank", TRUE);
 		$this->DB_SEL = $this->load->database("koc_rank_sel", TRUE);
 		$this->DB_INS = $this->load->database("koc_rank_ins", TRUE);
 
@@ -15,11 +14,9 @@ class Model_Rank extends MY_Model {
 		 * 각각의 그룹은 독립적으로 실행되기때문에 각 그룹내에서만 성공여부에따라서 커밋,롤백 하게 됩니다.
 		 * 즉 그룹간에는 서로 영향이 없습니다.
 		 */
-//20141210rep	$this->DB_API->trans_strict(FALSE);
 		$this->DB_SEL->trans_strict(FALSE);
 		$this->DB_INS->trans_strict(FALSE);
 
-//20141210rep	$this->DB_API->query("SET NAMES utf8");
 		$this->DB_SEL->query("SET NAMES utf8");
 		$this->DB_INS->query("SET NAMES utf8");
 	}
@@ -36,7 +33,6 @@ class Model_Rank extends MY_Model {
 	 */
 	public function onStartTransaction()
 	{
-//20141210rep	$this->DB_API->trans_start();
 		$this->DB_INS->trans_start();
 	}
 
@@ -46,7 +42,6 @@ class Model_Rank extends MY_Model {
 	*/
 	public function onCompleteTransaction()
 	{
-//20141210rep	$this->DB_API->trans_complete();
 		$this->DB_INS->trans_complete();
 	}
 
@@ -56,7 +51,6 @@ class Model_Rank extends MY_Model {
 	*/
 	public function onBeginTransaction()
 	{
-//20141210rep	$this->DB_API->trans_begin();
 		$this->DB_INS->trans_begin();
 	}
 
@@ -65,7 +59,6 @@ class Model_Rank extends MY_Model {
 	*/
 	public function onRollbackTransaction()
 	{
-//20141210rep	$this->DB_API->trans_rollback();
 		$this->DB_INS->trans_rollback();
 	}
 
@@ -74,14 +67,6 @@ class Model_Rank extends MY_Model {
 	*/
 	public function onEndTransaction( $result )
 	{
-//20141210rep	if ($this->DB_API->trans_status() === FALSE || $result === FALSE)
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_rollback();
-//20141210rep	}
-//20141210rep	else
-//20141210rep	{
-//20141210rep	$this->DB_API->trans_commit();
-//20141210rep	}
 		if ($this->DB_INS->trans_status() === FALSE || $result === FALSE)
 		{
 		    $this->DB_INS->trans_rollback();
@@ -637,35 +622,6 @@ class Model_Rank extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-/*
-	public function requestInitPVPRankStore( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." ( pid, weekseq, name, score, rank_datetime ) ";
-		$query .= "select '".$pid."', ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ), name, 1000, now() from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ";
-	}
-	public function requestInitPVPRank( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." () values () ";
-	}
-	public function requestInitPVBRankStore( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." () values () ";
-	}
-	public function requestInitPVBRank( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." () values () ";
-	}
-	public function requestInitSURVIVALRankStore( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." () values () ";
-	}
-	public function requestInitSURVIVALRank( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVPSTORE." () values () ";
-	}
-*/
-	//테스트용
 	public function resetPlayerPVE( $pid )
 	{
 		$query = "delete from koc_rank.".MY_Controller::TBL_PVE." where pid = '".$pid."'";
@@ -701,18 +657,5 @@ class Model_Rank extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-/*
-	public function insertPVP( $pid )
-	{
-		$query = "insert into ".MY_Controller::TBL_PVP." select '".$pid."', case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end, (select name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."'), ";
-		$query .= "(select max(rank) + 1 from ".MY_Controller::TBL_PVP." where weekseq = case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end), 1000, now() from dual ";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_API->query($query);
-		return $this->DB_API->affected_rows();
-	}
-*/
 }
 ?>

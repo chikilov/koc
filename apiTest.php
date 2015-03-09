@@ -1,5 +1,5 @@
 <?
-	$strurl = "/koc/index.php/request/api/requestLogin/";
+	$strurl = "/koc10100/index.php/request/api/requestLogin/";
 //print_r(mb_substr($strurl, -13, 12));
 print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
 ?>
@@ -79,10 +79,10 @@ print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
 		var actiondisp = document.getElementById("ActionURL");
 		var dataSam = document.getElementById("dataSample");
 
-		actiondisp.innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc/index.php/request/api/" + frmTest.apitype.value + "/";
+		actiondisp.innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
 		dataSam.innerText = arrSampleData[frmTest.apitype.selectedIndex];
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
-		frmTest.action = "/koc/index.php/request/api/" + frmTest.apitype.value + "/";
+		frmTest.action = "/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
 	}
 
 	function sendact() {
@@ -100,9 +100,9 @@ print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
 
 	window.onload = function () {
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
-		frmTest.action = "/koc/index.php/request/api/" + frmTest.apitype.value + "/";
+		frmTest.action = "/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
 		document.getElementById("dataSample").innerText = arrSampleData[frmTest.apitype.selectedIndex];
-		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc/index.php/request/api/" + frmTest.apitype.value + "/";
+		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
 
 	}
 </script>

@@ -1,7 +1,7 @@
 <?php
 class MY_Controller extends CI_Controller {
 	//const for version
-	const VERSION_FOR_ANDROID = "10000";
+	const VERSION_FOR_ANDROID = "10100";
 
 	//const for updatefile
 	const DOWNLOAD_URL = "static/StreamingAssets/";
@@ -706,7 +706,7 @@ EOF;
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
 					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
 					{
-						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 						{
 							$strReturn = $strReturn;
 						}
@@ -719,7 +719,7 @@ EOF;
 					{
 						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) )
+							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 							{
 								$strReturn = $strReturn;
 							}
@@ -742,7 +742,7 @@ EOF;
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
 					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
 					{
-						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 						{
 							$strReturn = $strReturn;
 						}
@@ -755,7 +755,7 @@ EOF;
 					{
 						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) )
+							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 							{
 								$strReturn = $strReturn;
 							}

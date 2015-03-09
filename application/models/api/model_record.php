@@ -4,7 +4,6 @@ class Model_Record extends MY_Model {
 	public function __construct()
 	{
 		parent::__construct();
-//20141210rep	$this->DB_API = $this->load->database("koc_record", TRUE);
 		$this->DB_SEL = $this->load->database("koc_record_sel", TRUE);
 		$this->DB_INS = $this->load->database("koc_record_ins", TRUE);
 
@@ -15,11 +14,9 @@ class Model_Record extends MY_Model {
 		 * 각각의 그룹은 독립적으로 실행되기때문에 각 그룹내에서만 성공여부에따라서 커밋,롤백 하게 됩니다.
 		 * 즉 그룹간에는 서로 영향이 없습니다.
 		 */
-//20141210rep	$this->DB_API->trans_strict(FALSE);
 		$this->DB_SEL->trans_strict(FALSE);
 		$this->DB_INS->trans_strict(FALSE);
 
-//20141210rep	$this->DB_API->query("SET NAMES utf8");
 		$this->DB_SEL->query("SET NAMES utf8");
 		$this->DB_INS->query("SET NAMES utf8");
 	}
@@ -36,7 +33,6 @@ class Model_Record extends MY_Model {
 	 */
 	public function onStartTransaction()
 	{
-//20141210rep	$this->DB_API->trans_start();
 		$this->DB_INS->trans_start();
 	}
 
@@ -46,7 +42,6 @@ class Model_Record extends MY_Model {
 	*/
 	public function onCompleteTransaction()
     {
-//20141210rep	$this->DB_API->trans_complete();
 		$this->DB_INS->trans_complete();
     }
 
@@ -56,7 +51,6 @@ class Model_Record extends MY_Model {
 	*/
 	public function onBeginTransaction()
 	{
-//20141210rep	$this->DB_API->trans_begin();
 		$this->DB_INS->trans_begin();
 	}
 
@@ -65,7 +59,6 @@ class Model_Record extends MY_Model {
 	*/
 	public function onRollbackTransaction()
 	{
-//20141210rep	$this->DB_API->trans_rollback();
 		$this->DB_INS->trans_rollback();
 	}
 
@@ -74,14 +67,6 @@ class Model_Record extends MY_Model {
 	*/
 	public function onEndTransaction( $result )
 	{
-//20141210rep	if ($this->DB_API->trans_status() === FALSE || $result === FALSE)
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_rollback();
-//20141210rep	}
-//20141210rep	else
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_commit();
-//20141210rep	}
 		if ($this->DB_INS->trans_status() === FALSE || $result === FALSE)
 		{
 		    $this->DB_INS->trans_rollback();
@@ -94,9 +79,8 @@ class Model_Record extends MY_Model {
 
 	public function requestLoggingStartPVE( $pid, $stageid, $friendid, $instant_item1, $instant_item2, $instant_item3, $instant_item4 )
 	{
-		$query = "insert into koc_record.".MY_Controller::TBL_PVE." ( pid, stageid, friendid, instant_item1, instant_item2, instant_item3, instant_item4, start_datetime ) values ( ";
-		$query .= "'".$pid."', ";
-		$query .= "'".$stageid."', ";
+		$query = "insert into koc_record.".MY_Controller::TBL_PVE." ( pid, stageid, friendid, instant_item1, instant_item2, instant_item3, instant_item4, start_datetime ) ";
+		$query .= "values ( '".$pid."', '".$stageid."', ";
 		if ( strcmp($friendid, "") == 0 )
 		{
 			$query .= "null, ";
@@ -105,11 +89,7 @@ class Model_Record extends MY_Model {
 		{
 			$query .= "'".$friendid."', ";
 		}
-		$query .= "'".$instant_item1."', ";
-		$query .= "'".$instant_item2."', ";
-		$query .= "'".$instant_item3."', ";
-		$query .= "'".$instant_item4."', ";
-		$query .= "now() ) ";
+		$query .= "'".$instant_item1."', '".$instant_item2."', '".$instant_item3."', '".$instant_item4."', now() ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

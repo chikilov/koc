@@ -59,72 +59,11 @@ class Model_Play extends MY_Model {
 		$this->DB_SEL->query($query);
 		return $this->DB_SEL->affected_rows();
 	}
-/* 20150224
-	public function getLastPackage( $pid )
-	{
-		$query = "select package from koc_play.".MY_Controller::TBL_PACKAGE_LOG." where pid = '".$pid."' order by logging_datetime desc limit 1";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		return $this->DB_SEL->query($query);
-	}
-
-	public function insertPackage( $pid, $package )
-	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PACKAGE_LOG." ( pid, package, logging_datetime ) values (";
-		$query .= "'".$pid."', '".$package."', sysdate())";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
-	}
-
-	public function requestDupId( $id )
-	{
-		$query = "select pid from koc_play.".MY_Controller::TBL_ACCOUNT." where id = '".$id."'";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		$this->DB_SEL->query($query);
-		return $this->DB_SEL->affected_rows();
-	}
-
-	public function requestDupMacaddr( $macaddr )
-	{
-		$query = "select a.pid, a.name, a.limit_type, a.limit_start, a.limit_end, ";
-		$query .= "count(c.result_datetime) as helpcount from koc_play.".MY_Controller::TBL_ACCOUNT." as a ";
-		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-		$query .= "left outer join koc_record.".MY_Controller::TBL_PVE." as c on a.pid = c.friendid ";
-		$query .= "and (c.result_datetime between b.login_datetime and now() or c.result_datetime is null) ";;
-		$query .= "where macaddr = '".$macaddr."' ";
-		$query .= "group by a.pid, a.name, a.limit_type, a.limit_start, a.limit_end ";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		return $this->DB_SEL->query($query);
-	}
-
-	public function requestJoin( $id, $password )
-	{
-		$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( id, password, name, reg_date ) values (";
-		$query .= " '".$id."', password( '".$password."' ), null, now() )";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->insert_id();
-	}
-
-	public function requestGuestJoin( $macaddr, $uuid )
-	{
-		$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( macaddr, uuid, reg_date ) values (";
-		$query .= " '".$macaddr."', '".$uuid."', now() )";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->insert_id();
-	}
-*/
 	public function requestJoinStep2( $pid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
-		$query .= "( pid, name, affiliate_name, show_prof,prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival ) ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERBASIC." ( pid, name, affiliate_name, show_prof, prof_img, vip_level, vip_exp, ";
+		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival ) ";
 		$query .= "select '".$pid."', null, null, 1, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -142,16 +81,7 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-/*
-	public function requestUpdateNameAccount( $pid, $name )
-	{
-		$query = "update koc_play.".MY_Controller::TBL_ACCOUNT." set name = '".$name."' where pid = '".$pid."' ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
-	}
-*/
 	public function requestUpdateNamePlay( $pid, $name )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set name = '".$name."' where pid = '".$pid."' ";
@@ -160,21 +90,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-/*
-	public function requestLogin( $id, $password )
-	{
-		$query = "select a.pid, a.name, a.limit_type, a.limit_start, a.limit_end, ";
-		$query .= "count(c.result_datetime) as helpcount from koc_play.".MY_Controller::TBL_ACCOUNT." as a ";
-		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-		$query .= "left outer join koc_record.".MY_Controller::TBL_PVE." as c on a.pid = c.friendid ";
-		$query .= "and (c.result_datetime between b.login_datetime and now() or c.result_datetime is null) ";;
-		$query .= "where a.id = '".$id."' and a.password = password( '".$password."' ) ";
-		$query .= "group by a.pid, a.name, a.limit_type, a.limit_start, a.limit_end ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		return $this->DB_SEL->query($query);
-	}
-*/
 	public function updateLoginTimeForMe( $pid )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set login_datetime = now() ";
@@ -1180,13 +1096,6 @@ class Model_Play extends MY_Model {
 
 	public function requestAchieveNewInsert( $pid, $aid )
 	{
-/*
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERACHIEVE." ";
-		$query .= "(pid, aid, groupid, astatus, agoal, is_reward, start_datetime, reward_datetime) ";
-		$query .= "select '".$pid."', id, groupid, 0, point, 0, now(), null from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." ";
-		$query .= "where id = '".$aid."' and not exists( select aid from koc_play.".MY_Controller::TBL_PLAYERACHIEVE." ";
-		$query .= "where pid = '".$pid."' and aid = '".$aid."' ) ";
-*/
 		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERACHIEVE." (pid, aid, groupid, astatus, agoal, is_reward, start_datetime, reward_datetime) ";
 		$query .= "select distinct '".$pid."', a.id, a.groupid, 0, a.point, 0, now(), null from koc_ref.achievements as a ";
 		$query .= "left outer join ( select aid, start_datetime from koc_play.".MY_Controller::TBL_PLAYERACHIEVE." where pid = '".$pid."' ) as b on a.id = b.aid ";
@@ -1228,20 +1137,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-/* 20150115 일반 업적도 포함되도록 수정
-	public function requestNextAchieveInsert( $pid, $aid )
-	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERACHIEVE." (pid, aid, groupid, astatus, agoal, is_reward, start_datetime, reward_datetime) ";
-		$query .= "select '".$pid."', id, groupid, 0, point, 0, now(), null from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." ";
-		$query .= "where repeate = 'daily' and required_1 in ('".join("', '", $aid)."') and not exists ( ";
-		$query .= "select aid from koc_play.".MY_Controller::TBL_PLAYERACHIEVE." ";
-		$query .= "where aid in (select id from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." where repeate = 'daily' and required_1 in ('".join("', '", $aid)."') ) ) ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
-	}
-*/
 	public function requestNextAchieveInsert( $pid, $aid )
 	{
 		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERACHIEVE." (pid, aid, groupid, astatus, agoal, is_reward, start_datetime, reward_datetime) ";
@@ -1252,14 +1148,6 @@ class Model_Play extends MY_Model {
 		$query .= "where aid in ( select id from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." where required_1 in ('".join("', '", $aid)."') ) ";
 		$query .= "and pid = '".$pid."' ) and case when a.repeate = 'DAILY' then date_format(b.start_datetime, '%Y%m%d') ";
 		$query .= "else date_format(now(), '%Y%m%d') end = date_format(now(), '%Y%m%d') ";
-/*
-		$query .= "select '".$pid."', id, groupid, 0, point, 0, now(), null from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." ";
-		$query .= "where required_1 in ('".join("', '", $aid)."') and not exists ( ";
-		$query .= "select aid from koc_play.".MY_Controller::TBL_PLAYERACHIEVE." ";
-		$query .= "where aid in (select id from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." where required_1 in ('".join("', '", $aid)."') ) ) ";
-		$query .= "and case when b.repeate = '".MY_Controller::ACHIEVE_REPEATE_FOR_DAILY."' then date_format(start_datetime, '%Y%m%d') ";
-		$query .= "else date_format(now(), '%Y%m%d') end = date_format(now(), '%Y%m%d') ";
-*/
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -1563,19 +1451,7 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-/*
-	public function requestWaitFriendList( $pid )
-	{
-		$query = "select a.pid, concat(b.name, '(', b.affiliate_name, ')') as name, b.prof_img, d.refid ";
-		$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d on c.memb_0 = d.idx ";
-		$query .= "where a.fid = '".$pid."' and a.friend_status = ".MY_Controller::FRIEND_STATUS_REQUEST." ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		return $this->DB_SEL->query($query);
-	}
-*/
 	public function updateFriendHelpTime( $pid, $fid )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERFRIEND." set last_help_time = now() where pid = '".$pid."' and fid = '".$fid."' ";
@@ -1748,6 +1624,14 @@ class Model_Play extends MY_Model {
 			{
 				$query .= "and pid = '4' ";
 			}
+			if ( $pid == "93" )
+			{
+				$query .= "and pid = '96' ";
+			}
+			else if ( $pid == "96" )
+			{
+				$query .= "and pid = '93' ";
+			}
 		}
 /*개발 테스트용 소스 끝*/
 //		$query .= "and score between ".($score - 100 + $downNum)." ";
@@ -1757,43 +1641,7 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-/*
-	public function requestDupAffiliateId( $affiliateType, $affiliateId )
-	{
-		$query = "select a.pid, a.name, a.limit_type, a.limit_start, a.limit_end, ";
-		$query .= "count(c.result_datetime) as helpcount from koc_play.".MY_Controller::TBL_ACCOUNT." as a ";
-		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-		$query .= "left outer join koc_record.".MY_Controller::TBL_PVE." as c on a.pid = c.friendid ";
-		$query .= "and (c.result_datetime between b.login_datetime and now() or c.result_datetime is null) ";;
-		$query .= "where affiliate_id = '".$affiliateId."' and affiliate_type = '".$affiliateType."' ";
-		$query .= "group by a.pid, a.name, a.limit_type, a.limit_start, a.limit_end ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		return $this->DB_INS->query($query);
-	}
-
-	public function requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg )
-	{
-		$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( ";
-		$query .= "macaddr, uuid, affiliate_type, affiliate_id, affiliate_name, email, prof_Img, reg_date ) ";
-		$query .= "values ( '".$macaddr."', '".$uuid."', '".$affiliateType."', '".$affiliateId."', '".$affiliateName."', ";
-		$query .= "'".$affiliateEmail."', '".$affiliateProfImg."', now() )";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->insert_id();
-	}
-
-	public function updateAffiliateNameAccount( $pid, $affiliateName, $affiliateEmail, $affiliateProfImg )
-	{
-		$query = "update koc_play.".MY_Controller::TBL_ACCOUNT." set affiliate_name = '".$affiliateName."', email = '".$affiliateEmail."', prof_img = '".$affiliateProfImg."' ";
-		$query .= "where pid = '".$pid."' ";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
-	}
-*/
 	public function updateAffiliateNamePlay( $pid, $affiliateName, $affiliateProfImg )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set affiliate_name = '".$affiliateName."', prof_img = '".$affiliateProfImg."' where pid = '".$pid."' ";
@@ -2436,9 +2284,9 @@ class Model_Play extends MY_Model {
 		$query .= "pvb_points = ".MY_Controller::MAX_MODES_PVB.", ";
 		$query .= "pvp_points = ".MY_Controller::MAX_MODES_PVP.", ";
 		$query .= "survival_points = ".MY_Controller::MAX_MODES_SURVIVAL.", ";
-		$query .= "game_points = 100000, ";
-		$query .= "cash_points = 100000, ";
-		$query .= "friendship_points = 1000 ";
+		$query .= "game_points = 0, ";
+		$query .= "cash_points = 0, ";
+		$query .= "friendship_points = 0 ";
 		$query .= "where pid = '".$pid."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );

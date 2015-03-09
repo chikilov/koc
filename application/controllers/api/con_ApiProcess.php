@@ -8,7 +8,6 @@ class Con_ApiProcess extends MY_Controller {
 		$this->load->model("api/Model_Rank", "dbRank");
 		$this->load->model("api/Model_Record", "dbRecord");
 		$this->load->model("api/Model_Ref", "dbRef");
-//		$this->output->enable_profiler(TRUE);
 	}
 
 	function index()
@@ -122,22 +121,6 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
-					//마지막 접속한 패키지 명을 가져옴
-					$lastPackage = $this->dbLogin->getLastPackage( $arrayResult["pid"] )->result_array();
-					if ( count($lastPackage) == 0 )
-					{
-						//기존 등록된 패키지 명이 없으므로 로그 등록
-						$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-					}
-					else
-					{
-						if ( strcmp($lastPackage[0]["package"], $package) == 1 )
-						{
-							//패키지 명이 다르면 로그 등록
-							$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-						}
-					}
-
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
@@ -211,21 +194,6 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
-					//마지막 접속한 패키지 명을 가져옴
-					$lastPackage = $this->dbLogin->getLastPackage( $arrayResult["pid"] )->result_array();
-					if ( count($lastPackage) == 0 )
-					{
-						//기존 등록된 패키지 명이 없으므로 로그 등록
-						$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-					}
-					else
-					{
-						if ( strcmp($lastPackage[0]["package"], $package) == 1 )
-						{
-							//패키지 명이 다르면 로그 등록
-							$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-						}
-					}
 					$this->dbLogin->updateAffiliateNameAccount( $arrayResult["pid"], $affiliateName, $affiliateEmail, $affiliateProfImg );
 
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
@@ -423,23 +391,7 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
-					//마지막 접속한 패키지 명을 가져옴
-					$lastPackage = $this->dbLogin->getLastPackage( $arrayResult["pid"] )->result_array();
-					$this->dbLogin->onBeginTransaction();
 					$this->dbPlay->onBeginTransaction();
-					if ( count($lastPackage) == 0 )
-					{
-						//기존 등록된 패키지 명이 없으므로 로그 등록
-						$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-					}
-					else
-					{
-						if ( strcmp($lastPackage[0]["package"], $package) == 1 )
-						{
-							//패키지 명이 다르면 로그 등록
-							$this->dbLogin->insertPackage( $arrayResult["pid"], $package );
-						}
-					}
 					$result = (bool)$this->dbPlay->updateLoginTimeForMe( $arrayResult["pid"] );
 					$this->dbPlay->updateLoginTimeForFriend( $arrayResult["pid"] );
 					$this->dbPlay->onEndTransaction( $result );
@@ -767,7 +719,6 @@ class Con_ApiProcess extends MY_Controller {
 					}
 				}
 				$result = $result & $this->dbPlay->newPlayerTeam( $pid, $arrayCharacter[0], $arrayCharacter[1], null );
-//				$result = $result & $this->dbPlay->insertEquipment( $arrayResult["pid"], $arrayEquipment[0] );
 				$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[0], "weapon", $arrayInventory[0] );
 				$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[1], "weapon", $arrayInventory[1] );
 			}
@@ -888,7 +839,14 @@ class Con_ApiProcess extends MY_Controller {
 				}
 
 				// 첫구매 체크 ( 상품 카테고리가 CASH 인 경우만 체크, 매일매일 패키지(카테고리 : SUBSCRIBE)와 개척자 패키지(카테고리 : LIMITED) 제외 )
-				$arrayResult["packinfo"]["is_first"] = $this->dbPlay->requestFirstBuyCheck( $pid )->result_array()[0]["is_first"];
+				if ( MY_Controller::VALID_FIRST_BUY_EVENT )
+				{
+					$arrayResult["packinfo"]["is_first"] = $this->dbPlay->requestFirstBuyCheck( $pid )->result_array()[0]["is_first"];
+				}
+				else
+				{
+					$arrayResult["packinfo"]["is_first"] = 0;
+				}
 
 				// 개척자 패키지
 				$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
@@ -1550,8 +1508,7 @@ class Con_ApiProcess extends MY_Controller {
 						curl_setopt($ch, CURLOPT_URL, $encrypted_url);
 						if ( ENVIRONMENT == "production" )
 						{
-							curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::TEST_IAP_KEY));
-//							curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::PROD_IAP_KEY));
+							curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::PROD_IAP_KEY));
 						}
 						else
 						{
@@ -1593,7 +1550,6 @@ class Con_ApiProcess extends MY_Controller {
 								$receipt = $arrResponse["result"]["receipt"];
 								$extra = json_decode($receipt["extra"], true);
 
-								//if ( $extra["pid"] == $pid && $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
 								if ( $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
 								{
 									if ( $is_consume )
@@ -1898,7 +1854,6 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$url = "https://iapdev.tstore.co.kr/digitalsignconfirm.iap";
 						}
-//{"pid":"77", "product":"NGP_CR_0206", "sid":"77","storetype":"tstore","receipt":"TX_00000000235787","signdata":"MIIH+QYJKoZIhvcNAQcCoIIH6jCCB+YCAQExDzANBglghkgBZQMEAgEFADBaBgkqhkiG9w0BBwGgTQRLMjAxNTAyMjYxODQ4MDh8VFhfMDAwMDAwMDAyMzYwNTJ8MDEwNjM2NDI3OTF8T0EwMDY4MzY3MnwwOTEwMDI4NTA0fDMzMDB8fHt8oIIF7TCCBekwggTRoAMCAQICA3GhOjANBgkqhkiG9w0BAQsFADBPMQswCQYDVQQGEwJLUjESMBAGA1UECgwJQ3Jvc3NDZXJ0MRUwEwYDVQQLDAxBY2NyZWRpdGVkQ0ExFTATBgNVBAMMDENyb3NzQ2VydENBMjAeFw0xNDEyMDQwNTU0MDBaFw0xNTEyMjExNDU5NTlaMIGMMQswCQYDVQQGEwJLUjESMBAGA1UECgwJQ3Jvc3NDZXJ0MRUwEwYDVQQLDAxBY2NyZWRpdGVkQ0ExGzAZBgNVBAsMEu2VnOq1reyghOyekOyduOymnTEPMA0GA1UECwwG7ISc67KEMSQwIgYDVQQDDBvsl5DsiqTsvIDsnbQg7ZSM656Y64ubKOyjvCkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDX2oQhDw1knBdNhIOVg0PzKnQTmI1dfiSQEE2JxV1HtZb7Z63a4MqW2RBz1a3qrd9WIZmgnMAte7WGXLvbBfpbG3fAXhqKpE/psncPWu1cPsm6jAD/r6Caunh35uMVCpw3Uvct4vTpy9n14HeamK6ky9+mbNdWAeUf0fAOAWwZ49NTXchdfqBIEgjQF/jIlv1CSBFG2525yktl1C+2sKLh6Bhhkf6hCk74bG54riDzF6+D3SWIbkFUINU4pK2sp/ZL0JJri55IySDyXtdpGAglois8a3EdIrw19k95BQNuRdMxLBflA90ox53TE+mn8gSxNR2BXW1e++8cAufE2GHFAgMBAAGjggKOMIICijCBjwYDVR0jBIGHMIGEgBS2dKmbkjzHUbEipE+8tzz+IjPXdqFopGYwZDELMAkGA1UEBhMCS1IxDTALBgNVBAoMBEtJU0ExLjAsBgNVBAsMJUtvcmVhIENlcnRpZmljYXRpb24gQXV0aG9yaXR5IENlbnRyYWwxFjAUBgNVBAMMDUtJU0EgUm9vdENBIDSCAhAEMB0GA1UdDgQWBBQDOWXJItmGyQK4r+lB/UCCS5rGFTAOBgNVHQ8BAf8EBAMCBsAwgYMGA1UdIAEB/wR5MHcwdQYKKoMajJpEBQQBAzBnMC0GCCsGAQUFBwIBFiFodHRwOi8vZ2NhLmNyb3NzY2VydC5jb20vY3BzLmh0bWwwNgYIKwYBBQUHAgIwKh4ovPgAIMd4yZ3BHMdYACDHINaorjCsBMdAACAAMbFEACDHhbLIsuQALjB6BgNVHREEczBxoG8GCSqDGoyaRAoBAaBiMGAMG+yXkOyKpOy8gOydtCDtlIzrnpjri5so7KO8KTBBMD8GCiqDGoyaRAoBAQEwMTALBglghkgBZQMEAgGgIgQgAvHjlL24vxpfiKiQ3qfu/SitEQ1Zpr4TQkPinNPy/kwwfQYDVR0fBHYwdDByoHCgboZsbGRhcDovL2Rpci5jcm9zc2NlcnQuY29tOjM4OS9jbj1zMWRwN3A5NCxvdT1jcmxkcCxvdT1BY2NyZWRpdGVkQ0Esbz1Dcm9zc0NlcnQsYz1LUj9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0MEYGCCsGAQUFBwEBBDowODA2BggrBgEFBQcwAYYqaHR0cDovL29jc3AuY3Jvc3NjZXJ0LmNvbToxNDIwMy9PQ1NQU2VydmVyMA0GCSqGSIb3DQEBCwUAA4IBAQA4XgBcXJ+XuJXFmvll8tM7bKugyvscaKILTZHr1tyWHcycZf9zNUcoBtp2mg+UVarEXxwZF40135lCwAftx42CnCltNlBBLyhfly3Vp9gWCLWrDCIkmu/70oznMQUizQiy5ZRA+K9QqJl+9hIbiQiNuZd8d0Bp7Hj5qzLaiOTAgNp9AXZ+zEa/PiICE/de1Fqh9Tn/pRtad6Z5Wh8EXvxzQiLQSNsYBmGU8Ic/x5qb3rkJzk9lpgWt7+42dik3Roe7iZzYIcLuTtJ7B+D+kyaKIWu77It0UxQsaU1TMB1LMABYxOYf58OGHTEUdbcTIjLc8hPbPomPTlWDlEWPs/PoMYIBgTCCAX0CAQEwVjBPMQswCQYDVQQGEwJLUjESMBAGA1UECgwJQ3Jvc3NDZXJ0MRUwEwYDVQQLDAxBY2NyZWRpdGVkQ0ExFTATBgNVBAMMDENyb3NzQ2VydENBMgIDcaE6MA0GCWCGSAFlAwQCAQUAMA0GCSqGSIb3DQEBCwUABIIBAHw/qDVOoZEwZJOsmuuijp6sC7oZ/0BRk+w0VPn7EcqGiDyOPmrkHxEsdln1dBqf2rtlsc+zV4FAn+GXFIz8QY7pve2L8AD8cWt+lyMppyVZnk7dAwzH5NXhAJZYTUvzepfsTkDxx6F3vcQP/FWLsH3wMmvBAuYrfCZfea3WwnKbWDlM9AJKcmTQlK6cCeJZQKtmfGXXgwc8ISuwoon2bYc0InMscXFLRQNZ9AAXod/RlIXMQ06C7/GbAnRjdG7lGB7GYEVW4sLiSmWVKZhuSPXxSAyHkHVAaHwCr1d6ap7GBYseX82kZw9PyW28M0J3GyHiqS2tCbIi1ZdgkXW9zeU=","consume":1}
 						//네이버 api 호출  TSTORE_APPID
 
 						$sendData = array("txid" => $paymentSeq, "appid" => MY_Controller::TSTORE_APPID, "signdata" => $signdata );
@@ -1909,7 +1864,7 @@ class Con_ApiProcess extends MY_Controller {
 						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 						curl_setopt($ch, CURLOPT_POSTFIELDS, $sendData_string);
 						curl_setopt($ch, CURLOPT_HTTPHEADER, array( "Content-Type: application/json", "Content-Length: " . strlen($sendData_string)));
-//echo curl_exec( $ch );
+
 						$arrResponse = json_decode( curl_exec( $ch ), true );
 
 						if ( empty( $arrResponse ) )
@@ -1942,10 +1897,6 @@ class Con_ApiProcess extends MY_Controller {
 							}
 							else
 							{
-								//$extra = json_decode($arrResponse["product"][0]["bp_info"], true);
-								//if ( $extra["pid"] == $pid && $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
-								//if ( $extra["sid"] = $sid && $extra["product"] == $product && $arrResponse["product"][0]["product_id"] == $arrayProduct[0]["iapcode"] )
-
 								$bpInfo = urldecode( $arrResponse["product"][0]["bp_info"] );
 								$extra   = json_decode( $bpInfo, true );
 
@@ -4171,28 +4122,16 @@ class Con_ApiProcess extends MY_Controller {
 
 		if( $pid && $arrayAchieve )
 		{
-			$this->dbPlay->onBeginTransaction();
-			$result = (bool)1;
 			foreach ( $arrayAchieve as $achieve )
 			{
 				$this->dbPlay->requestAchieveInsert( $pid, $achieve["aid"] );
-				$result = $result & (bool)$this->dbPlay->requestAchieveStatusUpdate( $pid, $achieve["aid"], $achieve["astatus"] );
+				$this->dbPlay->requestAchieveStatusUpdate( $pid, $achieve["aid"], $achieve["astatus"] );
 				$this->onSysLogWriteDb( $pid, "업적상태 변경, ".$achieve["aid"].", 변경상태, ".$achieve["astatus"] );
 			}
 
-			$this->dbPlay->onEndTransaction( $result );
-			if ( $result )
-			{
-				$resultCode = MY_Controller::STATUS_API_OK;
-				$resultText = MY_Controller::MESSAGE_API_OK;
-				$arrayResult = null;
-			}
-			else
-			{
-				$resultCode = MY_Controller::STATUS_ACHIEVE_UPDATE;
-				$resultText = MY_Controller::MESSAGE_ACHIEVE_UPDATE;
-				$arrayResult = null;
-			}
+			$resultCode = MY_Controller::STATUS_API_OK;
+			$resultText = MY_Controller::MESSAGE_API_OK;
+			$arrayResult = null;
 		}
 		else
 		{

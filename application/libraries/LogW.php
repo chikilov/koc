@@ -25,7 +25,6 @@ class LogW {
 
 		if ( ENVIRONMENT == 'production' )
 		{
-			// syslog($m_LogLevel, $m_LogMessage);
 			if (!is_dir("c:\\tmp\\".date("Ymd"))) {
 			    mkdir("c:\\tmp\\".date("Ymd"), 0777, true);
 			}
@@ -44,7 +43,6 @@ class LogW {
 		}
 		else if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'testing' )
 		{
-			// syslog($m_LogLevel, $m_LogMessage);
 			if (!is_dir("/tmp/".date("Ymd"))) {
 			    mkdir("/tmp/".date("Ymd"), 0777, true);
 			}
@@ -63,7 +61,6 @@ class LogW {
 		}
 		else if ( ENVIRONMENT == 'staging' )
 		{
-			// syslog($m_LogLevel, $m_LogMessage);
 			if (!is_dir("c:\\tmp\\".date("Ymd"))) {
 			    mkdir("c:\\tmp\\".date("Ymd"), 0777, true);
 			}
@@ -90,7 +87,6 @@ class LogW {
 		}
 		else if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'testing' )
 		{
-			// syslog($m_LogLevel, $m_LogMessage);
 			$logFileName = "/tmp/admlogfile_".date("Ymd").".log";
 
 			if (file_exists($logFileName)) {
@@ -106,7 +102,6 @@ class LogW {
 		}
 		else if ( ENVIRONMENT == 'staging' )
 		{
-			// syslog($m_LogLevel, $m_LogMessage);
 			$logFileName = "c:\\tmp\\admlogfile_".date("Ymd").".log";
 
 			if (file_exists($logFileName)) {

@@ -4,7 +4,6 @@ class Model_Admin extends MY_Model {
 	public function __construct()
 	{
 		parent::__construct();
-//20141210rep	$this->DB_API = $this->load->database("koc_admin", TRUE);
 		$this->DB_SEL = $this->load->database("koc_admin_sel", TRUE);
 		$this->DB_INS = $this->load->database("koc_admin_ins", TRUE);
 		/**
@@ -14,11 +13,9 @@ class Model_Admin extends MY_Model {
 		 * 각각의 그룹은 독립적으로 실행되기때문에 각 그룹내에서만 성공여부에따라서 커밋,롤백 하게 됩니다.
 		 * 즉 그룹간에는 서로 영향이 없습니다.
 		 */
-//20141210rep	$this->DB_API->trans_strict(FALSE);
 		$this->DB_SEL->trans_strict(FALSE);
 		$this->DB_INS->trans_strict(FALSE);
 
-//20141210rep	$this->DB_API->query("SET NAMES utf8");
 		$this->DB_SEL->query("SET NAMES utf8");
 		$this->DB_INS->query("SET NAMES utf8");
 	}
@@ -35,7 +32,6 @@ class Model_Admin extends MY_Model {
 	 */
 	public function onStartTransaction()
 	{
-//20141210rep	$this->DB_API->trans_start();
 		$this->DB_INS->trans_start();
 	}
 
@@ -45,7 +41,6 @@ class Model_Admin extends MY_Model {
 	*/
 	public function onCompleteTransaction()
     {
-//20141210rep	$this->DB_API->trans_complete();
         $this->DB_INS->trans_complete();
     }
 
@@ -55,7 +50,6 @@ class Model_Admin extends MY_Model {
 	*/
 	public function onBeginTransaction()
 	{
-//20141210rep	$this->DB_API->trans_begin();
 		$this->DB_INS->trans_begin();
 	}
 
@@ -64,7 +58,6 @@ class Model_Admin extends MY_Model {
 	*/
 	public function onRollbackTransaction()
 	{
-//20141210rep	$this->DB_API->trans_rollback();
 		$this->DB_INS->trans_rollback();
 	}
 
@@ -73,14 +66,6 @@ class Model_Admin extends MY_Model {
 	*/
 	public function onEndTransaction()
 	{
-//20141210rep	if ($this->DB_API->trans_status() === FALSE)
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_rollback();
-//20141210rep	}
-//20141210rep	else
-//20141210rep	{
-//20141210rep		$this->DB_API->trans_commit();
-//20141210rep	}
 		if ($this->DB_INS->trans_status() === FALSE)
 		{
 			$this->DB_INS->trans_rollback();
@@ -608,11 +593,11 @@ class Model_Admin extends MY_Model {
 	{
 		if ( $coupon_type == "R" )
 		{
-			$query = "update coupon_detail_info set coupon_user_id = '".$pid."', coupon_use_datetime = now() where coupon_id = '".$coupon_id."' ";
+			$query = "update koc_admin.coupon_detail_info set coupon_user_id = '".$pid."', coupon_use_datetime = now() where coupon_id = '".$coupon_id."' ";
 		}
 		else if ( $coupon_type == "S" )
 		{
-			$query = "insert into coupon_detail_info ( group_id, coupon_id, coupon_user_id, coupon_use_datetime ) values ";
+			$query = "insert into koc_admin.coupon_detail_info ( group_id, coupon_id, coupon_user_id, coupon_use_datetime ) values ";
 			$query .= "( '".$group_id."', '".$coupon_id."', '".$pid."', now() ) ";
 		}
 

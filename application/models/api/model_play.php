@@ -1550,11 +1550,11 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->affected_rows();
 	}
 
-	public function requestNameDupCount( $name )
+	public function requestNameDupCount( $pid, $name )
 	{
-		$query = "select pid from koc_play.".MY_Controller::TBL_PLAYERBASIC." where name = '".$name."' ";
+		$query = "select pid from koc_play.".MY_Controller::TBL_PLAYERBASIC." where name = '".$name."' and pid != '".$pid."' ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_SEL->query($query);
 		return $this->DB_SEL->affected_rows();
 	}

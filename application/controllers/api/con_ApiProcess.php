@@ -230,7 +230,7 @@ class Con_ApiProcess extends MY_Controller {
 		//회원가입
 		if( $pid && $name )
 		{
-			if ( $this->dbPlay->requestNameDupCount( $name ) > 0 )
+			if ( $this->dbPlay->requestNameDupCount( $pid, $name ) > 0 )
 			{
 				$resultCode = MY_Controller::STATUS_DUPLICATE_UPDATE_ID;
 				$resultText = MY_Controller::MESSAGE_DUPLICATE_UPDATE_ID;
@@ -238,7 +238,7 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
-				if ( $this->dbPlay->requestUpdateNamePlay( $pid, $name ) && $this->dbLogin->requestUpdateNameAccount( $pid, $name ) )
+				if ( $this->dbPlay->requestUpdateNamePlay( $pid, $name ) )
 				{
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;

@@ -58,8 +58,8 @@ class Model_Login extends MY_Model {
 
 	public function requestJoin( $id, $password )
 	{
-		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( id, password, name, reg_date ) values (";
-		$query .= " '".$id."', password( '".$password."' ), null, now() )";
+		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( id, password, reg_date ) values (";
+		$query .= " '".$id."', password( '".$password."' ), now() )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);
@@ -110,7 +110,7 @@ class Model_Login extends MY_Model {
 
 	public function requestAffiliateAccount( $pid )
 	{
-		$query = "select affiliate_name, name, email, prof_img from koc_account.".MY_Controller::TBL_ACCOUNT." where pid = '".$pid."' ";
+		$query = "select affiliate_name, email, prof_img from koc_account.".MY_Controller::TBL_ACCOUNT." where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
@@ -118,7 +118,7 @@ class Model_Login extends MY_Model {
 
 	public function requestLogin( $id, $password )
 	{
-		$query = "select pid, name, limit_type, limit_start, limit_end, 0 as helpcount ";
+		$query = "select pid, limit_type, limit_start, limit_end, 0 as helpcount ";
 		$query .= "from koc_account.".MY_Controller::TBL_ACCOUNT." ";
 		$query .= "where id = '".$id."' and password = password( '".$password."' ) ";
 
@@ -128,21 +128,12 @@ class Model_Login extends MY_Model {
 
 	public function requestDupMacaddr( $macaddr )
 	{
-		$query = "select pid, name, limit_type, limit_start, limit_end, 0 as helpcount ";
+		$query = "select pid, limit_type, limit_start, limit_end, 0 as helpcount ";
 		$query .= "from koc_account.".MY_Controller::TBL_ACCOUNT." ";
 		$query .= "where macaddr = '".$macaddr."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
-	}
-
-	public function requestUpdateNameAccount( $pid, $name )
-	{
-		$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set name = '".$name."' where pid = '".$pid."' ";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_LOGIN->query($query);
-		return $this->DB_LOGIN->affected_rows();
 	}
 }
 ?>

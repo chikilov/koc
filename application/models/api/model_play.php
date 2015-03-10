@@ -590,7 +590,7 @@ class Model_Play extends MY_Model {
 
 	public function deleteInventory( $pid, $iid )
 	{
-		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set is_del = 1 where pid = '".$pid."' and idx = '".$iid."' and is_del = 0 ";
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set is_del = 1, del_date = now() where pid = '".$pid."' and idx = '".$iid."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -755,7 +755,7 @@ class Model_Play extends MY_Model {
 	public function deletePlayerCharacter( $pid, $idx )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set ";
-		$query .= "is_del = 1 where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
+		$query .= "is_del = 1, del_date = now() where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -776,7 +776,7 @@ class Model_Play extends MY_Model {
 	public function deletePlayerItem( $pid, $idx )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set ";
-		$query .= "is_del = 1 where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
+		$query .= "is_del = 1, del_date = now() where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

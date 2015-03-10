@@ -5336,6 +5336,12 @@ class Con_ApiProcess extends MY_Controller {
 				$arrayResult = null;
 				$this->onSysLogWriteDb( $pid, $fid."친구 추가, 현재 친구 수 ".$friendCount["fcount"]."명" );
 			}
+			else
+			{
+				$resultCode = MY_Controller::STATUS_FRIEND_REQUEST;
+				$resultText = MY_Controller::MESSAGE_FRIEND_REQUEST;
+				$arrayResult = null;
+			}
 		}
 		else
 		{

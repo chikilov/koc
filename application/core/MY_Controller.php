@@ -376,8 +376,8 @@ EOF;
 	const MAX_DEL_FRIEND					= 10;	// 일일 친구삭제 수
 	const MAX_UPGRADE						= 5;	// 기본 최대 강화수치
 	const MAX_LEVEL							= 30;	// 기본 최대 강화수치
-	const MAX_INC_LIMIT_CHAR				= 50;	// 최대 캐릭터 증가 슬롯
-	const MAX_INC_LIMIT_ITEM				= 40;	// 최대 아이템 증가 슬롯
+	const MAX_INC_LIMIT_CHAR				= 100;	// 최대 캐릭터 증가 슬롯
+	const MAX_INC_LIMIT_ITEM				= 90;	// 최대 아이템 증가 슬롯
 
 	const MAX_ENERGY_POINTS					= 10;	// 기본 행성전 에너지
 	const MAX_MODES_PVB						= 10;	// 기본 PVB 에너지

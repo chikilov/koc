@@ -139,7 +139,7 @@ class Model_Rank extends MY_Model {
 
 	public function requestPVPScore( $pid )
 	{
-		$query = "select score from koc_rank.".MY_Controller::TBL_PVPSTORE." where pid = '".$pid."' ";
+		$query = "select rank, score from koc_rank.".MY_Controller::TBL_PVPSTORE." where pid = '".$pid."' ";
 		$query .= "and weekseq = ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
 		$query .= "else yearweek(now(), 2) end ) ";
 
@@ -194,7 +194,7 @@ class Model_Rank extends MY_Model {
 
 	public function requestFriendRankingInfoPVP( $pid )
 	{
-		$query = "select pid, name, refid, rank, score ";
+		$query = "select pid, name, refid, rank, score, prof_img ";
 		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";
 		$query .= "a.prof_img, d.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVP." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
@@ -237,7 +237,7 @@ class Model_Rank extends MY_Model {
 
 	public function requestFriendRankingInfoPVB( $pid )
 	{
-		$query = "select pid, name, refid, rank, score ";
+		$query = "select pid, name, refid, rank, score, prof_img ";
 		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";
 		$query .= "a.prof_img, d.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVB." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
@@ -280,7 +280,7 @@ class Model_Rank extends MY_Model {
 
 	public function requestFriendRankingInfoSURVIVAL( $pid )
 	{
-		$query = "select pid, name, refid, rank, score ";
+		$query = "select pid, name, refid, rank, score, prof_img ";
 		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, a.prof_img, d.refid, a.rank, a.score ";
 		$query .= "from koc_rank.".MY_Controller::TBL_SURVIVAL." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";

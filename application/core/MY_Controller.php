@@ -433,6 +433,8 @@ EOF;
 	const PVB_YEARWEEK_STANDARD				= 4;	//pvb는 매주 수요일 갱신
 	const SURVIVAL_YEARWEEK_STANDARD		= 5;	//survival은 매주 목요일 갱신
 	const MAX_LEVEL_PVB						= 20;	//PVB 최대레벨
+	const PVP_SCORE_DEVIDE_CONST			= 2000; //pvp 그룹 기준 상수
+	const PVP_SCORE_LAST_GROUP				= 18000; // pvp 그룹 마지막 그룹시작점수
 
 	//const for synthesize
 	const GATCHA_BY_GRADE					= "[\"GAC030000\", \"GAC030001\", \"GAC030002\", \"GAC030003\", \"GAC030004\"]";	//합성에 사용되는 가챠정보

@@ -1638,9 +1638,37 @@ class Model_Play extends MY_Model {
 			}
 		}
 /*개발 테스트용 소스 끝*/
-//		$query .= "and score between ".($score - 100 + $downNum)." ";
-//		$query .= "and ".($score + 100 + $downNum)." order by rand() desc limit 1";
 		$query .= "order by rand() desc limit 1 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high )
+	{
+		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query .= "on a.pid = b.pid where b.score between ".$limit_low." and ".$limit_high." ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
+	}
+
+	public function requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )
+	{
+		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query .= "on a.pid = b.pid where b.pid != '".$pid."' ";
+		$query .= "and b.score between ".$limit_low." and ".$limit_high." order by rand() desc limit 1";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )
+	{
+		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query .= "on a.pid = b.pid where b.pid != '".$pid."' ";
+		$query .= "and b.rank between ".$rank_low." and ".$rank_high." order by rand() desc limit 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

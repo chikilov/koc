@@ -1672,7 +1672,7 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else
 					{
-						$kurl = "http://m.koctest.tntgame.co.kr/refresh.php";
+						$kurl = "http://".$_SERVER['HTTP_HOST']."/refresh.php";
 						$kch = curl_init();
 						curl_setopt($kch, CURLOPT_URL, $kurl);
 						curl_setopt($kch, CURLOPT_RETURNTRANSFER, 1);
@@ -3307,34 +3307,62 @@ class Con_ApiProcess extends MY_Controller {
 
 		if( $pid )
 		{
-			/* 랭킹점수 기준의 매칭 방식 시작
-			$downNum = 0;
-			$downCnt = 0;
-			$score = $this->dbRank->requestMyRankingInfoPVP( $pid )->result_array()[0]["score"];
-
-			do {
-				$enemy_info = $this->dbRank->requestEnemyForPVP( $pid, $downNum, $score )->result_array();
-				$downNum = $downNum - 100;
-				$downCnt = $downCnt + 1;
-			} while (count($enemy_info) == 0 && $downCnt < 50);
-
-			$downNum = 0;
-			$downCnt = 0;
-			if ( empty($enemy_info) )
+			/* 랭킹점수 기준의 매칭 방식 시작 */
+			//화요일 12시 이전이면
+			if ( date("w") == 2 && date("H") < 13 )
 			{
-				do {
-					$enemy_info = $this->dbRank->requestEnemyForPVP( $pid, $downNum, $score )->result_array();
-					$downNum = $downNum + 100;
-					$downCnt = $downCnt + 1;
-				} while (count($enemy_info) == 0 && $downCnt < 50 );
+				$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
 			}
-			if ( empty($enemy_info) )
+			else
 			{
-				$enemy_info = $this->dbPlay->requestEnemyForInitPVP( $pid )->result_array();
-			}
-			랭킹점수 기준의 매칭 방식 끝 */
+				$player_score = $this->dbRank->requestPVPScore( $pid )->result_array();
+				if ( empty($player_score) )
+				{
+					$player_score = 0;
+					$player_rank = 0;
+				}
 
-			$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
+				$player_rank = $player_score[0]["rank"];
+				$player_score = $player_score[0]["score"];
+				$limit_low = floor($player_score / MY_Controller::PVP_SCORE_DEVIDE_CONST) * MY_Controller::PVP_SCORE_DEVIDE_CONST;
+				if ( $limit_low >= MY_Controller::PVP_SCORE_LAST_GROUP )
+				{
+					$limit_high = 1000000;
+				}
+				else
+				{
+					$limit_high = $limit_low + MY_Controller::PVP_SCORE_DEVIDE_CONST - 1;
+				}
+				$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
+				if ( $enemies < 5 )
+				{
+					if ( $player_rank < 5 )
+					{
+						$rank_high = 10;
+						$rank_low = 1;
+					}
+					else if ( $player_rank == 0 )
+					{
+						$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
+						$player_rank = $player_rank[0]["rank"];
+						$rank_high = $player_rank + 10;
+						$rank_low = $player_rank;
+					}
+					else
+					{
+						$rank_high = $player_rank + 5;
+						$rank_low = $player_rank - 5;
+					}
+					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
+				}
+				else
+				{
+					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )->result_array();
+				}
+			}
+
+			/* 랭킹점수 기준의 매칭 방식 끝 */
+			//$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
 			if ( empty($enemy_info) )
 			{
 				$resultCode = MY_Controller::STATUS_LOAD_RIVAL;
@@ -3604,6 +3632,14 @@ class Con_ApiProcess extends MY_Controller {
 		{
 			$duration = 0;
 		}
+		if ( $duration > 180)
+		{
+			$duration = 180;
+		}
+		if ( $duration < 0 )
+		{
+			$duration = 0;
+		}
 
 		if ( $remain_home == null || $remain_home == "" )
 		{
@@ -3628,19 +3664,37 @@ class Con_ApiProcess extends MY_Controller {
 		{
 			if ( $is_clear == 1 )
 			{
-				$score = floor( MY_Controller::PVP_POINT_BASIC_WIN + ( $remain_home * MY_Controller::PVP_POINT_USER_MULTIPLE ) - floor($duration / MY_Controller::PVP_POINT_TIME_DENOMINATOR ) * $pvp );
+				if ( $remain_home > 3 )
+				{
+					$remain_home = 3;
+				}
+				$score = floor( ( MY_Controller::PVP_POINT_BASIC_WIN + ( $remain_home * MY_Controller::PVP_POINT_USER_MULTIPLE ) - floor($duration / MY_Controller::PVP_POINT_TIME_DENOMINATOR ) ) * $pvp );
 				$strLogText = "승리";
 			}
 			else
 			{
-				$score = floor( MY_Controller::PVP_POINT_BASIC_LOSE + ($killed_away * MY_Controller::PVP_POINT_USER_MULTIPLE) - floor($duration / MY_Controller::PVP_POINT_TIME_DENOMINATOR) * $pvp );
+				if ( $killed_away > 3 )
+				{
+					$killed_away = 3;
+				}
+				$score = floor( ( MY_Controller::PVP_POINT_BASIC_LOSE + ( $killed_away * MY_Controller::PVP_POINT_USER_MULTIPLE ) + floor($duration / MY_Controller::PVP_POINT_TIME_DENOMINATOR) ) * $pvp );
 				$strLogText = "패배";
 			}
 			// 로그 추가 완료
-			$result = $this->dbRecord->updateLoggingResultStepForPVP( $pid, $logid, $score, $is_clear );
+			if ( (bool)$this->dbRecord->requestLoggingResultStepForPVP( $pid, $logid ) )
+			{
+				$result = $this->dbRecord->updateLoggingResultStepForPVP( $pid, $logid, $score, $is_clear );
+			}
+			else
+			{
+				$result = (bool)0;
+			}
+			if ( $result )
+			{
+				// 랭킹정보 추가
+				$result = $result & (bool)$this->dbRank->requestUpdatePVPRank( $pid, $score );
+			}
 
-			// 랭킹정보 추가
-			$result = $result & (bool)$this->dbRank->requestUpdatePVPRank( $pid, $score );
 			if ( $result )
 			{
 				$this->calcurateEnergy( $pid );

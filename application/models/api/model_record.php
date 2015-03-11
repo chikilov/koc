@@ -491,6 +491,14 @@ class Model_Record extends MY_Model {
 		return $this->DB_INS->insert_id();
 	}
 
+	public function requestLoggingResultStepForPVP( $pid, $logid )
+	{
+		$query = "select score from koc_record.".MY_Controller::TBL_PVP." where pid = '".$pid."' and idx = '".$logid."' and score is null ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
 
 	public function updateLoggingResultStepForPVP( $pid, $logid, $score, $is_clear )
 	{

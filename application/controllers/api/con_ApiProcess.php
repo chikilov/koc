@@ -3315,49 +3315,56 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
-				$player_score = $this->dbRank->requestPVPScore( $pid )->result_array();
-				if ( empty($player_score) )
+				if ( $this->dbRank->requestPVPRankCount( $pid ) < 10 )
 				{
-					$player_score = 0;
-					$player_rank = 0;
-				}
-
-				$player_rank = $player_score[0]["rank"];
-				$player_score = $player_score[0]["score"];
-				$limit_low = floor($player_score / MY_Controller::PVP_SCORE_DEVIDE_CONST) * MY_Controller::PVP_SCORE_DEVIDE_CONST;
-				if ( $limit_low >= MY_Controller::PVP_SCORE_LAST_GROUP )
-				{
-					$limit_high = 1000000;
+					$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
 				}
 				else
 				{
-					$limit_high = $limit_low + MY_Controller::PVP_SCORE_DEVIDE_CONST - 1;
-				}
-				$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
-				if ( $enemies < 5 )
-				{
-					if ( $player_rank < 5 )
+					$player_score = $this->dbRank->requestPVPScore( $pid )->result_array();
+					if ( empty($player_score) )
 					{
-						$rank_high = 10;
-						$rank_low = 1;
+						$player_score = 0;
+						$player_rank = 0;
 					}
-					else if ( $player_rank == 0 )
+
+					$player_rank = $player_score[0]["rank"];
+					$player_score = $player_score[0]["score"];
+					$limit_low = floor($player_score / MY_Controller::PVP_SCORE_DEVIDE_CONST) * MY_Controller::PVP_SCORE_DEVIDE_CONST;
+					if ( $limit_low >= MY_Controller::PVP_SCORE_LAST_GROUP )
 					{
-						$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
-						$player_rank = $player_rank[0]["rank"];
-						$rank_high = $player_rank + 10;
-						$rank_low = $player_rank;
+						$limit_high = 1000000;
 					}
 					else
 					{
-						$rank_high = $player_rank + 5;
-						$rank_low = $player_rank - 5;
+						$limit_high = $limit_low + MY_Controller::PVP_SCORE_DEVIDE_CONST - 1;
 					}
-					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
-				}
-				else
-				{
-					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )->result_array();
+					$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
+					if ( $enemies < 5 )
+					{
+						if ( $player_rank < 5 )
+						{
+							$rank_high = 10;
+							$rank_low = 1;
+						}
+						else if ( $player_rank == 0 )
+						{
+							$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
+							$player_rank = $player_rank[0]["rank"];
+							$rank_high = $player_rank + 10;
+							$rank_low = $player_rank;
+						}
+						else
+						{
+							$rank_high = $player_rank + 5;
+							$rank_low = $player_rank - 5;
+						}
+						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
+					}
+					else
+					{
+						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )->result_array();
+					}
 				}
 			}
 

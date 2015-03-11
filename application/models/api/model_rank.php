@@ -165,6 +165,15 @@ class Model_Rank extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
+	public function requestPVPRankCount( $pid )
+	{
+		$query = "select pid from koc_rank.".MY_Controller::TBL_PVP." where pid != '".$pid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
+	}
+
 	public function requestRankingInfoPVP( $pid, $page )
 	{
 		$query = "select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";

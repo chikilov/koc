@@ -676,190 +676,222 @@ class Con_ApiProcess extends MY_Controller {
 
 		if( $pid )
 		{
+			$tmpResult = 1;
 			if ( !($this->dbPlay->requestFirstLogin( $pid )) )
 			{
-				$this->dbPlay->requestJoinStep2( $pid );
-				$this->dbPlay->insertItem( $pid );
+				$mDBcpu = 0;
+				$sDBcpu = 0;
+				include(APPPATH.'config/database'.EXT);
+				$murl = "http://".$db['default_ins']['hostname']."/getCPUUsage.htm";
+				$surl = "http://".$db['default_sel']['hostname']."/getCPUUsage.htm";
+				$mch = curl_init();
+				$sch = curl_init();
+				curl_setopt($mch, CURLOPT_URL, $murl);
+				curl_setopt($sch, CURLOPT_URL, $surl);
+				curl_setopt($mch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($sch, CURLOPT_RETURNTRANSFER, 1);
+				$mArr = curl_exec( $mch );
+				$sArr = curl_exec( $sch );
 
-				$arraySupply = $this->dbRef->requestSupplies( $pid )->result_array();
-				$result = (bool)1;
-				$charCount = 0;
-				$itemCount = 0;
-				$equipCount = 0;
-				foreach( $arraySupply as $row )
+				if ( $mArr > 70 && $sArr > 70 )
 				{
-					if ( $row["article_type"] == "ASST" )
-					{
-						$result = $result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, $row["type"], $row["value"], "최초 회원가입 지급" );
-					}
-					else if ( $row["article_type"] == "CHAR" )
-					{
-						for ( $i = 0; $i < $row["value"]; $i++ )
-						{
-							$arrayCharacter[$charCount] = $this->dbPlay->characterProvision( $pid, $row["type"] );
-							$charCount = $charCount + 1;
-						}
-						$this->dbPlay->collectionProvision( $pid, $row["type"] );
-					}
-					else if ( $row["article_type"] == "WEPN" || $row["article_type"] == "BCPC" || $row["article_type"] == "SKIL" )
-					{
-						for ( $i = 0; $i < $row["value"]; $i++ )
-						{
-							$arrayInventory[$itemCount] = $this->dbPlay->inventoryProvision( $pid, $row["type"] );
-							$itemCount = $itemCount + 1;
-						}
-					}
-					else if ( $row["article_type"] == "OPRT" )
-					{
-						for ( $i = 0; $i < $row["value"]; $i++ )
-						{
-							$arrayEquipment[$equipCount] = $this->dbPlay->inventoryProvision( $pid, $row["type"] );
-							$equipCount = $equipCount + 1;
-						}
-					}
+					$tmpResult = 0;
 				}
-				$result = $result & $this->dbPlay->newPlayerTeam( $pid, $arrayCharacter[0], $arrayCharacter[1], null );
-				$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[0], "weapon", $arrayInventory[0] );
-				$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[1], "weapon", $arrayInventory[1] );
+				else
+				{
+					$this->dbPlay->requestJoinStep2( $pid );
+					$this->dbPlay->insertItem( $pid );
+
+					$arraySupply = $this->dbRef->requestSupplies( $pid )->result_array();
+					$result = (bool)1;
+					$charCount = 0;
+					$itemCount = 0;
+					$equipCount = 0;
+					foreach( $arraySupply as $row )
+					{
+						if ( $row["article_type"] == "ASST" )
+						{
+							$result = $result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, $row["type"], $row["value"], "최초 회원가입 지급" );
+						}
+						else if ( $row["article_type"] == "CHAR" )
+						{
+							for ( $i = 0; $i < $row["value"]; $i++ )
+							{
+								$arrayCharacter[$charCount] = $this->dbPlay->characterProvision( $pid, $row["type"] );
+								$charCount = $charCount + 1;
+							}
+							$this->dbPlay->collectionProvision( $pid, $row["type"] );
+						}
+						else if ( $row["article_type"] == "WEPN" || $row["article_type"] == "BCPC" || $row["article_type"] == "SKIL" )
+						{
+							for ( $i = 0; $i < $row["value"]; $i++ )
+							{
+								$arrayInventory[$itemCount] = $this->dbPlay->inventoryProvision( $pid, $row["type"] );
+								$itemCount = $itemCount + 1;
+							}
+						}
+						else if ( $row["article_type"] == "OPRT" )
+						{
+							for ( $i = 0; $i < $row["value"]; $i++ )
+							{
+								$arrayEquipment[$equipCount] = $this->dbPlay->inventoryProvision( $pid, $row["type"] );
+								$equipCount = $equipCount + 1;
+							}
+						}
+					}
+					$result = $result & $this->dbPlay->newPlayerTeam( $pid, $arrayCharacter[0], $arrayCharacter[1], null );
+					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[0], "weapon", $arrayInventory[0] );
+					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[1], "weapon", $arrayInventory[1] );
+					$tmpResult = 1;
+				}
 			}
 
-			$arrayResult["pid"] = (string)$pid;
-			$accountResult = $this->dbLogin->requestAffiliateAccount( $pid )->result_array();
-			$helpArray = $this->dbPlay->requestHelpCount( $pid )->result_array();
-			$arrayResult["helpcount"] = $helpArray[0]["helpcount"];
-			$this->dbPlay->updateLoginTimeForMe( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
-			if ( $helpArray[0]["show_prof"] )
+			if ( $tmpResult )
 			{
-				$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+				$arrayResult["pid"] = (string)$pid;
+				$accountResult = $this->dbLogin->requestAffiliateAccount( $pid )->result_array();
+				$helpArray = $this->dbPlay->requestHelpCount( $pid )->result_array();
+				$arrayResult["helpcount"] = $helpArray[0]["helpcount"];
+				$this->dbPlay->updateLoginTimeForMe( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+				if ( $helpArray[0]["show_prof"] )
+				{
+					$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+				}
+				else
+				{
+					$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], "" );
+				}
+				$this->dbPlay->updateAffiliateNamePlay( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+
+				//valid user check
+				$tmpArray = $this->dbPlay->requestPlayerSel($pid)->result_array();
+				if (empty($tmpArray))
+				{
+					$resultCode = MY_Controller::STATUS_NO_PLAYER;
+					$resultText = MY_Controller::MESSAGE_NO_PLAYER;
+					$arrayResult = null;
+				}
+				else
+				{
+					$tmpArray = $tmpArray[0];
+					//접속 이벤트 참여
+					$this->load->model('admin/Model_Admin', "dbAdmin");
+					$arrayEvent = $this->dbAdmin->requestValidAccEventList()->result_array();
+					foreach( $arrayEvent as $row )
+					{
+						if ( $this->dbAdmin->requestAccessEventApply( $pid, $row["idx"] ) == 1 )
+						{
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::ACCESS_EVENT_REWARD_TITLE, $row["evt_target"], $row["evt_value"], MY_Controller::NORMAL_EXPIRE_TERM );
+						}
+					}
+					if ( !($this->dbPlay->inventoryExistCheck( $pid )) && date("Ymd") > "20150215" && date("Ymd") < "20150223" )
+					{
+						$this->dbPlay->inventoryProvision( $pid, "OP01000008" );
+						$arrayResult["addeditemlist"] = "OP01000008";
+					}
+					else
+					{
+						$arrayResult["addeditemlist"] = null;
+					}
+
+					$arrayResult["name"] = $tmpArray["name"];
+					$arrayResult["show_prof"] = $tmpArray["show_prof"];
+					$arrayResult["prof_img"] = $tmpArray["prof_img"];
+					$arrayResult["vip_level"] = $tmpArray["vip_level"];
+					$arrayResult["vip_exp"] = $tmpArray["vip_exp"];
+					$arrayResult["max_cha"] = MY_Controller::MAX_CHAR_CAPACITY;
+					$arrayResult["inc_cha"] = $tmpArray["inc_cha"];
+					$arrayResult["max_wea"] = MY_Controller::MAX_WEPN_CAPACITY;
+					$arrayResult["inc_wea"] = $tmpArray["inc_wea"];
+					$arrayResult["max_exp"] = MY_Controller::MAX_EXPLORATION;
+					$arrayResult["inc_exp"] = $tmpArray["inc_exp"];
+					$arrayResult["max_eng"] = MY_Controller::MAX_ENERGY_POINTS;
+					$arrayResult["inc_eng"] = $tmpArray["inc_eng"];
+					$arrayResult["max_fri"] = MY_Controller::MAX_FRIENDS;
+					$arrayResult["inc_fri"] = $tmpArray["inc_fri"];
+					$arrayResult["max_pvp"] = MY_Controller::MAX_MODES_PVP;
+					$arrayResult["inc_pvp"] = $tmpArray["inc_pvp"];
+					$arrayResult["max_pvb"] = MY_Controller::MAX_MODES_PVB;
+					$arrayResult["inc_pvb"] = $tmpArray["inc_pvb"];
+					$arrayResult["max_survival"] = MY_Controller::MAX_MODES_SURVIVAL;
+					$arrayResult["inc_survival"] = $tmpArray["inc_survival"];
+
+					$arrayResult["op"] = $tmpArray["operator"];
+
+					$arrayResult["team"] = $this->dbPlay->requestTeam( $pid )->result_array();
+					$arrayResult["inventory"] = $this->dbPlay->requestInventory( $pid )->result_array();
+					$arrayResult["character"] = $this->dbPlay->requestCharacters( $pid )->result_array();
+
+					$this->calcurateEnergy( $pid );
+					$tmpArray = $this->dbPlay->requestItem( $pid )->result_array()[0];
+					$arrayResult["remain_item"] = $tmpArray;
+
+					$vipReward = $this->dbRef->requestDailyVipReward( $pid, $arrayResult["vip_level"] )->result_array();
+
+					if ( !( empty($vipReward) ) )
+					{
+						foreach( $vipReward as $row )
+						{
+							if ( $row["reward_div"] == "DAILY" )
+							{
+								$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+								$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+							}
+						}
+						$arrayResult["vip_reward"] = 1;
+					}
+					else
+					{
+						$arrayResult["vip_reward"] = 0;
+					}
+					// 매일매일 패키지 지급 처리
+					$everydayPack = $this->dbPlay->requestEverydayPackageList( $pid )->result_array();
+					if ( !empty( $everydayPack ) )
+					{
+						foreach( $everydayPack as $row )
+						{
+							if ( $row["is_reward"] < 1 )
+							{
+								$mail_id = $this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+								$this->dbPlay->requestLoggingEveryDayPackPayment( $pid, $mail_id, $row["idx"], $row["paymentSeq"], $row["product_id"], $row["expire_date"], $row["reward_type"], $row["reward_value"] );
+							}
+							$arrayResult["packinfo"]["everydaypack"][] = array( "product_id" => $row["product_id"], "expire_date" => $row["expire_date"] );
+						}
+					}
+					else
+					{
+						$arrayResult["packinfo"]["everydaypack"] = null;
+					}
+
+					// 첫구매 체크 ( 상품 카테고리가 CASH 인 경우만 체크, 매일매일 패키지(카테고리 : SUBSCRIBE)와 개척자 패키지(카테고리 : LIMITED) 제외 )
+					if ( MY_Controller::VALID_FIRST_BUY_EVENT )
+					{
+						$arrayResult["packinfo"]["is_first"] = $this->dbPlay->requestFirstBuyCheck( $pid )->result_array()[0]["is_first"];
+					}
+					else
+					{
+						$arrayResult["packinfo"]["is_first"] = 0;
+					}
+
+					// 개척자 패키지
+					$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
+					if ( !empty( $limitedPack ) )
+					{
+						$arrayResult["packinfo"]["limited"] = $limitedPack;
+					}
+					else
+					{
+						$arrayResult["packinfo"]["limited"] = null;
+					}
+					$resultCode = MY_Controller::STATUS_API_OK;
+					$resultText = MY_Controller::MESSAGE_API_OK;
+				}
 			}
 			else
 			{
-				$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], "" );
-			}
-			$this->dbPlay->updateAffiliateNamePlay( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
-
-			//valid user check
-			$tmpArray = $this->dbPlay->requestPlayerSel($pid)->result_array();
-			if (empty($tmpArray))
-			{
-				$resultCode = MY_Controller::STATUS_NO_PLAYER;
-				$resultText = MY_Controller::MESSAGE_NO_PLAYER;
+				$resultCode = MY_Controller::STATUS_SERVER_BUSY;
+				$resultText = MY_Controller::MESSAGE_SERVER_BUSY;
 				$arrayResult = null;
-			}
-			else
-			{
-				$tmpArray = $tmpArray[0];
-				//접속 이벤트 참여
-				$this->load->model('admin/Model_Admin', "dbAdmin");
-				$arrayEvent = $this->dbAdmin->requestValidAccEventList()->result_array();
-				foreach( $arrayEvent as $row )
-				{
-					if ( $this->dbAdmin->requestAccessEventApply( $pid, $row["idx"] ) == 1 )
-					{
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::ACCESS_EVENT_REWARD_TITLE, $row["evt_target"], $row["evt_value"], MY_Controller::NORMAL_EXPIRE_TERM );
-					}
-				}
-				if ( !($this->dbPlay->inventoryExistCheck( $pid )) && date("Ymd") > "20150215" && date("Ymd") < "20150223" )
-				{
-					$this->dbPlay->inventoryProvision( $pid, "OP01000008" );
-					$arrayResult["addeditemlist"] = "OP01000008";
-				}
-				else
-				{
-					$arrayResult["addeditemlist"] = null;
-				}
-
-				$arrayResult["name"] = $tmpArray["name"];
-				$arrayResult["show_prof"] = $tmpArray["show_prof"];
-				$arrayResult["prof_img"] = $tmpArray["prof_img"];
-				$arrayResult["vip_level"] = $tmpArray["vip_level"];
-				$arrayResult["vip_exp"] = $tmpArray["vip_exp"];
-				$arrayResult["max_cha"] = MY_Controller::MAX_CHAR_CAPACITY;
-				$arrayResult["inc_cha"] = $tmpArray["inc_cha"];
-				$arrayResult["max_wea"] = MY_Controller::MAX_WEPN_CAPACITY;
-				$arrayResult["inc_wea"] = $tmpArray["inc_wea"];
-				$arrayResult["max_exp"] = MY_Controller::MAX_EXPLORATION;
-				$arrayResult["inc_exp"] = $tmpArray["inc_exp"];
-				$arrayResult["max_eng"] = MY_Controller::MAX_ENERGY_POINTS;
-				$arrayResult["inc_eng"] = $tmpArray["inc_eng"];
-				$arrayResult["max_fri"] = MY_Controller::MAX_FRIENDS;
-				$arrayResult["inc_fri"] = $tmpArray["inc_fri"];
-				$arrayResult["max_pvp"] = MY_Controller::MAX_MODES_PVP;
-				$arrayResult["inc_pvp"] = $tmpArray["inc_pvp"];
-				$arrayResult["max_pvb"] = MY_Controller::MAX_MODES_PVB;
-				$arrayResult["inc_pvb"] = $tmpArray["inc_pvb"];
-				$arrayResult["max_survival"] = MY_Controller::MAX_MODES_SURVIVAL;
-				$arrayResult["inc_survival"] = $tmpArray["inc_survival"];
-
-				$arrayResult["op"] = $tmpArray["operator"];
-
-				$arrayResult["team"] = $this->dbPlay->requestTeam( $pid )->result_array();
-				$arrayResult["inventory"] = $this->dbPlay->requestInventory( $pid )->result_array();
-				$arrayResult["character"] = $this->dbPlay->requestCharacters( $pid )->result_array();
-
-				$this->calcurateEnergy( $pid );
-				$tmpArray = $this->dbPlay->requestItem( $pid )->result_array()[0];
-				$arrayResult["remain_item"] = $tmpArray;
-
-				$vipReward = $this->dbRef->requestDailyVipReward( $pid, $arrayResult["vip_level"] )->result_array();
-
-				if ( !( empty($vipReward) ) )
-				{
-					foreach( $vipReward as $row )
-					{
-						if ( $row["reward_div"] == "DAILY" )
-						{
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
-							$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
-						}
-					}
-					$arrayResult["vip_reward"] = 1;
-				}
-				else
-				{
-					$arrayResult["vip_reward"] = 0;
-				}
-				// 매일매일 패키지 지급 처리
-				$everydayPack = $this->dbPlay->requestEverydayPackageList( $pid )->result_array();
-				if ( !empty( $everydayPack ) )
-				{
-					foreach( $everydayPack as $row )
-					{
-						if ( $row["is_reward"] < 1 )
-						{
-							$mail_id = $this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
-							$this->dbPlay->requestLoggingEveryDayPackPayment( $pid, $mail_id, $row["idx"], $row["paymentSeq"], $row["product_id"], $row["expire_date"], $row["reward_type"], $row["reward_value"] );
-						}
-						$arrayResult["packinfo"]["everydaypack"][] = array( "product_id" => $row["product_id"], "expire_date" => $row["expire_date"] );
-					}
-				}
-				else
-				{
-					$arrayResult["packinfo"]["everydaypack"] = null;
-				}
-
-				// 첫구매 체크 ( 상품 카테고리가 CASH 인 경우만 체크, 매일매일 패키지(카테고리 : SUBSCRIBE)와 개척자 패키지(카테고리 : LIMITED) 제외 )
-				if ( MY_Controller::VALID_FIRST_BUY_EVENT )
-				{
-					$arrayResult["packinfo"]["is_first"] = $this->dbPlay->requestFirstBuyCheck( $pid )->result_array()[0]["is_first"];
-				}
-				else
-				{
-					$arrayResult["packinfo"]["is_first"] = 0;
-				}
-
-				// 개척자 패키지
-				$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
-				if ( !empty( $limitedPack ) )
-				{
-					$arrayResult["packinfo"]["limited"] = $limitedPack;
-				}
-				else
-				{
-					$arrayResult["packinfo"]["limited"] = null;
-				}
-				$resultCode = MY_Controller::STATUS_API_OK;
-				$resultText = MY_Controller::MESSAGE_API_OK;
 			}
 		}
 		else
@@ -3347,56 +3379,49 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
-				if ( $this->dbRank->requestPVPRankCount( $pid ) < 10 )
+				$player_score = $this->dbRank->requestPVPScore( $pid )->result_array();
+				if ( empty($player_score) )
 				{
-					$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
+					$player_score = 0;
+					$player_rank = 0;
+				}
+
+				$player_rank = $player_score[0]["rank"];
+				$player_score = $player_score[0]["score"];
+				$limit_low = floor($player_score / MY_Controller::PVP_SCORE_DEVIDE_CONST) * MY_Controller::PVP_SCORE_DEVIDE_CONST;
+				if ( $limit_low >= MY_Controller::PVP_SCORE_LAST_GROUP )
+				{
+					$limit_high = 1000000;
 				}
 				else
 				{
-					$player_score = $this->dbRank->requestPVPScore( $pid )->result_array();
-					if ( empty($player_score) )
+					$limit_high = $limit_low + MY_Controller::PVP_SCORE_DEVIDE_CONST - 1;
+				}
+				$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
+				if ( $enemies < 5 )
+				{
+					if ( $player_rank < 5 )
 					{
-						$player_score = 0;
-						$player_rank = 0;
+						$rank_high = 10;
+						$rank_low = 1;
 					}
-
-					$player_rank = $player_score[0]["rank"];
-					$player_score = $player_score[0]["score"];
-					$limit_low = floor($player_score / MY_Controller::PVP_SCORE_DEVIDE_CONST) * MY_Controller::PVP_SCORE_DEVIDE_CONST;
-					if ( $limit_low >= MY_Controller::PVP_SCORE_LAST_GROUP )
+					else if ( $player_rank == 0 )
 					{
-						$limit_high = 1000000;
-					}
-					else
-					{
-						$limit_high = $limit_low + MY_Controller::PVP_SCORE_DEVIDE_CONST - 1;
-					}
-					$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
-					if ( $enemies < 5 )
-					{
-						if ( $player_rank < 5 )
-						{
-							$rank_high = 10;
-							$rank_low = 1;
-						}
-						else if ( $player_rank == 0 )
-						{
-							$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
-							$player_rank = $player_rank[0]["rank"];
-							$rank_high = $player_rank + 10;
-							$rank_low = $player_rank;
-						}
-						else
-						{
-							$rank_high = $player_rank + 5;
-							$rank_low = $player_rank - 5;
-						}
-						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
+						$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
+						$player_rank = $player_rank[0]["rank"];
+						$rank_high = $player_rank + 10;
+						$rank_low = $player_rank;
 					}
 					else
 					{
-						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )->result_array();
+						$rank_high = $player_rank + 5;
+						$rank_low = $player_rank - 5;
 					}
+					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
+				}
+				else
+				{
+					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )->result_array();
 				}
 			}
 

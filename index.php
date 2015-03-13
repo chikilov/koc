@@ -18,6 +18,7 @@ ob_start();
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
+
 if (
 	//L4
 	$_SERVER['HTTP_HOST'] == '211.110.6.34'
@@ -70,7 +71,7 @@ else if (
 )
 {
 	define('ENVIRONMENT', 'production');
-	define('SERVERGROUP', '1');
+	define('SERVERGROUP', '');
 }
 else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
 {

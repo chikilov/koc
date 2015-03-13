@@ -1654,6 +1654,16 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->affected_rows();
 	}
 
+	public function requestEnemyForPVPCount( $pid )
+	{
+		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query .= "on a.pid = b.pid ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
+	}
+
 	public function requestEnemyForPVPWithRange( $pid, $limit_low, $limit_high )
 	{
 		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
@@ -1713,11 +1723,10 @@ class Model_Play extends MY_Model {
 	//for Admin
 	public function requestBasicInfoByPid( $searchValue )
 	{
-		$query = "select a.pid, a.id, a.email, a.affiliate_id, a.affiliate_type, concat(a.name, '(', a.affiliate_name, ')') as name, ";
-		$query .= "a.uuid, a.reg_date, b.login_datetime, b.vip_level, b.vip_exp, ";
-		$query .= "if(now() between a.limit_start and a.limit_end, a.limit_type, null) as limit_type, a.limit_start, a.limit_end ";
-		$query .= "from koc_play.".MY_Controller::TBL_ACCOUNT." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-		$query .= "where a.pid = '".$searchValue."' ";
+		$query = "select pid, id, name, ";
+		$query .= "login_datetime, vip_level, vip_exp, ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC;
+		$query .= "where pid = '".$searchValue."' ";
 
 		$this->logw->admLogWrite( LOG_NOTICE, "sql : ".$query );
 		return $this->DB_SEL->query($query);

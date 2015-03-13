@@ -3400,24 +3400,22 @@ class Con_ApiProcess extends MY_Controller {
 				$enemies = $this->dbPlay->requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high );
 				if ( $enemies < 5 )
 				{
-					if ( $player_rank < 5 )
+					if ( $this->dbPlay->requestEnemyForPVPCount( $pid ) < 10 )
+					{
+						$enemy_info = $this->dbPlay->requestEnemyForPVP( $pid )->result_array();
+					}
+					else if ( $player_rank < 5 )
 					{
 						$rank_high = 10;
 						$rank_low = 1;
-					}
-					else if ( $player_rank == 0 )
-					{
-						$player_rank = $this->dbRank->requestMaxRankPVP( $pid )->result_array();
-						$player_rank = $player_rank[0]["rank"];
-						$rank_high = $player_rank + 10;
-						$rank_low = $player_rank;
+						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
 					}
 					else
 					{
 						$rank_high = $player_rank + 5;
 						$rank_low = $player_rank - 5;
+						$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
 					}
-					$enemy_info = $this->dbPlay->requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )->result_array();
 				}
 				else
 				{

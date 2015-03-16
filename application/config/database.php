@@ -116,6 +116,40 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
 	$db['default_ins']['dbdriver'] = 'mysql';
 	$db['default_ins']['pconnect'] = TRUE;
 }
+else if ( ENVIRONMENT == 'production' && SERVERGROUP == "3" )
+{
+	//log single
+	$db['log']['hostname'] = '172.18.55.239';
+	$db['log']['username'] = 'webuser';
+	$db['log']['password'] = 'dudrud0612@';
+	//login single
+	$db['login']['hostname'] = '172.19.172.69';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612@';
+
+	$db['default']['hostname'] = '172.18.54.80';
+	$db['default']['username'] = 'webuser';
+	$db['default']['password'] = 'dudrud0612@';
+	//replication slave
+	$db['default_sel']['hostname'] = '172.18.47.80';
+	$db['default_sel']['username'] = 'webuser';
+	$db['default_sel']['password'] = 'dudrud0612@';
+	//replication master
+	$db['default_ins']['hostname'] = '172.18.54.80';
+	$db['default_ins']['username'] = 'webuser';
+	$db['default_ins']['password'] = 'dudrud0612@';
+
+	$db['login']['dbdriver'] = 'mysql';
+	$db['login']['pconnect'] = TRUE;
+	$db['log']['dbdriver'] = 'mysql';
+	$db['log']['pconnect'] = TRUE;
+	$db['default']['dbdriver'] = 'mysql';
+	$db['default']['pconnect'] = TRUE;
+	$db['default_sel']['dbdriver'] = 'mysql';
+	$db['default_sel']['pconnect'] = TRUE;
+	$db['default_ins']['dbdriver'] = 'mysql';
+	$db['default_ins']['pconnect'] = TRUE;
+}
 else if ( ENVIRONMENT == 'development' )
 {
 	// getsebool -a |grep httpd 외부에서 데이터베이스 접근하도록 설정되어있는 지 확인

@@ -67,11 +67,55 @@ else if (
 	define('SERVERGROUP', '2');
 }
 else if (
+	//L4
+	$_SERVER['HTTP_HOST'] == '1.234.6.33'
+	|| $_SERVER['HTTP_HOST'] == 'm.koc3lb.tntgame.co.kr'
+	//web01
+	|| $_SERVER['HTTP_HOST'] == '1.234.89.245'
+	|| $_SERVER['HTTP_HOST'] == 'm.koc3api1.tntgame.co.kr'
+	//web02
+	|| $_SERVER['HTTP_HOST'] == '211.110.154.217'
+	|| $_SERVER['HTTP_HOST'] == 'm.koc3api2.tntgame.co.kr'
+	//web03
+	|| $_SERVER['HTTP_HOST'] == '1.234.69.161'
+	|| $_SERVER['HTTP_HOST'] == 'm.koc3api3.tntgame.co.kr'
+	//web04
+	|| $_SERVER['HTTP_HOST'] == '1.234.69.83'
+	|| $_SERVER['HTTP_HOST'] == 'm.koc3api4.tntgame.co.kr'
+)
+{
+	define('ENVIRONMENT', 'production');
+	define('SERVERGROUP', '3');
+}
+else if (
 	$_SERVER['HTTP_HOST'] == 'm.koclogin.tntgame.co.kr'
 )
 {
 	define('ENVIRONMENT', 'production');
-	define('SERVERGROUP', '');
+	if ( $_SERVER["LOCAL_ADDR"] == '175.119.227.180'
+			|| $_SERVER["LOCAL_ADDR"] == '211.110.6.124'
+			|| $_SERVER["LOCAL_ADDR"] == '1.234.7.75'
+			|| $_SERVER["LOCAL_ADDR"] == '211.110.154.227'
+	)
+	{
+		define('SERVERGROUP', '1');
+	}
+	else if ( $_SERVER["LOCAL_ADDR"] == '1.234.45.250'
+			|| $_SERVER["LOCAL_ADDR"] == '175.126.103.73'
+			|| $_SERVER["LOCAL_ADDR"] == '1.234.89.167'
+			|| $_SERVER["LOCAL_ADDR"] == '1.234.6.60'
+	)
+	{
+		define('SERVERGROUP', '2');
+	}
+	else if ( $_SERVER["LOCAL_ADDR"] == '1.234.89.245'
+			|| $_SERVER["LOCAL_ADDR"] == '211.110.154.217'
+			|| $_SERVER["LOCAL_ADDR"] == '1.234.69.161'
+			|| $_SERVER["LOCAL_ADDR"] == '1.234.69.83'
+	)
+	{
+		define('SERVERGROUP', '3');
+	}
 }
 else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
 {

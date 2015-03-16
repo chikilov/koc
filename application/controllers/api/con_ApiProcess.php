@@ -1719,7 +1719,7 @@ class Con_ApiProcess extends MY_Controller {
 
 						if ( ENVIRONMENT == "production" )
 						{
-							$kurl = "http://m.koccommon.tntgame.co.kr/token.htm";
+							$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
 						}
 						else
 						{
@@ -1732,6 +1732,8 @@ class Con_ApiProcess extends MY_Controller {
 						$ch = curl_init();
 						curl_setopt($ch, CURLOPT_URL, $url);
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+						curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+						curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
 						$arrResponse = json_decode( curl_exec( $ch ), true );
 
 						if ( empty( $arrResponse ) )
@@ -1925,6 +1927,8 @@ class Con_ApiProcess extends MY_Controller {
 						$ch = curl_init();
 						curl_setopt($ch, CURLOPT_URL, $url);
 						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+						curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+						curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
 						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 						curl_setopt($ch, CURLOPT_POSTFIELDS, $sendData_string);
 						curl_setopt($ch, CURLOPT_HTTPHEADER, array( "Content-Type: application/json", "Content-Length: " . strlen($sendData_string)));

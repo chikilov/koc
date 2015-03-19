@@ -29,15 +29,22 @@ class Con_ApiProcess extends MY_Controller {
 		}
 		$id = $decoded["id"];
 		$password = $decoded["password"];
+		$macaddr = $decoded["macaddr"];
 
 		//회원가입
-		if( $id && $password )
+		if( $id && $password && $macaddr )
 		{
 			//아이디 중복 체크
-			if ($this->dbLogin->requestDupId( $id ) > 0)
+			if ( $this->dbLogin->requestDupId( $id ) > 0 )
 			{
 				$resultCode = MY_Controller::STATUS_CREATE_DUPLICATE_ID;
 				$resultText = MY_Controller::MESSAGE_CREATE_DUPLICATE_ID;
+				$arrayResult = null;
+			}
+			else if ( $this->dbLogin->requestCheckMac( $macaddr ) )
+			{
+				$resultCode = MY_Controller::STATUS_RESTRICT_MAC;
+				$resultText = MY_Controller::MESSAGE_RESTRICT_MAC;
 				$arrayResult = null;
 			}
 			else
@@ -92,23 +99,32 @@ class Con_ApiProcess extends MY_Controller {
 			$arrayResult = $this->dbLogin->requestDupMacaddr( $macaddr )->result_array();
 			if ( empty( $arrayResult ) )
 			{
-				//회원 가입처리
-				$arrayResult["pid"] = $this->dbLogin->requestGuestJoin( $macaddr, $uuid );
-				if ( count($arrayResult) < 1 )
+				if ( $this->dbLogin->requestCheckMac( $macaddr ) )
 				{
-					$resultCode = MY_Controller::STATUS_JOIN_GUEST;
-					$resultText = MY_Controller::MESSAGE_JOIN_GUEST;
+					$resultCode = MY_Controller::STATUS_RESTRICT_MAC;
+					$resultText = MY_Controller::MESSAGE_RESTRICT_MAC;
 					$arrayResult = null;
-					$result = (bool)0;
 				}
 				else
 				{
-					$result = (bool)$arrayResult["pid"];
-				}
+					//회원 가입처리
+					$arrayResult["pid"] = $this->dbLogin->requestGuestJoin( $macaddr, $uuid );
+					if ( count($arrayResult) < 1 )
+					{
+						$resultCode = MY_Controller::STATUS_JOIN_GUEST;
+						$resultText = MY_Controller::MESSAGE_JOIN_GUEST;
+						$arrayResult = null;
+						$result = (bool)0;
+					}
+					else
+					{
+						$result = (bool)$arrayResult["pid"];
+					}
 
-				$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
-				$resultCode = MY_Controller::STATUS_API_OK;
-				$resultText = MY_Controller::MESSAGE_API_OK;
+					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					$resultCode = MY_Controller::STATUS_API_OK;
+					$resultText = MY_Controller::MESSAGE_API_OK;
+				}
 			}
 			else
 			{
@@ -165,23 +181,32 @@ class Con_ApiProcess extends MY_Controller {
 			$arrayResult = $this->dbLogin->requestDupAffiliateId( $affiliateType, $affiliateId )->result_array();
 			if ( empty( $arrayResult ) )
 			{
-				//회원 가입처리
-				$arrayResult["pid"] = $this->dbLogin->requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg );
-				if ( count($arrayResult) < 1 )
+				if ( $this->dbLogin->requestCheckMac( $macaddr ) )
 				{
-					$resultCode = MY_Controller::STATUS_JOIN_PARTNERSHIP;
-					$resultText = MY_Controller::MESSAGE_JOIN_PARTNERSHIP;
+					$resultCode = MY_Controller::STATUS_RESTRICT_MAC;
+					$resultText = MY_Controller::MESSAGE_RESTRICT_MAC;
 					$arrayResult = null;
-					$result = (bool)0;
 				}
 				else
 				{
-					$result = (bool)$arrayResult["pid"];
-				}
+					//회원 가입처리
+					$arrayResult["pid"] = $this->dbLogin->requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg );
+					if ( count($arrayResult) < 1 )
+					{
+						$resultCode = MY_Controller::STATUS_JOIN_PARTNERSHIP;
+						$resultText = MY_Controller::MESSAGE_JOIN_PARTNERSHIP;
+						$arrayResult = null;
+						$result = (bool)0;
+					}
+					else
+					{
+						$result = (bool)$arrayResult["pid"];
+					}
 
-				$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
-				$resultCode = MY_Controller::STATUS_API_OK;
-				$resultText = MY_Controller::MESSAGE_API_OK;
+					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					$resultCode = MY_Controller::STATUS_API_OK;
+					$resultText = MY_Controller::MESSAGE_API_OK;
+				}
 			}
 			else
 			{
@@ -928,6 +953,12 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				$resultCode = MY_Controller::STATUS_DEPLOY_CHARACTER_INFO;
 				$resultText = MY_Controller::MESSAGE_DEPLOY_CHARACTER_INFO;
+				$arrayResult = null;
+			}
+			else if ( $teamInfo["00"] == 0 || $teamInfo["10"] == 0 || $teamInfo["20"] == 0 )
+			{
+				$resultCode = MY_Controller::STATUS_NO_CHARACTER_FOR_SLOT;
+				$resultText = MY_Controller::MESSAGE_NO_CHARACTER_FOR_SLOT;
 				$arrayResult = null;
 			}
 			else

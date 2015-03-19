@@ -135,5 +135,15 @@ class Model_Login extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
 	}
+
+	public function requestCheckMac( $macaddr )
+	{
+		$query = "select macaddr from koc_account.".MY_Controller::TBL_RESTRICTMACADDR." ";
+		$query .= "where macaddr = '".$macaddr."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
 }
 ?>

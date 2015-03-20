@@ -49,6 +49,10 @@ EOF;
 	const MESSAGE_SERVER_OFFLINE = "NG_ERROR_SERVER_OFFLINE";
 	const STATUS_API_OK = "0200";
 	const MESSAGE_API_OK = "NG_SUCCESS";
+	const STATUS_LOGIN_DUP = "0300";
+	const MESSAGE_LOGIN_DUP = "NG_ERROR_LOGIN_DUP";
+	const STATUS_INSERT_ROW = "0500";
+	const MESSAGE_INSERT_ROW = "NG_ERROR_INSERT_ROW";
 
 	//const for each error response
 	const STATUS_CREATE_DUPLICATE_ID = "0011";
@@ -594,6 +598,7 @@ EOF;
 		$this->load->model("api/Model_Rank", "dbRank");
 		$this->load->model("api/Model_Record", "dbRecord");
 		$this->load->model("api/Model_Ref", "dbRef");
+		$this->load->model("api/Model_Login", "dbLogin");
 
 		date_default_timezone_set('Asia/Seoul');
 
@@ -612,11 +617,35 @@ EOF;
 			}
 		}
 
-		if ( array_key_exists( "pid", $_POST ) )
+		$requestData = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+		if ( array_key_exists( "pid", $requestData ) )
 		{
-			$keyId = $_POST["pid"];
+			$keyId = $requestData["pid"];
 			if ( $keyId != "" )
 			{
+				if ( array_key_exists( "cursession", $requestData ) )
+				{
+					$cursession = $requestData["cursession"];
+					if ( !($this->dbLogin->requestSessionCheck( $keyId, $cursession )) && $cursession != "forAdmin" )
+					{
+						$resultCode = MY_Controller::STATUS_LOGIN_DUP;
+						$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
+						$arrayResult = null;
+
+						echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
+						exit(0);
+					}
+				}
+				else
+				{
+					$resultCode = MY_Controller::STATUS_LOGIN_DUP;
+					$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
+					$arrayResult = null;
+
+					echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
+					exit(0);
+				}
+
 				//$arrKey = $this->dbPlay->requestKey( $keyId )->result_array();
 				//$public_key = $arrKey[0]["public_key"];
 				//$private_key = $arrKey[0]["private_key"];
@@ -791,7 +820,7 @@ EOF;
 
 	function ADM_RETURN_MESSAGE( $status, $message, $arrayResult, $reqData )
 	{
-		$userId = $this->session->userdata('userId_session');
+		$userId = "";//$this->session->userdata('userId_session');
 		if (defined('ENVIRONMENT'))
 		{
 			switch (ENVIRONMENT)

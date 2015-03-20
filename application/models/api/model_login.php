@@ -56,10 +56,10 @@ class Model_Login extends MY_Model {
 		return $this->DB_LOGIN->affected_rows();
 	}
 
-	public function requestJoin( $id, $password )
+	public function requestJoin( $id, $password, $macaddr )
 	{
-		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( id, password, reg_date ) values (";
-		$query .= " '".$id."', password( '".$password."' ), now() )";
+		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( id, password, macaddr, reg_date ) values (";
+		$query .= " '".$id."', password( '".$password."' ), '".$macaddr."', now() )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);
@@ -140,6 +140,44 @@ class Model_Login extends MY_Model {
 	{
 		$query = "select macaddr from koc_account.".MY_Controller::TBL_RESTRICTMACADDR." ";
 		$query .= "where macaddr = '".$macaddr."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function checkDup( $cursession )
+	{
+		$query = "select cursession from koc_account.".MY_Controller::TBL_ACCOUNT." where cursession = '".$cursession."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function updateSession( $affiliateType, $affiliateId, $cursession )
+	{
+		if ( $affiliateType == "0" )
+		{
+			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where id = '".$affiliateId."' ";
+		}
+		else if ( $affiliateType == "1" )
+		{
+			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where affiliate_id is null and id is null and macaddr = '".$affiliateId."' ";
+		}
+		else
+		{
+			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where affiliate_type = '".$affiliateType."' and affiliate_id = '".$affiliateId."' ";
+		}
+
+		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function requestSessionCheck( $keyId, $cursession )
+	{
+		$query = "select pid from koc_account.".MY_Controller::TBL_ACCOUNT." where pid = '".$keyId."' and cursession = '".$cursession."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);

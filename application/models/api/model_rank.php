@@ -96,10 +96,11 @@ class Model_Rank extends MY_Model {
 		$query .= "case when dayofweek(now()) < ".MY_Controller::PVB_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
 		$query .= "else yearweek(now(), 2) end, ";
 		$query .= "( select name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
-		$query .= "( select affiliate_name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
+		$query .= "( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "( select if(show_prof, prof_img, '') as prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "'".$stageid."', 0, '".$score."', now() from dual ";
-		$query .= "on duplicate key update score = score + ".$score." ";
+		$query .= "on duplicate key update score = score + ".$score.", ";
+		$query .= "affiliate_name = ( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -112,10 +113,11 @@ class Model_Rank extends MY_Model {
 		$query .= "case when dayofweek(now()) < ".MY_Controller::SURVIVAL_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
 		$query .= "else yearweek(now(), 2) end, ";
 		$query .= "( select name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
-		$query .= "( select affiliate_name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
+		$query .= "( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "( select if(show_prof, prof_img, '') as prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "0, '".$score."', now() from dual ";
-		$query .= "on duplicate key update score = score + ".$score." ";
+		$query .= "on duplicate key update score = score + ".$score.", ";
+		$query .= "affiliate_name = ( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -128,10 +130,11 @@ class Model_Rank extends MY_Model {
 		$query .= "case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
 		$query .= "else yearweek(now(), 2) end, ";
 		$query .= "( select name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
-		$query .= "( select affiliate_name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
+		$query .= "( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "( select if(show_prof, prof_img, '') as prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "0, '".$score."', now() from dual ";
-		$query .= "on duplicate key update score = score + ".$score." ";
+		$query .= "on duplicate key update score = score + ".$score.", ";
+		$query .= "affiliate_name = ( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -176,7 +179,7 @@ class Model_Rank extends MY_Model {
 
 	public function requestRankingInfoPVP( $pid, $page )
 	{
-		$query = "select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";
+		$query = "select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
 		$query .= "a.prof_img, c.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVP." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid and b.team_seq = 0 ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on b.memb_0 = c.idx where ";
@@ -204,7 +207,7 @@ class Model_Rank extends MY_Model {
 	public function requestFriendRankingInfoPVP( $pid )
 	{
 		$query = "select pid, name, refid, rank, score, prof_img ";
-		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";
+		$query .= "from ( select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
 		$query .= "a.prof_img, d.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVP." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
@@ -219,7 +222,8 @@ class Model_Rank extends MY_Model {
 
 	public function requestRankingInfoPVB( $pid, $page )
 	{
-		$query = "select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, a.prof_img, c.refid, a.rank, a.score ";
+		$query = "select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
+		$query .= "a.prof_img, c.refid, a.rank, a.score ";
 		$query .= "from koc_rank.".MY_Controller::TBL_PVB." as a force index (idx_pvb_weekseq, idx_pvb_rank) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid and b.team_seq = 0 ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on b.memb_0 = c.idx where ";
@@ -247,7 +251,7 @@ class Model_Rank extends MY_Model {
 	public function requestFriendRankingInfoPVB( $pid )
 	{
 		$query = "select pid, name, refid, rank, score, prof_img ";
-		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, ";
+		$query .= "from ( select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
 		$query .= "a.prof_img, d.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVB." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
@@ -262,7 +266,8 @@ class Model_Rank extends MY_Model {
 
 	public function requestRankingInfoSURVIVAL( $pid, $page )
 	{
-		$query = "select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, a.prof_img, c.refid, a.rank, a.score ";
+		$query = "select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
+		$query .= "a.prof_img, c.refid, a.rank, a.score ";
 		$query .= "from koc_rank.".MY_Controller::TBL_SURVIVAL." as a inner join ";
 		$query .= "koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid and b.team_seq = 0 ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on b.memb_0 = c.idx where ";
@@ -290,7 +295,8 @@ class Model_Rank extends MY_Model {
 	public function requestFriendRankingInfoSURVIVAL( $pid )
 	{
 		$query = "select pid, name, refid, rank, score, prof_img ";
-		$query .= "from ( select a.pid, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')') as name, a.prof_img, d.refid, a.rank, a.score ";
+		$query .= "from ( select a.pid, concat(ifnull(a.name, '-'), if(a.affiliate_name is null or a.affiliate_name = '', '', concat('(', a.affiliate_name, ')'))) as name, ";
+		$query .= "a.prof_img, d.refid, a.rank, a.score ";
 		$query .= "from koc_rank.".MY_Controller::TBL_SURVIVAL." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";

@@ -17,7 +17,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestJoin()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -50,7 +49,7 @@ class Con_ApiProcess extends MY_Controller {
 			else
 			{
 				//회원 가입처리
-				$arrayResult["pid"] = $this->dbLogin->requestJoin( $id, $password );
+				$arrayResult["pid"] = $this->dbLogin->requestJoin( $id, $password, $macaddr );
 				if ( count($arrayResult) < 1 )
 				{
 					$resultCode = MY_Controller::STATUS_CREATE_ID;
@@ -78,7 +77,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestGuestLogin()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -109,6 +107,13 @@ class Con_ApiProcess extends MY_Controller {
 				{
 					//회원 가입처리
 					$arrayResult["pid"] = $this->dbLogin->requestGuestJoin( $macaddr, $uuid );
+					$checkCount = 1;
+					while ( $checkCount >= 1 ) //중복카운트가 0일때 까지 돌림
+					{
+						$cursession = $this->generateRandomString(16); // 16자리 난수 생성 (영대문자+숫자)
+						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
+					}
+
 					if ( count($arrayResult) < 1 )
 					{
 						$resultCode = MY_Controller::STATUS_JOIN_GUEST;
@@ -118,12 +123,14 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else
 					{
+						$arrayResult["cursession"] = $cursession;
 						$result = (bool)$arrayResult["pid"];
-					}
 
-					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
-					$resultCode = MY_Controller::STATUS_API_OK;
-					$resultText = MY_Controller::MESSAGE_API_OK;
+						$this->dbLogin->updateSession( "1", $macaddr, $cursession );
+						$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+						$resultCode = MY_Controller::STATUS_API_OK;
+						$resultText = MY_Controller::MESSAGE_API_OK;
+					}
 				}
 			}
 			else
@@ -137,6 +144,15 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
+					$checkCount = 1;
+					while ( $checkCount >= 1 ) //중복카운트가 0일때 까지 돌림
+					{
+						$cursession = $this->generateRandomString(16); // 16자리 난수 생성 (영대문자+숫자)
+						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
+					}
+
+					$this->dbLogin->updateSession( "1", $macaddr, $cursession );
+					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
@@ -155,7 +171,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAffiliateLogin()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -203,6 +218,15 @@ class Con_ApiProcess extends MY_Controller {
 						$result = (bool)$arrayResult["pid"];
 					}
 
+					$checkCount = 1;
+					while ( $checkCount >= 1 ) //중복카운트가 0일때 까지 돌림
+					{
+						$cursession = $this->generateRandomString(16); // 16자리 난수 생성 (영대문자+숫자)
+						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
+					}
+
+					$this->dbLogin->updateSession( $affiliateType, $affiliateId, $cursession );
+					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
@@ -219,6 +243,15 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
+					$checkCount = 1;
+					while ( $checkCount >= 1 ) //중복카운트가 0일때 까지 돌림
+					{
+						$cursession = $this->generateRandomString(16); // 16자리 난수 생성 (영대문자+숫자)
+						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
+					}
+
+					$this->dbLogin->updateSession( $affiliateType, $affiliateId, $cursession );
+					$arrayResult["cursession"] = $cursession;
 					$this->dbLogin->updateAffiliateNameAccount( $arrayResult["pid"], $affiliateName, $affiliateEmail, $affiliateProfImg );
 
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
@@ -239,7 +272,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateName()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -375,7 +407,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLogin()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -416,6 +447,15 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
+					$checkCount = 1;
+					while ( $checkCount >= 1 ) //중복카운트가 0일때 까지 돌림
+					{
+						$cursession = $this->generateRandomString(16); // 16자리 난수 생성 (영대문자+숫자)
+						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
+					}
+
+					$this->dbLogin->updateSession( "0", $id, $cursession );
+					$arrayResult["cursession"] = $cursession;
 					$this->dbPlay->onBeginTransaction();
 					$result = (bool)$this->dbPlay->updateLoginTimeForMe( $arrayResult["pid"] );
 					$this->dbPlay->updateLoginTimeForFriend( $arrayResult["pid"] );
@@ -667,10 +707,11 @@ class Con_ApiProcess extends MY_Controller {
 		}
 		$pid = $decoded["pid"];
 		$show_prof = $decoded["show_prof"];
+		$show_name = $decoded["show_name"];
 
 		if ( $pid )
 		{
-			$this->dbPlay->requestUpdateShowProfile( $pid, $show_prof );
+			$this->dbPlay->requestUpdateShowProfile( $pid, $show_prof, $show_name );
 			$resultCode = MY_Controller::STATUS_API_OK;
 			$resultText = MY_Controller::MESSAGE_API_OK;
 			$arrayResult = null;
@@ -687,7 +728,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestPlayer()
 	{
-		$this->load->model("api/Model_Login", "dbLogin");
 		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		if ( array_key_exists("pid", $decoded) )
 		{
@@ -778,15 +818,23 @@ class Con_ApiProcess extends MY_Controller {
 				$helpArray = $this->dbPlay->requestHelpCount( $pid )->result_array();
 				$arrayResult["helpcount"] = $helpArray[0]["helpcount"];
 				$this->dbPlay->updateLoginTimeForMe( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
-				if ( $helpArray[0]["show_prof"] )
+				if ( $helpArray[0]["show_name"] )
 				{
-					$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+					$affiliateName = $accountResult[0]["affiliate_name"];
 				}
 				else
 				{
-					$this->dbPlay->updateAffiliateFriendInfo( $pid, $accountResult[0]["affiliate_name"], "" );
+					$affiliateName = "";
 				}
-				$this->dbPlay->updateAffiliateNamePlay( $pid, $accountResult[0]["affiliate_name"], $accountResult[0]["prof_img"] );
+				if ( $helpArray[0]["show_prof"] )
+				{
+					$this->dbPlay->updateAffiliateFriendInfo( $pid, $affiliateName, $accountResult[0]["prof_img"] );
+				}
+				else
+				{
+					$this->dbPlay->updateAffiliateFriendInfo( $pid, $affiliateName, "" );
+				}
+				$this->dbPlay->updateAffiliateNamePlay( $pid, $affiliateName, $accountResult[0]["prof_img"] );
 
 				//valid user check
 				$tmpArray = $this->dbPlay->requestPlayerSel($pid)->result_array();
@@ -821,6 +869,7 @@ class Con_ApiProcess extends MY_Controller {
 
 					$arrayResult["name"] = $tmpArray["name"];
 					$arrayResult["show_prof"] = $tmpArray["show_prof"];
+					$arrayResult["show_name"] = $tmpArray["show_name"];
 					$arrayResult["prof_img"] = $tmpArray["prof_img"];
 					$arrayResult["vip_level"] = $tmpArray["vip_level"];
 					$arrayResult["vip_exp"] = $tmpArray["vip_exp"];
@@ -3487,6 +3536,7 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					$enemy_info = array_merge($enemy_info, $this->dbPlay->requestPVPEquipment( $enemyPid )->result_array()[0]);
 					unset($enemy_info[0]);
+
 					$enemy_info["pid"] = $enemyPid;
 					$enemy_info["prof_img"] = $enemyProfImg;
 					$enemy_info["charInfo"] = $this->dbPlay->requestPVPTeam( $enemyPid )->result_array();
@@ -5355,7 +5405,6 @@ class Con_ApiProcess extends MY_Controller {
 		if( $pid )
 		{
 			$arrayResult["recomlist"] = $this->dbPlay->requestRecomFriendList( $pid, $searchVal )->result_array();
-			//$arrayResult["waitlist"] = $this->dbPlay->requestWaitFriendList( $pid )->result_array();
 			$resultCode = MY_Controller::STATUS_API_OK;
 			$resultText = MY_Controller::MESSAGE_API_OK;
 		}
@@ -6273,7 +6322,7 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				//회원 가입처리
 				$this->dbPlay->onBeginTransaction();
-				$arrayResult["pid"] = $this->dbPlay->requestJoin( $id, $password );
+				$arrayResult["pid"] = $this->dbPlay->requestJoin( $id, $password, $macaddr );
 				if ( count($arrayResult) < 1 )
 				{
 					$resultCode = MY_Controller::STATUS_UPDATE_NOTHING;
@@ -6422,6 +6471,32 @@ class Con_ApiProcess extends MY_Controller {
 		}
 
 		$this->dbPlay->onEndTransaction( $result );
+	}
+
+	public function requestSendMail()
+	{
+		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+		$pid = $decoded["pid"];
+		$sid = $decoded["sid"];
+		$title = $decoded["title"];
+		$attach_type = $decoded["attach_type"];
+		$attach_value = $decoded["attach_value"];
+		$expire_date = $decoded["expire_date"];
+
+		if ( $this->dbMail->sendMail( $pid, $sid, $title, $attach_type, $attach_value, $expire_date ) )
+		{
+			$resultCode = MY_Controller::STATUS_API_OK;
+			$resultText = MY_Controller::MESSAGE_API_OK;
+			$arrayResult = null;
+		}
+		else
+		{
+			$resultCode = MY_Controller::STATUS_INSERT_ROW;
+			$resultText = MY_Controller::MESSAGE_INSERT_ROW;
+			$arrayResult = null;
+		}
+
+		echo $this->ADM_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $_POST["data"] );
 	}
 }
 ?>

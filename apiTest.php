@@ -1,7 +1,84 @@
-<?
-	$strurl = "/koc10100/index.php/request/api/requestLogin/";
-//print_r(mb_substr($strurl, -13, 12));
-print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
+<?php
+	if ( $_SERVER["SERVER_ADDR"] == "175.119.227.180" || $_SERVER["LOCAL_ADDR"] == "175.119.227.180" )
+	{
+		$serverAddr = "175.119.227.180";
+		$serverName = "api_1-1";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "211.110.6.124" || $_SERVER["LOCAL_ADDR"] == "211.110.6.124" )
+	{
+		$serverAddr = "211.110.6.124";
+		$serverName = "api_1-2";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.7.75" || $_SERVER["LOCAL_ADDR"] == "1.234.7.75" )
+	{
+		$serverAddr = "1.234.7.75";
+		$serverName = "api_1-3";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "211.110.154.227" || $_SERVER["LOCAL_ADDR"] == "211.110.154.227" )
+	{
+		$serverAddr = "211.110.154.227";
+		$serverName = "api_1-4";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.45.250" || $_SERVER["LOCAL_ADDR"] == "1.234.45.250" )
+	{
+		$serverAddr = "1.234.45.250";
+		$serverName = "api_2-1";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "175.126.103.73" || $_SERVER["LOCAL_ADDR"] == "175.126.103.73" )
+	{
+		$serverAddr = "175.126.103.73";
+		$serverName = "api_2-2";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.89.167" || $_SERVER["LOCAL_ADDR"] == "1.234.89.167" )
+	{
+		$serverAddr = "1.234.89.167";
+		$serverName = "api_2-3";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.6.60" || $_SERVER["LOCAL_ADDR"] == "1.234.6.60" )
+	{
+		$serverAddr = "1.234.6.60";
+		$serverName = "api_2-4";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.89.245" || $_SERVER["LOCAL_ADDR"] == "1.234.89.245" )
+	{
+		$serverAddr = "1.234.89.245";
+		$serverName = "api_3-1";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "211.110.154.217" || $_SERVER["LOCAL_ADDR"] == "211.110.154.217" )
+	{
+		$serverAddr = "211.110.154.217";
+		$serverName = "api_3-2";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.69.161" || $_SERVER["LOCAL_ADDR"] == "1.234.69.161" )
+	{
+		$serverAddr = "1.234.69.161";
+		$serverName = "api_3-3";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "1.234.69.83" || $_SERVER["LOCAL_ADDR"] == "1.234.69.83" )
+	{
+		$serverAddr = "1.234.69.83";
+		$serverName = "api_3-4";
+		$urlbase = "koc10100";
+	}
+	else if ( $_SERVER["SERVER_ADDR"] == "101.79.109.239" || $_SERVER["LOCAL_ADDR"] == "101.79.109.239" )
+	{
+		$serverAddr = "101.79.109.239";
+		$serverName = "dev";
+		$urlbase = "koc";
+	}
+	echo $serverAddr." ( ".$serverName." )<br />";
+	$strurl = "/".$urlbase."/index.php/request/api/requestLogin/";
 ?>
 <script type="text/javascript">
 	var arrSampleData = [
@@ -72,17 +149,18 @@ print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
 		"{\"pid\":\"13645\",\"characters\":[{\"cid\":\"111\"},{\"cid\":\"222\"}]}",
 		"{\"pid\":\"13645\"}",
 		"{\"pid\":\"1\"}",
-		"{\"prefix\":\"WEAPONTEST_\",\"maxSeq\":\"108\"}"
+		"{\"prefix\":\"WEAPONTEST_\",\"maxSeq\":\"108\"}",
+		"{\"pid\":\"10\",\"sid\":\"0\",\"title\":\"NG_MESSAGE_MAIL_REWARD_EV\",\"attach_type\":\"GAC060006\",\"attach_value\":\"1\",\"expire_date\":\"72\",\"cursession\":\"forAdmin\"}"
 	];
 
 	function apiTypeChg() {
 		var actiondisp = document.getElementById("ActionURL");
 		var dataSam = document.getElementById("dataSample");
 
-		actiondisp.innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
+		actiondisp.innerText = "http://<?=$_SERVER['HTTP_HOST']?>/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
 		dataSam.innerText = arrSampleData[frmTest.apitype.selectedIndex];
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
-		frmTest.action = "/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
+		frmTest.action = "/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
 	}
 
 	function sendact() {
@@ -100,9 +178,9 @@ print_r(mb_substr($strurl, 0, mb_strrpos($strurl, "/")));
 
 	window.onload = function () {
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
-		frmTest.action = "/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
+		frmTest.action = "/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
 		document.getElementById("dataSample").innerText = arrSampleData[frmTest.apitype.selectedIndex];
-		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/koc10100/index.php/request/api/" + frmTest.apitype.value + "/";
+		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
 
 	}
 </script>
@@ -183,6 +261,7 @@ Action주소 : <br />
 		<option value="requestMaxCharacterAll">requestMaxCharacterAll</option>
 		<option value="requestInit">requestInit</option>
 		<option value="requestTestLoop">requestTestLoop</option>
+		<option value="requestSendMail">requestSendMail</option>
 	</select><br /><br />
 	<textarea name="data" id="samData" style="width:600px;height:300px;">
 	</textarea><br /><br />

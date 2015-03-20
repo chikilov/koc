@@ -73,7 +73,7 @@ class Model_Play extends MY_Model {
 
 	public function requestHelpCount( $pid )
 	{
-		$query = "select a.show_prof, count(b.result_datetime) as helpcount from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
+		$query = "select a.show_prof, a.show_name, count(b.result_datetime) as helpcount from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
 		$query .= "left outer join koc_record.".MY_Controller::TBL_PVE." as b on a.pid = b.friendid ";
 		$query .= "and (b.result_datetime between a.login_datetime and now() or b.result_datetime is null) ";
 		$query .= "where a.pid = '".$pid."' ";
@@ -123,7 +123,7 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerSel( $pid )
 	{
-		$query = "select name, show_prof, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
 		$query .= "inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
@@ -134,7 +134,7 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerIns( $pid )
 	{
-		$query = "select name, show_prof, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
 		$query .= "inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
@@ -143,9 +143,9 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
-	public function requestUpdateShowProfile( $pid, $show_prof )
+	public function requestUpdateShowProfile( $pid, $show_prof, $show_name )
 	{
-		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set show_prof = ".$show_prof." where pid = '".$pid."' ";
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set show_prof = ".$show_prof.", show_name = ".$show_name." where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -154,7 +154,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPVPEquipment( $pid )
 	{
-		$query = "select if(a.affiliate_name is null or a.affiliate_name = '', a.name, concat(ifnull(a.name, ''), '(', ifnull(a.affiliate_name, ''), ')')) as name, ";
+		$query = "select if(a.show_name, if(a.affiliate_name is null or a.affiliate_name = '', ifnull(a.name, '-'), concat(ifnull(a.name, ''), ";
+		$query .= "'(', ifnull(a.affiliate_name, ''), ')')), ifnull(a.name, '-')) as name, ";
 		$query .= "c.refid as op, d.refid as pilot_0, e.refid as pilot_1, f.refid as pilot_2 ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
@@ -1267,7 +1268,8 @@ class Model_Play extends MY_Model {
 	public function requestRecomFriendList( $pid, $searchVal )
 	{
 		$query = "select f.pid, f.name, if(f.show_prof, f.prof_img, '') as prof_img, f.refid, f.inc_fri, f.friendCount from ( ";
-		$query .= "select a.pid, a.show_prof, a.prof_img, if(a.affiliate_name is null or a.affiliate_name = '', a.name, concat(a.name, '(', a.affiliate_name, ')')) as name, ";
+		$query .= "select a.pid, a.show_prof, a.prof_img, if(a.show_name, if(a.affiliate_name is null or a.affiliate_name = '', ifnull(a.name, '-'), ";
+		$query .= "concat(a.name, '(', a.affiliate_name, ')')), a.name) as name, ";
 		$query .= "d.refid, a.inc_fri, count(e.fid) as friendCount ";
 		$query .= "from koc_play.player_basic as a left outer join ( ";
 		$query .= "select fid from koc_play.player_friend where pid = '".$pid."' and friend_status < 2 ) as b on a.pid = b.fid ";
@@ -1289,26 +1291,13 @@ class Model_Play extends MY_Model {
 
 	public function requestMyFriendList( $pid, $status )
 	{
-		if ( $status == 1 )
-		{
-			$query = "select a.fid, if(a.faffiliate_name is null or a.faffiliate_name = '', a.fname, concat(a.fname, '(', a.faffiliate_name, ')')) as fname, ";
-			$query .= "a.fprof_img, a.login_datetime, ";
-			$query .= "ifnull(a.last_present_time, '1900-01-01 00:00:00') as last_present_time, c.refid ";
-			$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a ";
-			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.fid = b.pid and b.team_seq = 0 ";
-			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on b.memb_0 = c.idx ";
-			$query .= "where a.pid = '".$pid."' and a.friend_status = ".$status." ";
-		}
-		else
-		{
-			$query = "select a.pid as fid, if(b.affiliate_name is null or b.affiliate_name = '', b.name, concat(b.name, '(', b.affiliate_name, ')')) as fname, ";
-			$query .= "b.prof_img as fprof_img, b.login_datetime, ";
-			$query .= "ifnull(last_present_time, '1900-01-01 00:00:00') as last_present_time, d.refid ";
-			$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
-			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
-			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d on c.memb_0 = d.idx ";
-			$query .= "where a.fid = '".$pid."' and a.friend_status = ".$status." ";
-		}
+		$query = "select a.pid as fid, if(b.show_name, if(b.affiliate_name is null or b.affiliate_name = '', ifnull(b.name, '-'), ";
+		$query .= "concat(b.name, '(', b.affiliate_name, ')')), b.name) as fname, b.prof_img as fprof_img, b.login_datetime, ";
+		$query .= "ifnull(last_present_time, '1900-01-01 00:00:00') as last_present_time, d.refid ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d on c.memb_0 = d.idx ";
+		$query .= "where a.fid = '".$pid."' and a.friend_status = ".$status." ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -1616,7 +1605,7 @@ class Model_Play extends MY_Model {
 
 	public function requestEnemyForPVP( $pid )
 	{
-		$query = "select pid, show_prof, prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid != '".$pid."' ";
+		$query = "select pid, show_prof, show_name, prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid != '".$pid."' ";
 /*개발 테스트용 소스 시작*/
 		if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'staging' )
 		{
@@ -1646,7 +1635,7 @@ class Model_Play extends MY_Model {
 
 	public function requestEnemyForPVPWithRangeCount( $pid, $limit_low, $limit_high )
 	{
-		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query = "select a.pid, a.show_prof, a.show_name, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
 		$query .= "on a.pid = b.pid where b.score between ".$limit_low." and ".$limit_high." ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -1676,7 +1665,7 @@ class Model_Play extends MY_Model {
 
 	public function requestEnemyForPVPWithRank( $pid, $rank_low, $rank_high )
 	{
-		$query = "select a.pid, a.show_prof, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
+		$query = "select a.pid, a.show_prof, a.show_name, a.prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a inner join koc_rank.".MY_Controller::TBL_PVP." as b ";
 		$query .= "on a.pid = b.pid where b.pid != '".$pid."' ";
 		$query .= "and b.rank between ".$rank_low." and ".$rank_high." order by rand() desc limit 1 ";
 

@@ -1,77 +1,85 @@
 <?php
-	if ( $_SERVER["SERVER_ADDR"] == "175.119.227.180" || $_SERVER["LOCAL_ADDR"] == "175.119.227.180" )
+	if ( array_key_exists( "SERVER_ADDR", $_SERVER ) )
+	{
+		$serverAddrKeyName = "SERVER_ADDR";
+	}
+	else if ( array_key_exists( "LOCAL_ADDR", $_SERVER ) )
+	{
+		$serverAddrKeyName = "LOCAL_ADDR";
+	}
+	if ( $_SERVER[$serverAddrKeyName] == "175.119.227.180" )
 	{
 		$serverAddr = "175.119.227.180";
 		$serverName = "api_1-1";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "211.110.6.124" || $_SERVER["LOCAL_ADDR"] == "211.110.6.124" )
+	else if ( $_SERVER[$serverAddrKeyName] == "211.110.6.124" )
 	{
 		$serverAddr = "211.110.6.124";
 		$serverName = "api_1-2";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.7.75" || $_SERVER["LOCAL_ADDR"] == "1.234.7.75" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.7.75" )
 	{
 		$serverAddr = "1.234.7.75";
 		$serverName = "api_1-3";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "211.110.154.227" || $_SERVER["LOCAL_ADDR"] == "211.110.154.227" )
+	else if ( $_SERVER[$serverAddrKeyName] == "211.110.154.227" )
 	{
 		$serverAddr = "211.110.154.227";
 		$serverName = "api_1-4";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.45.250" || $_SERVER["LOCAL_ADDR"] == "1.234.45.250" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.45.250" )
 	{
 		$serverAddr = "1.234.45.250";
 		$serverName = "api_2-1";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "175.126.103.73" || $_SERVER["LOCAL_ADDR"] == "175.126.103.73" )
+	else if ( $_SERVER[$serverAddrKeyName] == "175.126.103.73" )
 	{
 		$serverAddr = "175.126.103.73";
 		$serverName = "api_2-2";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.89.167" || $_SERVER["LOCAL_ADDR"] == "1.234.89.167" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.89.167" )
 	{
 		$serverAddr = "1.234.89.167";
 		$serverName = "api_2-3";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.6.60" || $_SERVER["LOCAL_ADDR"] == "1.234.6.60" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.6.60" )
 	{
 		$serverAddr = "1.234.6.60";
 		$serverName = "api_2-4";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.89.245" || $_SERVER["LOCAL_ADDR"] == "1.234.89.245" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.89.245" )
 	{
 		$serverAddr = "1.234.89.245";
 		$serverName = "api_3-1";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "211.110.154.217" || $_SERVER["LOCAL_ADDR"] == "211.110.154.217" )
+	else if ( $_SERVER[$serverAddrKeyName] == "211.110.154.217" )
 	{
 		$serverAddr = "211.110.154.217";
 		$serverName = "api_3-2";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.69.161" || $_SERVER["LOCAL_ADDR"] == "1.234.69.161" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.69.161" )
 	{
 		$serverAddr = "1.234.69.161";
 		$serverName = "api_3-3";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "1.234.69.83" || $_SERVER["LOCAL_ADDR"] == "1.234.69.83" )
+	else if ( $_SERVER[$serverAddrKeyName] == "1.234.69.83" )
 	{
 		$serverAddr = "1.234.69.83";
 		$serverName = "api_3-4";
 		$urlbase = "koc10100";
 	}
-	else if ( $_SERVER["SERVER_ADDR"] == "101.79.109.239" || $_SERVER["LOCAL_ADDR"] == "101.79.109.239" )
+	else if ( $_SERVER[$serverAddrKeyName] == "101.79.109.239" )
 	{
 		$serverAddr = "101.79.109.239";
 		$serverName = "dev";

@@ -46,7 +46,7 @@ if (
 {
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '1');
-	define('SUBFIX', $subfix);
+	define('SUBFIX', '');
 }
 else if (
 	//L4
@@ -68,7 +68,7 @@ else if (
 {
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '2');
-	define('SUBFIX', $subfix);
+	define('SUBFIX', '');
 }
 else if (
 	//L4

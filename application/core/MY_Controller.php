@@ -617,51 +617,57 @@ EOF;
 			}
 		}
 
-		$requestData = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists( "pid", $requestData ) )
+		if ( array_key_exists( "data", $_POST ) )
 		{
-			$keyId = $requestData["pid"];
-			if ( $keyId != "" )
+			$requestData = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+			if ( $requestData != "" )
 			{
-				if ( array_key_exists( "cursession", $requestData ) )
+				if ( array_key_exists( "pid", $requestData ) )
 				{
-					$cursession = $requestData["cursession"];
-					if ( !($this->dbLogin->requestSessionCheck( $keyId, $cursession )) && $cursession != "forAdmin" )
+					$keyId = $requestData["pid"];
+					if ( $keyId != "" )
 					{
-						$resultCode = MY_Controller::STATUS_LOGIN_DUP;
-						$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
-						$arrayResult = null;
+						if ( array_key_exists( "cursession", $requestData ) )
+						{
+							$cursession = $requestData["cursession"];
+							if ( !($this->dbLogin->requestSessionCheck( $keyId, $cursession )) && $cursession != "forAdmin" )
+							{
+								$resultCode = MY_Controller::STATUS_LOGIN_DUP;
+								$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
+								$arrayResult = null;
 
-						echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
-						exit(0);
+								echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
+								exit(0);
+							}
+						}
+						else
+						{
+							$resultCode = MY_Controller::STATUS_LOGIN_DUP;
+							$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
+							$arrayResult = null;
+
+							echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
+							exit(0);
+						}
+
+						//$arrKey = $this->dbPlay->requestKey( $keyId )->result_array();
+						//$public_key = $arrKey[0]["public_key"];
+						//$private_key = $arrKey[0]["private_key"];
+						$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
+						$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
+					}
+					else
+					{
+						$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
+						$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
 					}
 				}
 				else
 				{
-					$resultCode = MY_Controller::STATUS_LOGIN_DUP;
-					$resultText = MY_Controller::MESSAGE_LOGIN_DUP;
-					$arrayResult = null;
-
-					echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $keyId, $_POST["data"] );
-					exit(0);
+					$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
+					$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
 				}
-
-				//$arrKey = $this->dbPlay->requestKey( $keyId )->result_array();
-				//$public_key = $arrKey[0]["public_key"];
-				//$private_key = $arrKey[0]["private_key"];
-				$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
-				$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
 			}
-			else
-			{
-				$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
-				$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
-			}
-		}
-		else
-		{
-			$public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
-			$private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
 		}
 	}
 

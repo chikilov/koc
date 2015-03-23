@@ -5319,13 +5319,12 @@ class Con_ApiProcess extends MY_Controller {
 			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
 		}
 		$pid = $decoded["pid"];
+		$oid = $decoded["oid"];
 
-		if( $pid )
+		if( $pid && $oid )
 		{
-			$arrayResult["pid"] = (string)$pid;
-
 			//valid user check
-			$tmpArray = $this->dbPlay->requestPlayerSel($pid)->result_array()[0];
+			$tmpArray = $this->dbPlay->requestPlayerSel( $oid )->result_array()[0];
 			if (empty($tmpArray))
 			{
 				$resultCode = MY_Controller::STATUS_FRIEND_NOBODY;
@@ -5334,6 +5333,7 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
+				$arrayResult["pid"] = (string)$oid;
 				$arrayResult["name"] = $tmpArray["name"];
 				$arrayResult["prof_img"] = $tmpArray["prof_img"];
 				$arrayResult["vip_level"] = $tmpArray["vip_level"];
@@ -5341,9 +5341,9 @@ class Con_ApiProcess extends MY_Controller {
 
 				$arrayResult["op"] = $tmpArray["operator"];
 
-				$arrayResult["team"] = $this->dbPlay->requestTeam( $pid )->result_array();
-				$arrayResult["inventory"] = $this->dbPlay->requestInventory( $pid )->result_array();
-				$arrayResult["character"] = $this->dbPlay->requestCharacters( $pid )->result_array();
+				$arrayResult["team"] = $this->dbPlay->requestTeam( $oid )->result_array();
+				$arrayResult["inventory"] = $this->dbPlay->requestInventory( $oid )->result_array();
+				$arrayResult["character"] = $this->dbPlay->requestCharacters( $oid )->result_array();
 
 				$resultCode = MY_Controller::STATUS_API_OK;
 				$resultText = MY_Controller::MESSAGE_API_OK;

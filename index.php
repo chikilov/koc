@@ -19,6 +19,8 @@ ob_start();
  *
  */
 
+$subfix = "_check";
+
 if (
 	//L4
 	$_SERVER['HTTP_HOST'] == '211.110.6.34'
@@ -44,6 +46,7 @@ if (
 {
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '1');
+	define('SUBFIX', $subfix);
 }
 else if (
 	//L4
@@ -65,6 +68,7 @@ else if (
 {
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '2');
+	define('SUBFIX', $subfix);
 }
 else if (
 	//L4
@@ -86,12 +90,14 @@ else if (
 {
 	define('ENVIRONMENT', 'production');
 	define('SERVERGROUP', '3');
+	define('SUBFIX', $subfix);
 }
 else if (
 	$_SERVER['HTTP_HOST'] == 'm.koclogin.tntgame.co.kr'
 )
 {
 	define('ENVIRONMENT', 'production');
+	define('SUBFIX', $subfix);
 	if ( $_SERVER["LOCAL_ADDR"] == '175.119.227.180'
 			|| $_SERVER["LOCAL_ADDR"] == '211.110.6.124'
 			|| $_SERVER["LOCAL_ADDR"] == '1.234.7.75'
@@ -121,11 +127,13 @@ else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
 {
 	define('ENVIRONMENT', 'staging');
 	define('SERVERGROUP', '');
+	define('SUBFIX', '');
 }
 else
 {
 	define('ENVIRONMENT', 'development');
 	define('SERVERGROUP', '');
+	define('SUBFIX', '');
 }
 
 

@@ -240,11 +240,11 @@ $db['default_ins']['dbcollat'] = 'utf8_general_ci';
 
 //20150224 loginserver add
 $db['koc_play_login'] = $db['login'];
-$db['koc_play_login']['database'] = 'koc_account';
+$db['koc_play_login']['database'] = 'koc_account'.SUBFIX;
 
 //20150224 loginserver add
 $db['koc_play_log'] = $db['log'];
-$db['koc_play_log']['database'] = 'koc_play';
+$db['koc_play_log']['database'] = 'koc_play'.SUBFIX;
 
 //20141210rep	$db['koc_mail'] = $db['default'];
 $db['koc_mail_sel'] = $db['default_sel'];

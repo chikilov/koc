@@ -49,7 +49,7 @@ class Model_Log extends MY_Model {
 
 	public function requestLog( $pid, $logtype, $logcontent )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERLOG.SERVERGROUP." ( pid, logtype, logcontent, log_datetime ) values ";
+		$query = "insert into ".$this->DB_LOG->database.".".MY_Controller::TBL_PLAYERLOG.SERVERGROUP." ( pid, logtype, logcontent, log_datetime ) values ";
 		$query .= "( '".$pid."', '".$logtype."', '".$logcontent."', now() ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );

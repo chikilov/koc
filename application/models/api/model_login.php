@@ -49,7 +49,7 @@ class Model_Login extends MY_Model {
 
 	public function requestDupId( $id )
 	{
-		$query = "select pid from koc_account.".MY_Controller::TBL_ACCOUNT." where id = '".$id."'";
+		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where id = '".$id."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);
@@ -58,7 +58,7 @@ class Model_Login extends MY_Model {
 
 	public function requestJoin( $id, $password, $macaddr )
 	{
-		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( id, password, macaddr, reg_date ) values (";
+		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ( id, password, macaddr, reg_date ) values (";
 		$query .= " '".$id."', password( '".$password."' ), '".$macaddr."', now() )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -68,7 +68,7 @@ class Model_Login extends MY_Model {
 
 	public function requestGuestJoin( $macaddr, $uuid )
 	{
-		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( macaddr, uuid, reg_date ) values (";
+		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ( macaddr, uuid, reg_date ) values (";
 		$query .= " '".$macaddr."', '".$uuid."', now() )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -79,7 +79,7 @@ class Model_Login extends MY_Model {
 	public function requestDupAffiliateId( $affiliateType, $affiliateId )
 	{
 		$query = "select pid, name, limit_type, limit_start, limit_end, 0 as helpcount ";
-		$query .= "from koc_account.".MY_Controller::TBL_ACCOUNT." ";
+		$query .= "from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ";
 		$query .= "where affiliate_id = '".$affiliateId."' and affiliate_type = '".$affiliateType."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -88,7 +88,7 @@ class Model_Login extends MY_Model {
 
 	public function requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg )
 	{
-		$query = "insert into koc_account.".MY_Controller::TBL_ACCOUNT." ( ";
+		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ( ";
 		$query .= "macaddr, uuid, affiliate_type, affiliate_id, affiliate_name, email, prof_Img, reg_date ) ";
 		$query .= "values ( '".$macaddr."', '".$uuid."', '".$affiliateType."', '".$affiliateId."', '".$affiliateName."', ";
 		$query .= "'".$affiliateEmail."', '".$affiliateProfImg."', now() )";
@@ -100,7 +100,8 @@ class Model_Login extends MY_Model {
 
 	public function updateAffiliateNameAccount( $pid, $affiliateName, $affiliateEmail, $affiliateProfImg )
 	{
-		$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set affiliate_name = '".$affiliateName."', email = '".$affiliateEmail."', prof_img = '".$affiliateProfImg."' ";
+		$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ";
+		$query .= "set affiliate_name = '".$affiliateName."', email = '".$affiliateEmail."', prof_img = '".$affiliateProfImg."' ";
 		$query .= "where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -110,7 +111,7 @@ class Model_Login extends MY_Model {
 
 	public function requestAffiliateAccount( $pid )
 	{
-		$query = "select affiliate_name, email, prof_img from koc_account.".MY_Controller::TBL_ACCOUNT." where pid = '".$pid."' ";
+		$query = "select affiliate_name, email, prof_img from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
@@ -119,7 +120,7 @@ class Model_Login extends MY_Model {
 	public function requestLogin( $id, $password )
 	{
 		$query = "select pid, limit_type, limit_start, limit_end, 0 as helpcount ";
-		$query .= "from koc_account.".MY_Controller::TBL_ACCOUNT." ";
+		$query .= "from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ";
 		$query .= "where id = '".$id."' and password = password( '".$password."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -129,7 +130,7 @@ class Model_Login extends MY_Model {
 	public function requestDupMacaddr( $macaddr )
 	{
 		$query = "select pid, limit_type, limit_start, limit_end, 0 as helpcount ";
-		$query .= "from koc_account.".MY_Controller::TBL_ACCOUNT." ";
+		$query .= "from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ";
 		$query .= "where macaddr = '".$macaddr."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -138,7 +139,7 @@ class Model_Login extends MY_Model {
 
 	public function requestCheckMac( $macaddr )
 	{
-		$query = "select macaddr from koc_account.".MY_Controller::TBL_RESTRICTMACADDR." ";
+		$query = "select macaddr from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_RESTRICTMACADDR." ";
 		$query .= "where macaddr = '".$macaddr."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -148,7 +149,7 @@ class Model_Login extends MY_Model {
 
 	public function checkDup( $cursession )
 	{
-		$query = "select cursession from koc_account.".MY_Controller::TBL_ACCOUNT." where cursession = '".$cursession."' ";
+		$query = "select cursession from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where cursession = '".$cursession."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);
@@ -159,15 +160,17 @@ class Model_Login extends MY_Model {
 	{
 		if ( $affiliateType == "0" )
 		{
-			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where id = '".$affiliateId."' ";
+			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where id = '".$affiliateId."' ";
 		}
 		else if ( $affiliateType == "1" )
 		{
-			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where affiliate_id is null and id is null and macaddr = '".$affiliateId."' ";
+			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' ";
+			$query .= "where affiliate_id is null and id is null and macaddr = '".$affiliateId."' ";
 		}
 		else
 		{
-			$query = "update koc_account.".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where affiliate_type = '".$affiliateType."' and affiliate_id = '".$affiliateId."' ";
+			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' ";
+			$query .= "where affiliate_type = '".$affiliateType."' and affiliate_id = '".$affiliateId."' ";
 		}
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
@@ -177,7 +180,7 @@ class Model_Login extends MY_Model {
 
 	public function requestSessionCheck( $keyId, $cursession )
 	{
-		$query = "select pid from koc_account.".MY_Controller::TBL_ACCOUNT." where pid = '".$keyId."' and cursession = '".$cursession."' ";
+		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where pid = '".$keyId."' and cursession = '".$cursession."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);

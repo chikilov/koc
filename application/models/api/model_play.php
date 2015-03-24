@@ -2204,10 +2204,10 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function requestLogIap( $is_provision, $pid, $sid, $storeType, $product_id, $payment_unit, $payment_type, $payment_value, $paymentSeq, $approvedPaymentNo, $naverId, $paymentTime, $curcash )
+	public function requestLogIap( $is_provision, $pid, $sid, $storeType, $product_id, $payment_unit, $payment_type, $payment_value, $paymentSeq, $approvedPaymentNo, $naverId, $paymentTime, $curcash, $reasonCode )
 	{
 		$query = "insert into koc_play.player_iap ( pid, sid, storetype, product_id, payment_unit, payment_type, payment_value, ";
-		$query .= "buy_date, expire_date, is_refund, is_provision, paymentSeq, approvedPaymentNo, naverId, paymentTime, curcash ) ";
+		$query .= "buy_date, expire_date, is_refund, is_provision, paymentSeq, approvedPaymentNo, naverId, paymentTime, curcash, reasonCode ) ";
 		$query .= "select '".$pid."', '".$sid."', '".$storeType."', '".$product_id."', '".$payment_unit."', '".$payment_type."', '".$payment_value."', ";
 		$query .= "now(), date_add( now(), interval ( duration - 1 ) day ), 0, ".$is_provision.", ";
 		$query .= "'".$paymentSeq."', '".$approvedPaymentNo."', '".$naverId."', ";
@@ -2219,7 +2219,15 @@ class Model_Play extends MY_Model {
 		{
 			$query .= "'".$paymentTime."', ";
 		}
-		$query .= "'".$curcash."' ";
+		$query .= "'".$curcash."', ";
+		if ( $reasonCode == "" )
+		{
+			$query .= "null ";
+		}
+		else
+		{
+			$query .= "'".$reasonCode."' ";
+		}
 		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." where id = '".$product_id."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -2229,7 +2237,7 @@ class Model_Play extends MY_Model {
 
 	public function requestBuyIapExists( $pid, $storeType, $paymentSeq )
 	{
-		$query = "select idx from koc_play.player_iap where pid = '".$pid."' and storetype = '".$storeType."' and paymentSeq = '".$paymentSeq."' ";
+		$query = "select idx from koc_play.player_iap where pid = '".$pid."' and storetype = '".$storeType."' and paymentSeq = '".$paymentSeq."' and is_provision = 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

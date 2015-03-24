@@ -1577,7 +1577,7 @@ class Con_ApiProcess extends MY_Controller {
 					}
 
 					//지급 성공
-					$is_provision = true;
+					$is_provision = 1;
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 					$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
@@ -1593,13 +1593,14 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$arrayResult = null;
 						//지급 오류
-						$is_provision = false;
+						$is_provision = 0;
 						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 						$receiptPaymentSeq = "";
 						$receiptApprovedPaymentNo = "";
 						$receiptNaverId = "";
 						$receiptPaymentTime = "";
+						$reasonCode = "01";
 					}
 					else
 					{
@@ -1628,7 +1629,7 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$arrayResult = null;
 							//지급 오류
-							$is_provision = false;
+							$is_provision = 0;
 							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -1636,6 +1637,7 @@ class Con_ApiProcess extends MY_Controller {
 							$receiptApprovedPaymentNo = "";
 							$receiptNaverId = "";
 							$receiptPaymentTime = "";
+							$reasonCode = "02";
 						}
 						else
 						{
@@ -1643,7 +1645,7 @@ class Con_ApiProcess extends MY_Controller {
 							{
 								$arrayResult = null;
 								//지급 오류
-								$is_provision = false;
+								$is_provision = 0;
 								$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -1651,6 +1653,7 @@ class Con_ApiProcess extends MY_Controller {
 								$receiptApprovedPaymentNo = "";
 								$receiptNaverId = "";
 								$receiptPaymentTime = "";
+								$reasonCode = "02";
 							}
 							else
 							{
@@ -1733,27 +1736,30 @@ class Con_ApiProcess extends MY_Controller {
 										}
 
 										//지급 성공
-										$is_provision = true;
+										$is_provision = 0;
 										$resultCode = MY_Controller::STATUS_API_OK;
 										$resultText = MY_Controller::MESSAGE_API_OK;
 										$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
+										$reasonCode = "";
 									}
 									else
 									{
 										$arrayResult = null;
 										//지급 오류
-										$is_provision = false;
+										$is_provision = 0;
 										$resultCode = MY_Controller::STATUS_CONSUME;
 										$resultText = MY_Controller::MESSAGE_CONSUME;
+										$reasonCode = "03";
 									}
 								}
 								else
 								{
 									$arrayResult = null;
 									//지급 오류
-									$is_provision = false;
+									$is_provision = 0;
 									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+									$reasonCode = "04";
 								}
 								$receiptPaymentSeq = $receipt["paymentSeq"];
 								$receiptApprovedPaymentNo = $receipt["approvedPaymentNo"];
@@ -1769,13 +1775,14 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$arrayResult = null;
 						//지급 오류
-						$is_provision = false;
+						$is_provision = 0;
 						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 						$receiptPaymentSeq = "";
 						$receiptApprovedPaymentNo = "";
 						$receiptNaverId = "";
 						$receiptPaymentTime = "";
+						$reasonCode = "01";
 					}
 					else
 					{
@@ -1815,7 +1822,7 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$arrayResult = null;
 							//지급 오류
-							$is_provision = false;
+							$is_provision = 0;
 							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -1823,6 +1830,7 @@ class Con_ApiProcess extends MY_Controller {
 							$receiptApprovedPaymentNo = "";
 							$receiptNaverId = "";
 							$receiptPaymentTime = "";
+							$reasonCode = "02";
 						}
 						else
 						{
@@ -1830,7 +1838,7 @@ class Con_ApiProcess extends MY_Controller {
 							{
 								$arrayResult = null;
 								//지급 오류
-								$is_provision = false;
+								$is_provision = 0;
 								$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -1838,6 +1846,7 @@ class Con_ApiProcess extends MY_Controller {
 								$receiptApprovedPaymentNo = "";
 								$receiptNaverId = "";
 								$receiptPaymentTime = "";
+								$reasonCode = "02";
 							}
 							else
 							{
@@ -1920,7 +1929,7 @@ class Con_ApiProcess extends MY_Controller {
 											}
 
 											//지급 성공
-											$is_provision = true;
+											$is_provision = 1;
 											$resultCode = MY_Controller::STATUS_API_OK;
 											$resultText = MY_Controller::MESSAGE_API_OK;
 											$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
@@ -1929,32 +1938,36 @@ class Con_ApiProcess extends MY_Controller {
 											$receiptApprovedPaymentNo = "";
 											$receiptNaverId = "";
 											$receiptPaymentTime = "";
+											$reasonCode = "";
 										}
 										else
 										{
 											$arrayResult = null;
 											//지급 오류
-											$is_provision = false;
+											$is_provision = 0;
 											$resultCode = MY_Controller::STATUS_CONSUME;
 											$resultText = MY_Controller::MESSAGE_CONSUME;
+											$reasonCode = "03";
 										}
 									}
 									else
 									{
 										$arrayResult = null;
 										//지급 오류
-										$is_provision = false;
+										$is_provision = 0;
 										$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 										$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+										$reasonCode = "04";
 									}
 								}
 								else
 								{
 									$arrayResult = null;
 									//지급 오류
-									$is_provision = false;
+									$is_provision = 0;
 									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+									$reasonCode = "04";
 								}
 								$receiptPaymentSeq = $paymentSeq;
 								$receiptApprovedPaymentNo = "";
@@ -1977,13 +1990,14 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$arrayResult = null;
 						//지급 오류
-						$is_provision = false;
+						$is_provision = 0;
 						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 						$receiptPaymentSeq = "";
 						$receiptApprovedPaymentNo = "";
 						$receiptNaverId = "";
 						$receiptPaymentTime = "";
+						$reasonCode = "01";
 					}
 					else
 					{
@@ -2014,7 +2028,7 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$arrayResult = null;
 							//지급 오류
-							$is_provision = false;
+							$is_provision = 0;
 							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -2022,6 +2036,7 @@ class Con_ApiProcess extends MY_Controller {
 							$receiptApprovedPaymentNo = "";
 							$receiptNaverId = "";
 							$receiptPaymentTime = "";
+							$reasonCode = "02";
 						}
 						else
 						{
@@ -2029,7 +2044,7 @@ class Con_ApiProcess extends MY_Controller {
 							{
 								$arrayResult = null;
 								//지급 오류
-								$is_provision = false;
+								$is_provision = 0;
 								$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
 								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
@@ -2037,6 +2052,7 @@ class Con_ApiProcess extends MY_Controller {
 								$receiptApprovedPaymentNo = "";
 								$receiptNaverId = "";
 								$receiptPaymentTime = "";
+								$reasonCode = "02";
 							}
 							else
 							{
@@ -2119,7 +2135,7 @@ class Con_ApiProcess extends MY_Controller {
 										}
 
 										//지급 성공
-										$is_provision = true;
+										$is_provision = 1;
 										$resultCode = MY_Controller::STATUS_API_OK;
 										$resultText = MY_Controller::MESSAGE_API_OK;
 										$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
@@ -2128,23 +2144,26 @@ class Con_ApiProcess extends MY_Controller {
 										$receiptApprovedPaymentNo = "";
 										$receiptNaverId = "";
 										$receiptPaymentTime = "";
+										$reasonCode = "";
 									}
 									else
 									{
 										$arrayResult = null;
 										//지급 오류
-										$is_provision = false;
+										$is_provision = 1;
 										$resultCode = MY_Controller::STATUS_CONSUME;
 										$resultText = MY_Controller::MESSAGE_CONSUME;
+										$reasonCode = "03";
 									}
 								}
 								else
 								{
 									$arrayResult = null;
 									//지급 오류
-									$is_provision = false;
+									$is_provision = 0;
 									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+									$reasonCode = "04";
 								}
 								$receiptPaymentSeq = $paymentSeq;
 								$receiptApprovedPaymentNo = "";
@@ -2165,7 +2184,7 @@ class Con_ApiProcess extends MY_Controller {
 					$curcash["cash_points"] = 0;
 					$curcash["event_points"] = 0;
 				}
-				$this->dbPlay->requestLogIap( $is_provision, $pid, $sid, $storeType, $product, $arrayProduct[0]["payment_unit"], $arrayProduct[0]["payment_type"], $arrayProduct[0]["payment_value"], $receiptPaymentSeq, $receiptApprovedPaymentNo, $receiptNaverId, $receiptPaymentTime, $curcash["cash_points"].",".$curcash["event_points"] );
+				$this->dbPlay->requestLogIap( $is_provision, $pid, $sid, $storeType, $product, $arrayProduct[0]["payment_unit"], $arrayProduct[0]["payment_type"], $arrayProduct[0]["payment_value"], $receiptPaymentSeq, $receiptApprovedPaymentNo, $receiptNaverId, $receiptPaymentTime, $curcash["cash_points"].",".$curcash["event_points"], $reasonCode );
 			}
 		}
 		else

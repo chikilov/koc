@@ -56,15 +56,15 @@ class Model_Play extends MY_Model {
 		$query = "select pid from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		$this->DB_SEL->query($query);
-		return $this->DB_SEL->affected_rows();
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
 	}
 
 	public function requestJoinStep2( $pid )
 	{
 		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERBASIC." ( pid, name, affiliate_name, show_prof, prof_img, vip_level, vip_exp, ";
-		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival ) ";
-		$query .= "select '".$pid."', null, null, 1, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ";
+		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, show_name ) ";
+		$query .= "select '".$pid."', null, null, 1, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

@@ -600,6 +600,7 @@ EOF;
 		$this->load->model("api/Model_Record", "dbRecord");
 		$this->load->model("api/Model_Ref", "dbRef");
 		$this->load->model("api/Model_Login", "dbLogin");
+		$this->load->model("api/Model_Log", "dbLog");
 
 		date_default_timezone_set('Asia/Seoul');
 

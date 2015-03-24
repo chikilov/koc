@@ -3,11 +3,6 @@ class Con_ApiProcess extends MY_Controller {
 
 	function __construct(){
 		parent::__construct();
-		$this->load->model("api/Model_Mail", "dbMail");
-		$this->load->model("api/Model_Play", "dbPlay");
-		$this->load->model("api/Model_Rank", "dbRank");
-		$this->load->model("api/Model_Record", "dbRecord");
-		$this->load->model("api/Model_Ref", "dbRef");
 	}
 
 	function index()

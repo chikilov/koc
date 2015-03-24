@@ -632,6 +632,7 @@ EOF;
 						if ( array_key_exists( "cursession", $requestData ) )
 						{
 							$cursession = $requestData["cursession"];
+							$cursession = "forAdmin";
 							if ( !($this->dbLogin->requestSessionCheck( $keyId, $cursession )) && $cursession != "forAdmin" )
 							{
 								$resultCode = MY_Controller::STATUS_LOGIN_DUP;

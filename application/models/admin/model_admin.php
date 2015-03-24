@@ -577,16 +577,28 @@ class Model_Admin extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function couponVerify( $coupon_id, $pid )
+	public function couponVerify1( $coupon_id, $pid )
 	{
 		$query = "select a.group_id, a.coupon_type, c.reward_type, c.reward_value, b.coupon_user_id, if( a.group_id in ";
 		$query .= "( select group_id from koc_admin.coupon_detail_info where coupon_user_id = '".$pid."' group by group_id ), 'DUPLICATE', '') as result ";
 		$query .= "from koc_admin.coupon_basic_info as a left outer join koc_admin.coupon_detail_info as b on a.group_id = b.group_id ";
 		$query .= "left outer join koc_admin.coupon_reward_info as c on a.group_id = c.group_id ";
-		$query .= "where ( a.static_code = '".$coupon_id."' or b.coupon_id = '".$coupon_id."' ) ";
+		$query .= "where a.static_code = '".$coupon_id."' ";
 		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date ";
 
-		return $this->DB_SEL->query($query);
+		return $this->DB_INS->query($query);
+	}
+
+	public function couponVerify2( $coupon_id, $pid )
+	{
+		$query = "select a.group_id, a.coupon_type, c.reward_type, c.reward_value, b.coupon_user_id, if( a.group_id in ";
+		$query .= "( select group_id from koc_admin.coupon_detail_info where coupon_user_id = '".$pid."' group by group_id ), 'DUPLICATE', '') as result ";
+		$query .= "from koc_admin.coupon_basic_info as a left outer join koc_admin.coupon_detail_info as b on a.group_id = b.group_id ";
+		$query .= "left outer join koc_admin.coupon_reward_info as c on a.group_id = c.group_id ";
+		$query .= "where b.coupon_id = '".$coupon_id."' ";
+		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date ";
+
+		return $this->DB_INS->query($query);
 	}
 
 	public function requestCouponStatusUpdate( $pid, $group_id, $coupon_type, $coupon_id )

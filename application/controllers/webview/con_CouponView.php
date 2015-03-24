@@ -26,14 +26,23 @@ class Con_CouponView extends MY_Controller {
 		{
 			$coupon_id = $_POST["coupon_id"];
 			$pid = $_POST["pid"];
-			$couponInfo = $this->dbAdmin->couponVerify( $coupon_id, $pid )->result_array();
+			$couponInfo1 = $this->dbAdmin->couponVerify1( $coupon_id, $pid )->result_array();
+			$couponInfo2 = $this->dbAdmin->couponVerify2( $coupon_id, $pid )->result_array();
 			// 쿠폰 정보가 올바르지 않은 경우
-			if ( empty( $couponInfo ) )
+			if ( empty( $couponInfo1 ) && empty( $couponInfo2 ) )
 			{
 				$result = "NONE";
 			}
 			else
 			{
+				if ( empty( $couponInfo1 ) )
+				{
+					$couponInfo = $couponInfo2;
+				}
+				else
+				{
+					$couponInfo = $couponInfo1;
+				}
 				// 이미 사용된 쿠폰인 경우
 				if ( $couponInfo[0]["coupon_user_id"] > 0 )
 				{

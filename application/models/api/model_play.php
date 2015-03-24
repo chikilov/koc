@@ -2288,15 +2288,6 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
-	public function requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText )
-	{
-		$query = "insert into koc_play.player_asset_logging ( pid, usetype, asset_type, asset_value, description, reg_datetime ) ";
-		$query .= "values ( '".$pid."', '".$use_gubun."', '".$point_type."', '".$point_value."', '".$loggingText."', now() )";
-
-		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-		return $this->DB_INS->query($query);
-	}
-
 	public function inventoryExistCheck( $pid )
 	{
 		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and refid = 'OP01000008' ";

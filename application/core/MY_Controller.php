@@ -313,6 +313,7 @@ EOF;
 	const TBL_PLAYERCOLLECTION = "player_collection";
 	const TBL_PLAYERFRIEND = "player_friend";
 	const TBL_PLAYERLOG = "player_log";
+	const TBL_PLAYERASSETLOG = "player_asset_logging";
 	const TBL_PLAYERVIP = "player_vip";
 	const TBL_PLAYEREXTRAATTEND = "player_extraattend";
 
@@ -1036,7 +1037,7 @@ EOF;
     	if ( strcmp($use_gubun, "save") == 0 )
     	{
 	    	$this->dbPlay->updatePlayerPoint( $pid, $point_type, $point_value, $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-			$this->dbPlay->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
+			$this->dbLog->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
 		    return true;
 		}
 		else if ( strcmp($use_gubun, "use") == 0 )
@@ -1047,27 +1048,27 @@ EOF;
 				if ( $remain_item["cash_points"] >= $point_value )
 				{
 					$result = (bool)$this->dbPlay->paymentCharge( $pid, $point_type, $point_value, $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-					$this->dbPlay->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
+					$this->dbLog->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
 				}
 				else
 				{
 					if ( $remain_item["cash_points"] > 0 )
 					{
 						$result = (bool)$this->dbPlay->paymentCharge( $pid, $point_type, $remain_item["cash_points"], $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-						$this->dbPlay->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $remain_item["cash_points"], $loggingText );
+						$this->dbLog->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $remain_item["cash_points"], $loggingText );
 					}
 					else
 					{
 						$result = (bool)1;
 					}
 					$result = $result & (bool)$this->dbPlay->paymentCharge( $pid, "EVENT_POINTS", $point_value - $remain_item["cash_points"], $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-					$this->dbPlay->requestLoggingUseAssets( $pid, $use_gubun, "EVENT_POINTS", $point_value - $remain_item["cash_points"], $loggingText );
+					$this->dbLog->requestLoggingUseAssets( $pid, $use_gubun, "EVENT_POINTS", $point_value - $remain_item["cash_points"], $loggingText );
 				}
 			}
 			else
 			{
 				$result = (bool)$this->dbPlay->paymentCharge( $pid, $point_type, $point_value, $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-				$this->dbPlay->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
+				$this->dbLog->requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText );
 			}
 		    return $result;
 		}

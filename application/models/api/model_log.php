@@ -56,5 +56,15 @@ class Model_Log extends MY_Model {
 		$this->DB_LOG->query($query);
 		return $this->DB_LOG->affected_rows();
 	}
+
+	public function requestLoggingUseAssets( $pid, $use_gubun, $point_type, $point_value, $loggingText )
+	{
+		$query = "insert into ".$this->DB_LOG->database.".".MY_Controller::TBL_PLAYERASSETLOG.SERVERGROUP." ";
+		$query .= "( pid, usetype, asset_type, asset_value, description, reg_datetime ) ";
+		$query .= "values ( '".$pid."', '".$use_gubun."', '".$point_type."', '".$point_value."', '".$loggingText."', now() )";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_LOG->query($query);
+	}
 }
 ?>

@@ -146,7 +146,8 @@ class Model_Mail extends MY_Model {
 
 	public function sendMail( $pid, $sid, $title, $type, $value, $expire_term )
 	{
-		$query = "insert into koc_mail.".MY_Controller::TBL_MAIL." ( pid, sid, title, attach_type, attach_value, is_receive, send_date, receive_date, expire_date ) values ( ";
+		$query = "insert into koc_mail.".MY_Controller::TBL_MAIL." ";
+		$query .= "( pid, sid, title, attach_type, attach_value, is_receive, send_date, receive_date, expire_date ) values ( ";
 		$query .= "'".$pid."', '".$sid."', '".$title."', '".$type."', '".$value."', 0, now(), null, ";
 		if ( $expire_term )
 		{
@@ -156,7 +157,7 @@ class Model_Mail extends MY_Model {
 		{
 			$query .= "null ";
 		}
-		$query .= ")";
+		$query .= ") ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

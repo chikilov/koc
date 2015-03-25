@@ -78,6 +78,8 @@ EOF;
 	const MESSAGE_DUPLICATE_LOGIN_ID = "NG_ERROR_DUPLICATE_LOGIN_ID";
 	const STATUS_INFO_ID = "0042";
 	const MESSAGE_INFO_ID = "NG_ERROR_INFO_ID";
+	const STATUS_REJECT_ID = "0043";
+	const MESSAGE_REJECT_ID = "NG_ERROR_REJECT_ID";
 
 	const STATUS_REQUEST_MAIL = "0051";
 	const MESSAGE_REQUEST_MAIL = "NG_ERROR_REQUEST_MAIL";
@@ -530,6 +532,7 @@ EOF;
 
 // 점검중 처리
 //		define("HEALTHCHECK" , true);
+/*
 		define("HEALTHCHECK" , false);
 
 		if ( HEALTHCHECK )
@@ -540,7 +543,7 @@ EOF;
 			echo $strReturn;
 			exit;
 		}
-
+*/
 		if ( ENVIRONMENT == 'production' )
 		{
 			error_reporting(E_ALL);
@@ -850,7 +853,6 @@ EOF;
 					exit('The application environment is not set correctly.');
 			}
 		}
-		//$this->onSysLogWriteDb( $kakao_id, $reqData, $this->json_encode2( array( "status"=>$status, "message"=>$message, "data"=>$data )) );
 
 		return $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
 	}

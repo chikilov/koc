@@ -437,8 +437,8 @@ class Con_ApiProcess extends MY_Controller {
 				if ( $arrayResult["limit_type"] == "R" )
 				{
 					$this->onSysLogWriteDb( $arrayResult["pid"], "탈퇴 유저 로그인 시도" );
-					$resultCode = MY_Controller::STATUS_INFO_ID;
-					$resultText = MY_Controller::MESSAGE_INFO_ID;
+					$resultCode = MY_Controller::STATUS_REJECT_ID;
+					$resultText = MY_Controller::MESSAGE_REJECT_ID;
 				}
 				else
 				{
@@ -1586,6 +1586,7 @@ class Con_ApiProcess extends MY_Controller {
 					$receiptApprovedPaymentNo = "";
 					$receiptNaverId = "";
 					$receiptPaymentTime = "";
+					$reasonCode = "";
 				}
 				else if ( $storeType == "naver" )
 				{

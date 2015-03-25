@@ -123,8 +123,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerSel( $pid )
 	{
-		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
-		$query .= "inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, ";
+		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -134,8 +134,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerIns( $pid )
 	{
-		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, ";
-		$query .= "inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, ";
+		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -903,7 +903,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-
+/*
 	public function updateTime( $pid, $upCol, $uptime )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERITEM." set ";
@@ -940,7 +940,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-
+*/
 	public function requestUpdateUpgradeInfo( $pid, $idx, $up_grade, $up_refid, $up_incentive )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set ";

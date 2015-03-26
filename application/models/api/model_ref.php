@@ -89,7 +89,7 @@ class Model_Ref extends MY_Model {
 
 	public function requestProductList( $pid, $storeType, $storeVersion, $country_code )
 	{
-		$query = "select a.id, a.category, a.retry_id, a.is_retry, a.type, a.value, ";
+		$query = "select a.id, a.alignment_index, a.category, a.retry_id, a.is_retry, a.type, a.value, ";
 		$query .= "max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_paytype, null), null)) as evt_paytype, ";
 		$query .= "ifnull( max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_value, null), null)), 0) as evt_value, ";
 		$query .= "b.payment_unit, b.payment_type, b.payment_value, ";
@@ -154,7 +154,7 @@ class Model_Ref extends MY_Model {
 
 	public function productVerify( $pid, $storeType, $product, $country_code )
 	{
-		$query = "select a.category, a.type, a.value as attach_value, c.payment_unit, c.payment_type, c.payment_value, ";
+		$query = "select a.product_type, a.category, a.type, a.value as attach_value, c.payment_unit, c.payment_type, c.payment_value, ";
 		$query .= "a.bonus, b.article_type, b.article_value, a.vip_exp, a.".$storeType." as iapcode ";
 		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.type = b.article_id ";
 		$query .= "inner join koc_ref.product_price as c on a.id = c.product_id ";
@@ -227,7 +227,8 @@ class Model_Ref extends MY_Model {
 		$query = "select id, pattern, seq, reward_type, reward_value as attach_value, d.article_type, d.article_value ";
 		$query .= "from ( select a.id, a.pattern, a.seq, a.reward_type, a.reward_value, a.reward_probability, (@rowsum) + 1 as min_prob, ";
 		$query .= "(@rowsum := @rowsum + a.reward_probability) as max_prob from koc_ref.".MY_Controller::TBL_REWARD." as a , (select @rowsum := 0) as b ";
-		$query .= "where a.id = '".$rid."' and a.pattern = '".$rpattern."' order by a.seq ) as c inner join koc_ref.".MY_Controller::TBL_ARTICLE." as d on c.reward_type = d.article_id ";
+		$query .= "where a.id = '".$rid."' and a.pattern = '".$rpattern."' order by a.seq ) as c ";
+		$query .= "inner join koc_ref.".MY_Controller::TBL_ARTICLE." as d on c.reward_type = d.article_id ";
 		$query .= "where ".$rvalue." between min_prob and max_prob ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -253,15 +254,18 @@ class Model_Ref extends MY_Model {
 		$query .= "if( a.seq = b.seq, a.reward_probability + ";
 		$query .= "(select reward_probability from koc_ref.".MY_Controller::TBL_REWARD." where id = '".$rid."' and pattern = '".$rpattern."' and seq = '".$rseq."'), ";
 		$query .= "a.reward_probability ) as reward_probability from reward as a left outer join ( ";
-		$query .= "select seq from koc_ref.".MY_Controller::TBL_REWARD." where id = '".$rid."' and pattern = '".$rpattern."' and seq != '".$rseq."' order by reward_probability desc limit 1 ";
+		$query .= "select seq from koc_ref.".MY_Controller::TBL_REWARD." where id = '".$rid."' and pattern = '".$rpattern."' and seq != '".$rseq."' ";
+		$query .= "order by reward_probability desc limit 1 ";
 		$query .= ") as b on a.seq = b.seq where a.id = '".$rid."' and a.pattern = '".$rpattern."' and a.seq != '".$rseq."' ) as c ) as d inner join ";
 		$query .= "( select e.id, e.pattern, e.seq, e.reward_type, e.reward_value, (@rowsum) + 1 as min_prob, (@rowsum := @rowsum + ";
 		$query .= "if( e.seq = f.seq, e.reward_probability + ";
 		$query .= "(select reward_probability from koc_ref.".MY_Controller::TBL_REWARD." where id = '".$rid."' and pattern = '".$rpattern."' and seq = '".$rseq."'), ";
-		$query .= "e.reward_probability ) ) as max_prob from koc_ref.".MY_Controller::TBL_REWARD." as e left outer join ( select seq from koc_ref.".MY_Controller::TBL_REWARD." ";
+		$query .= "e.reward_probability ) ) as max_prob from koc_ref.".MY_Controller::TBL_REWARD." as e ";
+		$query .= "left outer join ( select seq from koc_ref.".MY_Controller::TBL_REWARD." ";
 		$query .= "where id = '".$rid."' and pattern = '".$rpattern."' and seq != '".$rseq."' order by reward_probability desc limit 1 ";
 		$query .= ") as f on e.seq = f.seq, (select @rowsum := 0) as g where e.id = '".$rid."' and e.pattern = '".$rpattern."' and e.seq != '".$rseq."' ";
-		$query .= "order by e.seq ) as h on d.rand_prob between h.min_prob and h.max_prob inner join koc_ref.".MY_Controller::TBL_ARTICLE." as i on h.reward_type = i.article_id ";
+		$query .= "order by e.seq ) as h on d.rand_prob between h.min_prob and h.max_prob ";
+		$query .= "inner join koc_ref.".MY_Controller::TBL_ARTICLE." as i on h.reward_type = i.article_id ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -469,6 +473,15 @@ class Model_Ref extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
+
+	public function requestPackageList( $pid, $product_id )
+	{
+		$query = "select type, value from koc_ref.package_list where id = '".$product_id."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
 //for ADMIN
 	public function requestAdminProductList()
 	{
@@ -505,9 +518,22 @@ class Model_Ref extends MY_Model {
 	public function requestGatcha( $pid, $id )
 	{
 		$query = "select a.id, a.idx, ifnull(c.grade, 0) + ifnull(d.grade, 0) as grade, a.refid ";
-		$query .= "from koc_ref.gatcha_sim as a inner join koc_ref.numbers as b on a.probability >= b.number ";
-		$query .= "left outer join koc_ref.ref_character as c on a.refid = c.id ";
-		$query .= "left outer join koc_ref.item as d on a.refid = d.id ";
+		$query .= "from koc_ref.".MY_Controller::TBL_GATCHA_SIM." as a inner join koc_ref.numbers as b on a.probability >= b.number ";
+		$query .= "left outer join koc_ref.".MY_Controller::TBL_REFCHARACTER." as c on a.refid = c.id ";
+		$query .= "left outer join koc_ref.".MY_Controller::TBL_ITEM." as d on a.refid = d.id ";
+		$query .= "where a.id = '".$id."' and a.probability > 0 ";
+		$query .= "order by rand() desc limit 1 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
+	public function requestGatchaEvent( $pid, $id )
+	{
+		$query = "select a.id, a.idx, ifnull(c.grade, 0) + ifnull(d.grade, 0) as grade, a.refid ";
+		$query .= "from koc_ref.".MY_Controller::TBL_GATCHA_EVENT_SIM." as a inner join koc_ref.numbers as b on a.probability >= b.number ";
+		$query .= "left outer join koc_ref.".MY_Controller::TBL_REFCHARACTER." as c on a.refid = c.id ";
+		$query .= "left outer join koc_ref.".MY_Controller::TBL_ITEM." as d on a.refid = d.id ";
 		$query .= "where a.id = '".$id."' and a.probability > 0 ";
 		$query .= "order by rand() desc limit 1 ";
 
@@ -517,7 +543,17 @@ class Model_Ref extends MY_Model {
 
 	public function requestGatchaUpdateProbability( $pid, $id, $refid )
 	{
-		$query = "update koc_ref.gatcha_sim set probability = probability - 1 ";
+		$query = "update koc_ref.".MY_Controller::TBL_GATCHA_SIM." set probability = probability - 1 ";
+		$query .= "where id = '".$id."' and refid = '".$refid."' and probability > 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function requestGatchaEventUpdateProbability( $pid, $id, $refid )
+	{
+		$query = "update koc_ref.".MY_Controller::TBL_GATCHA_EVENT_SIM." set probability = probability - 1 ";
 		$query .= "where id = '".$id."' and refid = '".$refid."' and probability > 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -527,7 +563,18 @@ class Model_Ref extends MY_Model {
 
 	public function insertGatcha( $pid, $id )
 	{
-		$query = "insert into koc_ref.gatcha_sim ( id, refid, probability ) select id, reference, probability from koc_ref.".MY_Controller::TBL_GATCHA." where id = '".$id."' ";
+		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_SIM." ( id, refid, probability ) ";
+		$query .= "select id, reference, probability from koc_ref.".MY_Controller::TBL_GATCHA." where id = '".$id."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function insertGatchaEvent( $pid, $id )
+	{
+		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_EVENT_SIM." ( id, refid, probability ) ";
+		$query .= "select id, reference, probability from koc_ref.".MY_Controller::TBL_GATCHA_EVENT." where id = '".$id."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -536,7 +583,18 @@ class Model_Ref extends MY_Model {
 
 	public function requestGetGatcha( $id, $grade, $refid, $pid )
 	{
-		$query = "insert into koc_ref.gatcha_result ( id, grade, refid, pid, result_date ) values ( '".$id."', '".$grade."', '".$refid."', '".$pid."', now() ) ";
+		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_RESULT." ( id, grade, refid, pid, result_date ) ";
+		$query .= "values ( '".$id."', '".$grade."', '".$refid."', '".$pid."', now() ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function requestGetGatchaEvent( $id, $grade, $refid, $pid )
+	{
+		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_EVENT_RESULT." ( id, grade, refid, pid, result_date ) ";
+		$query .= "values ( '".$id."', '".$grade."', '".$refid."', '".$pid."', now() ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -546,8 +604,9 @@ class Model_Ref extends MY_Model {
 	public function requestGatchaProbabilityList()
 	{
 		$query = "select a.id, c.kr, round(b.probability / a.totsum * 100, 3) as prob from ( select id, sum(probability) as totsum ";
-		$query .= "from gatcha group by id ) as a inner join ( select id, reference, probability from gatcha ) as b on a.id = b.id ";
-		$query .= "inner join koc_ref.text as c on concat( 'NG_ARTICLE_', b.reference ) = c.id ";
+		$query .= "from koc_ref.".MY_Controller::TBL_GATCHA." group by id ) as a ";
+		$query .= "inner join ( select id, reference, probability from koc_ref.".MY_Controller::TBL_GATCHA." ) as b on a.id = b.id ";
+		$query .= "inner join koc_ref.".MY_Controller::TBL_TEXT." as c on concat( 'NG_ARTICLE_', b.reference ) = c.id ";
 
 		return $this->DB_SEL->query($query);
 	}
@@ -562,7 +621,7 @@ class Model_Ref extends MY_Model {
 
 	public function requestInitGatcha( $id )
 	{
-		$query = "insert into koc_ref.gatcha_sim (id, refid) select id, refid from gatcha where id = '".$id."' ";
+		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_SIM." (id, refid) select id, refid from gatcha where id = '".$id."' ";
 
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();

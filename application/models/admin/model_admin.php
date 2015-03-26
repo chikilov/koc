@@ -223,7 +223,7 @@ class Model_Admin extends MY_Model {
 	public function requestCouponList()
 	{
 		$query = "select d.group_id, d.reg_datetime, d.coupon_count, d.static_code, d.coupon_type, d.is_valid, ";
-		$query .= "sum( if( e.coupon_user_id = 0 or e.coupon_user_id is null, 0, 1 ) ) as use_count, ";
+		$query .= "count(e.coupon_id) as use_count, ";
 		$query .= "left(d.start_date, 10) as start_date, left(d.end_date, 10) as end_date, d.group_name, ";
 		$query .= "d.reward_type, d.reward_value from ( ";
 		$query .= "select a.group_id, a.reg_datetime, a.coupon_count, a.static_code, a.coupon_type, cast(a.is_valid as unsigned) as is_valid, ";
@@ -233,7 +233,8 @@ class Model_Admin extends MY_Model {
 		$query .= "left outer join koc_admin.coupon_reward_info as b on a.group_id = b.group_id ";
 		$query .= "left outer join koc_ref.text as c on concat('NG_ARTICLE_', b.reward_type) = c.id ";
 		$query .= "group by a.group_id, a.reg_datetime, a.coupon_count, a.static_code, a.coupon_type, a.is_valid, a.start_date, a.end_date, a.group_name ";
-		$query .= ") as d left outer join koc_admin.coupon_detail_info as e on d.group_id = e.group_id ";
+		$query .= ") as d left outer join (select group_id, coupon_id from koc_admin.coupon_detail_info ";
+		$query .= "where coupon_user_id > 0 and coupon_user_id is not null ) as e on d.group_id = e.group_id ";
 		$query .= "group by d.group_id ";
 
 		return $this->DB_SEL->query($query);
@@ -615,6 +616,15 @@ class Model_Admin extends MY_Model {
 
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
+	}
+
+	public function requestGatchaEventStatus()
+	{
+		$query = "select idx from koc_admin.gacha_manage where cast(left(now(), 10) as date) between start_date and end_date ";
+		$query .= "and hour(now()) between start_time and end_time ";
+
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
 	}
 }
 ?>

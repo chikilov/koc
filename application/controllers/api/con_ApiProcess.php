@@ -802,6 +802,8 @@ class Con_ApiProcess extends MY_Controller {
 					$result = $result & $this->dbPlay->newPlayerTeam( $pid, $arrayCharacter[0], $arrayCharacter[1], null );
 					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[0], "weapon", $arrayInventory[0] );
 					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[1], "weapon", $arrayInventory[1] );
+					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[0], "backpack", $arrayInventory[3] );
+					$result = $result & $this->dbPlay->itemToChar( $pid, $arrayCharacter[1], "backpack", $arrayInventory[4] );
 					$tmpResult = 1;
 				}
 			}
@@ -933,6 +935,7 @@ class Con_ApiProcess extends MY_Controller {
 					}
 
 					// 첫구매 체크 ( 상품 카테고리가 CASH 인 경우만 체크, 매일매일 패키지(카테고리 : SUBSCRIBE)와 개척자 패키지(카테고리 : LIMITED) 제외 )
+					/*
 					if ( MY_Controller::VALID_FIRST_BUY_EVENT )
 					{
 						$arrayResult["packinfo"]["is_first"] = $this->dbPlay->requestFirstBuyCheck( $pid )->result_array()[0]["is_first"];
@@ -941,6 +944,9 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$arrayResult["packinfo"]["is_first"] = 0;
 					}
+					*/
+					// 월간 패키지 첫구매 체크
+					$arrayResult["packinfo"]["is_first"] = intval(!(bool)$this->dbPlay->requestPackageBuyHistory( $pid, "", MY_Controller::PRODUCTTYPE_PACKAGE_MONTHLY ));
 
 					// 개척자 패키지
 					$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
@@ -1504,145 +1510,151 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
-				if ( $storeType == "editor" )
+				$product_status = true;
+				if (
+					$arrayProduct[0]["product_type"] == MY_Controller::PRODUCTTYPE_PACKAGE_FOREVER
+					|| $arrayProduct[0]["product_type"] == MY_Controller::PRODUCTTYPE_PACKAGE_ENDPOINT
+					|| $arrayProduct[0]["product_type"] == MY_Controller::PRODUCTTYPE_PACKAGE_MONTHLY
+				)
 				{
-					// 지급 처리
-					if ( $pid != $sid )
-					{
-						$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
-						if ( $arrayProduct[0]["bonus"] > 0 )
-						{
-							$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
-						}
+					$product_status = !(bool)$this->dbPlay->requestPackageBuyHistory( $pid, $product, $arrayProduct[0]["product_type"] );
+				}
 
-						if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+				if ( $product_status )
+				{
+					if ( $storeType == "editor" )
+					{
+						// 지급 처리
+						if ( $pid != $sid )
 						{
-							if ( $arrayProduct[0]["vip_exp"] > 0 )
+							$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
+							if ( $arrayProduct[0]["bonus"] > 0 )
 							{
-								$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
-								if ( !( empty( $vipInfo ) ) )
+								$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
+							}
+
+							if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+							{
+								if ( $arrayProduct[0]["vip_exp"] > 0 )
 								{
-									$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
-									if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
+									$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
+									if ( !( empty( $vipInfo ) ) )
 									{
-										$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
-										if ( !( empty($vipReward) ) )
+										$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
+										if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
 										{
-											foreach( $vipReward as $row )
+											$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
+											if ( !( empty($vipReward) ) )
 											{
-												if ( $row["reward_div"] == "PERM" )
+												foreach( $vipReward as $row )
 												{
-													$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
-												}
-												else
-												{
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
-													$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+													if ( $row["reward_div"] == "PERM" )
+													{
+														$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
+													}
+													else
+													{
+														$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+														$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+													}
 												}
 											}
 										}
+										$arrayResult["vipinfo"] = $vipInfo[0];
 									}
-									$arrayResult["vipinfo"] = $vipInfo[0];
+									else
+									{
+										$arrayResult["vipinfo"] = null;
+									}
 								}
-								else
-								{
-									$arrayResult["vipinfo"] = null;
-								}
+							}
+							else
+							{
+								$arrayResult["vipinfo"] = null;
 							}
 						}
 						else
 						{
-							$arrayResult["vipinfo"] = null;
+							$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
 						}
-					}
-					else
-					{
-						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
-					}
-					//패키지 추가지급 코드
-					if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-					{
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-					}
-					else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-					{
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-						$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-					}
+						//패키지 추가지급 코드
+						$arrayPackageList = $this->dbRef->requestPackageList( $pid, $product )->result_array();
+						if ( !empty($arrayPackageList) )
+						{
+							foreach( $arrayPackageList as $row )
+							{
+								$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
+							}
+						}
+						/*
+						if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
+						{
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
+						}
+						else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
+						{
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+						}
+						*/
 
-					//지급 성공
-					$is_provision = 1;
-					$resultCode = MY_Controller::STATUS_API_OK;
-					$resultText = MY_Controller::MESSAGE_API_OK;
-					$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
+						//지급 성공
+						$is_provision = 1;
+						$resultCode = MY_Controller::STATUS_API_OK;
+						$resultText = MY_Controller::MESSAGE_API_OK;
+						$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
 
-					$receiptPaymentSeq = "";
-					$receiptApprovedPaymentNo = "";
-					$receiptNaverId = "";
-					$receiptPaymentTime = "";
-					$reasonCode = "";
-				}
-				else if ( $storeType == "naver" )
-				{
-					if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
-					{
-						$arrayResult = null;
-						//지급 오류
-						$is_provision = 0;
-						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 						$receiptPaymentSeq = "";
 						$receiptApprovedPaymentNo = "";
 						$receiptNaverId = "";
 						$receiptPaymentTime = "";
-						$reasonCode = "01";
+						$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
 					}
-					else
+					else if ( $storeType == "naver" )
 					{
-						$this->load->library( 'HmacManager', TRUE );
-						$nonce = mt_rand();
-
-						$url = "http://apis.naver.com/".MY_Controller::CP_ID."/appStore/receiptV2.json?nonce=".$nonce."&paymentSeq=".$paymentSeq;
-
-						$encrypted_url = $this->hmacmanager->getEncryptUrl($url);
-
-						//네이버 api 호출
-						$ch = curl_init();
-						curl_setopt($ch, CURLOPT_URL, $encrypted_url);
-						if ( ENVIRONMENT == "production" )
-						{
-							curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::PROD_IAP_KEY));
-						}
-						else
-						{
-							curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::TEST_IAP_KEY));
-						}
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-						$arrResponse = json_decode( curl_exec( $ch ), true );
-
-						if ( empty( $arrResponse ) )
+						if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
 						{
 							$arrayResult = null;
 							//지급 오류
 							$is_provision = 0;
-							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
-							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
-
+							$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 							$receiptPaymentSeq = "";
 							$receiptApprovedPaymentNo = "";
 							$receiptNaverId = "";
 							$receiptPaymentTime = "";
-							$reasonCode = "02";
+							$reasonCode = MY_Controller::REASONCODE_RECEIPT_ALREADY_PROVISION;
 						}
 						else
 						{
-							if ( $arrResponse["code"] != 0 )
+							$this->load->library( 'HmacManager', TRUE );
+							$nonce = mt_rand();
+
+							$url = "http://apis.naver.com/".MY_Controller::CP_ID."/appStore/receiptV2.json?nonce=".$nonce."&paymentSeq=".$paymentSeq;
+
+							$encrypted_url = $this->hmacmanager->getEncryptUrl($url);
+
+							//네이버 api 호출
+							$ch = curl_init();
+							curl_setopt($ch, CURLOPT_URL, $encrypted_url);
+							if ( ENVIRONMENT == "production" )
+							{
+								curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::PROD_IAP_KEY));
+							}
+							else
+							{
+								curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::TEST_IAP_KEY));
+							}
+							curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+							$arrResponse = json_decode( curl_exec( $ch ), true );
+
+							if ( empty( $arrResponse ) )
 							{
 								$arrayResult = null;
 								//지급 오류
@@ -1654,208 +1666,30 @@ class Con_ApiProcess extends MY_Controller {
 								$receiptApprovedPaymentNo = "";
 								$receiptNaverId = "";
 								$receiptPaymentTime = "";
-								$reasonCode = "02";
+								$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
 							}
 							else
 							{
-								$receipt = $arrResponse["result"]["receipt"];
-								$extra = json_decode($receipt["extra"], true);
-
-								if ( $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
-								{
-									if ( $is_consume )
-									{
-										// 지급 처리
-										if ( $pid != $sid )
-										{
-											$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
-											if ( $arrayProduct[0]["bonus"] > 0 )
-											{
-												$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
-											}
-
-											if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
-											{
-												if ( $arrayProduct[0]["vip_exp"] > 0 )
-												{
-													$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
-													if ( !( empty( $vipInfo ) ) )
-													{
-														$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
-														if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
-														{
-															$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
-															if ( !( empty($vipReward) ) )
-															{
-																foreach( $vipReward as $row )
-																{
-																	if ( $row["reward_div"] == "PERM" )
-																	{
-																		$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
-																	}
-																	else
-																	{
-																		$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
-																		$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
-																	}
-																}
-															}
-														}
-														$arrayResult["vipinfo"] = $vipInfo[0];
-													}
-													else
-													{
-														$arrayResult["vipinfo"] = null;
-													}
-												}
-											}
-											else
-											{
-												$arrayResult["vipinfo"] = null;
-											}
-										}
-										else
-										{
-											$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
-										}
-
-										//패키지 추가지급 코드
-										if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-										{
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-										}
-										else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-										{
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-										}
-
-										//지급 성공
-										$is_provision = 0;
-										$resultCode = MY_Controller::STATUS_API_OK;
-										$resultText = MY_Controller::MESSAGE_API_OK;
-										$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
-										$reasonCode = "";
-									}
-									else
-									{
-										$arrayResult = null;
-										//지급 오류
-										$is_provision = 0;
-										$resultCode = MY_Controller::STATUS_CONSUME;
-										$resultText = MY_Controller::MESSAGE_CONSUME;
-										$reasonCode = "03";
-									}
-								}
-								else
+								if ( $arrResponse["code"] != 0 )
 								{
 									$arrayResult = null;
 									//지급 오류
 									$is_provision = 0;
-									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-									$reasonCode = "04";
+									$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
+									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
+
+									$receiptPaymentSeq = "";
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = "";
+									$receiptPaymentTime = "";
+									$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
 								}
-								$receiptPaymentSeq = $receipt["paymentSeq"];
-								$receiptApprovedPaymentNo = $receipt["approvedPaymentNo"];
-								$receiptNaverId = $receipt["naverId"];
-								$receiptPaymentTime = date("Y-m-d H:i:s", $receipt["paymentTime"] / 1000);
-							}
-						}
-					}
-				}
-				else if ( $storeType == "google" )
-				{
-					if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
-					{
-						$arrayResult = null;
-						//지급 오류
-						$is_provision = 0;
-						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-						$receiptPaymentSeq = "";
-						$receiptApprovedPaymentNo = "";
-						$receiptNaverId = "";
-						$receiptPaymentTime = "";
-						$reasonCode = "01";
-					}
-					else
-					{
-						if ( ENVIRONMENT == "production" )
-						{
-							$kurl = "http://m.koccommon.tntgame.co.kr/refresh.php";
-						}
-						else
-						{
-							$kurl = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/refresh.php";
-						}
-						$kch = curl_init();
-						curl_setopt($kch, CURLOPT_URL, $kurl);
-						curl_setopt($kch, CURLOPT_RETURNTRANSFER, 1);
-						curl_exec( $kch );
-
-						if ( ENVIRONMENT == "production" )
-						{
-							$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
-						}
-						else
-						{
-							$sFileName = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/token.htm";
-						}
-						$sResult = json_decode(file_get_contents($sFileName),true);
-						$url = "https://www.googleapis.com/androidpublisher/v1.1/applications/com.tntgame.koc.google/inapp/".$arrayProduct[0]["iapcode"]."/purchases/".$paymentSeq;
-						$url .= "?access_token=".$sResult["access_token"];
-
-						$ch = curl_init();
-						curl_setopt($ch, CURLOPT_URL, $url);
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-						curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-						curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
-						$arrResponse = json_decode( curl_exec( $ch ), true );
-
-						if ( empty( $arrResponse ) )
-						{
-							$arrayResult = null;
-							//지급 오류
-							$is_provision = 0;
-							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
-							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
-
-							$receiptPaymentSeq = "";
-							$receiptApprovedPaymentNo = "";
-							$receiptNaverId = "";
-							$receiptPaymentTime = "";
-							$reasonCode = "02";
-						}
-						else
-						{
-							if ($arrResponse == false || $arrResponse == "" || empty( $arrResponse ) )
-							{
-								$arrayResult = null;
-								//지급 오류
-								$is_provision = 0;
-								$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
-								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
-
-								$receiptPaymentSeq = "";
-								$receiptApprovedPaymentNo = "";
-								$receiptNaverId = "";
-								$receiptPaymentTime = "";
-								$reasonCode = "02";
-							}
-							else
-							{
-								if ( array_key_exists("developerPayload", $arrResponse) )
+								else
 								{
-									$extra   = json_decode( $arrResponse["developerPayload"], true );
+									$receipt = $arrResponse["result"]["receipt"];
+									$extra = json_decode($receipt["extra"], true);
 
-									if ( $extra["sid"] == $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
+									if ( $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
 									{
 										if ( $is_consume )
 										{
@@ -1912,7 +1746,17 @@ class Con_ApiProcess extends MY_Controller {
 											{
 												$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
 											}
+
 											//패키지 추가지급 코드
+											$arrayPackageList = $this->dbRef->requestPackageList( $pid, $product )->result_array();
+											if ( !empty($arrayPackageList) )
+											{
+												foreach( $arrayPackageList as $row )
+												{
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
+												}
+											}
+											/*
 											if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
 											{
 												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
@@ -1928,18 +1772,14 @@ class Con_ApiProcess extends MY_Controller {
 												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
 												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
 											}
+											*/
 
 											//지급 성공
-											$is_provision = 1;
+											$is_provision = 0;
 											$resultCode = MY_Controller::STATUS_API_OK;
 											$resultText = MY_Controller::MESSAGE_API_OK;
 											$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
-
-											$receiptPaymentSeq = "";
-											$receiptApprovedPaymentNo = "";
-											$receiptNaverId = "";
-											$receiptPaymentTime = "";
-											$reasonCode = "";
+											$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
 										}
 										else
 										{
@@ -1948,7 +1788,7 @@ class Con_ApiProcess extends MY_Controller {
 											$is_provision = 0;
 											$resultCode = MY_Controller::STATUS_CONSUME;
 											$resultText = MY_Controller::MESSAGE_CONSUME;
-											$reasonCode = "03";
+											$reasonCode = MY_Controller::REASONCODE_CONSUME_FAILED;
 										}
 									}
 									else
@@ -1958,90 +1798,66 @@ class Con_ApiProcess extends MY_Controller {
 										$is_provision = 0;
 										$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
 										$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-										$reasonCode = "04";
+										$reasonCode = MY_Controller::REASONCODE_DOESNT_MATCH_RECEIPT;
 									}
-								}
-								else
-								{
-									$arrayResult = null;
-									//지급 오류
-									$is_provision = 0;
-									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-									$reasonCode = "04";
-								}
-								$receiptPaymentSeq = $paymentSeq;
-								$receiptApprovedPaymentNo = "";
-								$receiptNaverId = "";
-								if ( array_key_exists("purchaseTime", $arrResponse) )
-								{
-									$receiptPaymentTime = date("Y-m-d H:i:s", $arrResponse["purchaseTime"] / 1000);
-								}
-								else
-								{
-									$receiptPaymentTime = null;
+									$receiptPaymentSeq = $receipt["paymentSeq"];
+									$receiptApprovedPaymentNo = $receipt["approvedPaymentNo"];
+									$receiptNaverId = $receipt["naverId"];
+									$receiptPaymentTime = date("Y-m-d H:i:s", $receipt["paymentTime"] / 1000);
 								}
 							}
 						}
 					}
-				}
-				else if ( $storeType == "tstore" )
-				{
-					if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
+					else if ( $storeType == "google" )
 					{
-						$arrayResult = null;
-						//지급 오류
-						$is_provision = 0;
-						$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-						$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-						$receiptPaymentSeq = "";
-						$receiptApprovedPaymentNo = "";
-						$receiptNaverId = "";
-						$receiptPaymentTime = "";
-						$reasonCode = "01";
-					}
-					else
-					{
-						if ( ENVIRONMENT == "production" )
-						{
-							$url = "https://iap.tstore.co.kr/digitalsignconfirm.iap";
-						}
-						else
-						{
-							$url = "https://iapdev.tstore.co.kr/digitalsignconfirm.iap";
-						}
-						//네이버 api 호출  TSTORE_APPID
-
-						$sendData = array("txid" => $paymentSeq, "appid" => MY_Controller::TSTORE_APPID, "signdata" => $signdata );
-						$sendData_string = json_encode( $sendData, JSON_UNESCAPED_UNICODE);
-						$ch = curl_init();
-						curl_setopt($ch, CURLOPT_URL, $url);
-						curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-						curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-						curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
-						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-						curl_setopt($ch, CURLOPT_POSTFIELDS, $sendData_string);
-						curl_setopt($ch, CURLOPT_HTTPHEADER, array( "Content-Type: application/json", "Content-Length: " . strlen($sendData_string)));
-
-						$arrResponse = json_decode( curl_exec( $ch ), true );
-
-						if ( empty( $arrResponse ) )
+						if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
 						{
 							$arrayResult = null;
 							//지급 오류
 							$is_provision = 0;
-							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
-							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
-
+							$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
 							$receiptPaymentSeq = "";
 							$receiptApprovedPaymentNo = "";
 							$receiptNaverId = "";
 							$receiptPaymentTime = "";
-							$reasonCode = "02";
+							$reasonCode = MY_Controller::REASONCODE_RECEIPT_ALREADY_PROVISION;
 						}
 						else
 						{
-							if ( $arrResponse["status"] != 0 || $arrResponse["detail"] != "0000" )
+							if ( ENVIRONMENT == "production" )
+							{
+								$kurl = "http://m.koccommon.tntgame.co.kr/refresh.php";
+							}
+							else
+							{
+								$kurl = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/refresh.php";
+							}
+							$kch = curl_init();
+							curl_setopt($kch, CURLOPT_URL, $kurl);
+							curl_setopt($kch, CURLOPT_RETURNTRANSFER, 1);
+							curl_exec( $kch );
+
+							if ( ENVIRONMENT == "production" )
+							{
+								$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
+							}
+							else
+							{
+								$sFileName = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/token.htm";
+							}
+							$sResult = json_decode(file_get_contents($sFileName),true);
+							$url = "https://www.googleapis.com/androidpublisher/v1.1/applications/com.tntgame.koc.google/inapp/".$arrayProduct[0]["iapcode"]."/purchases/".$paymentSeq;
+							$url .= "?access_token=".$sResult["access_token"];
+
+							$ch = curl_init();
+							curl_setopt($ch, CURLOPT_URL, $url);
+							curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+							curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
+							$arrResponse = json_decode( curl_exec( $ch ), true );
+
+							if ( empty( $arrResponse ) )
 							{
 								$arrayResult = null;
 								//지급 오류
@@ -2053,135 +1869,392 @@ class Con_ApiProcess extends MY_Controller {
 								$receiptApprovedPaymentNo = "";
 								$receiptNaverId = "";
 								$receiptPaymentTime = "";
-								$reasonCode = "02";
+								$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
 							}
 							else
 							{
-								$bpInfo = urldecode( $arrResponse["product"][0]["bp_info"] );
-								$extra   = json_decode( $bpInfo, true );
-
-								if ( $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
+								if ($arrResponse == false || $arrResponse == "" || empty( $arrResponse ) )
 								{
-									if ( $is_consume )
-									{
-										// 지급 처리
-										if ( $pid != $sid )
-										{
-											$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
-											if ( $arrayProduct[0]["bonus"] > 0 )
-											{
-												$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
-											}
+									$arrayResult = null;
+									//지급 오류
+									$is_provision = 0;
+									$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
+									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
 
-											if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+									$receiptPaymentSeq = "";
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = "";
+									$receiptPaymentTime = "";
+									$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
+								}
+								else
+								{
+									if ( array_key_exists("developerPayload", $arrResponse) )
+									{
+										$extra   = json_decode( $arrResponse["developerPayload"], true );
+
+										if ( $extra["sid"] == $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
+										{
+											if ( $is_consume )
 											{
-												if ( $arrayProduct[0]["vip_exp"] > 0 )
+												// 지급 처리
+												if ( $pid != $sid )
 												{
-													$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
-													if ( !( empty( $vipInfo ) ) )
+													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
+													if ( $arrayProduct[0]["bonus"] > 0 )
 													{
-														$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
-														if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
+														$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
+													}
+
+													if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+													{
+														if ( $arrayProduct[0]["vip_exp"] > 0 )
 														{
-															$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
-															if ( !( empty($vipReward) ) )
+															$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
+															if ( !( empty( $vipInfo ) ) )
 															{
-																foreach( $vipReward as $row )
+																$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
+																if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
 																{
-																	if ( $row["reward_div"] == "PERM" )
+																	$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
+																	if ( !( empty($vipReward) ) )
 																	{
-																		$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
-																	}
-																	else
-																	{
-																		$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
-																		$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+																		foreach( $vipReward as $row )
+																		{
+																			if ( $row["reward_div"] == "PERM" )
+																			{
+																				$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
+																			}
+																			else
+																			{
+																				$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+																				$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+																			}
+																		}
 																	}
 																}
+																$arrayResult["vipinfo"] = $vipInfo[0];
+															}
+															else
+															{
+																$arrayResult["vipinfo"] = null;
 															}
 														}
-														$arrayResult["vipinfo"] = $vipInfo[0];
 													}
 													else
 													{
 														$arrayResult["vipinfo"] = null;
 													}
 												}
+												else
+												{
+													$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
+												}
+												//패키지 추가지급 코드
+												$arrayPackageList = $this->dbRef->requestPackageList( $pid, $product )->result_array();
+												if ( !empty($arrayPackageList) )
+												{
+													foreach( $arrayPackageList as $row )
+													{
+														$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
+													}
+												}
+												/*
+												if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
+												{
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
+												}
+												else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
+												{
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+												}
+												*/
+
+												//지급 성공
+												$is_provision = 1;
+												$resultCode = MY_Controller::STATUS_API_OK;
+												$resultText = MY_Controller::MESSAGE_API_OK;
+												$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
+
+												$receiptPaymentSeq = "";
+												$receiptApprovedPaymentNo = "";
+												$receiptNaverId = "";
+												$receiptPaymentTime = "";
+												$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
 											}
 											else
 											{
-												$arrayResult["vipinfo"] = null;
+												$arrayResult = null;
+												//지급 오류
+												$is_provision = 0;
+												$resultCode = MY_Controller::STATUS_CONSUME;
+												$resultText = MY_Controller::MESSAGE_CONSUME;
+												$reasonCode = MY_Controller::REASONCODE_CONSUME_FAILED;
 											}
 										}
 										else
 										{
-											$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
+											$arrayResult = null;
+											//지급 오류
+											$is_provision = 0;
+											$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+											$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+											$reasonCode = MY_Controller::REASONCODE_DOESNT_MATCH_RECEIPT;
 										}
-
-										//패키지 추가지급 코드
-										if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-										{
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-										}
-										else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-										{
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-										}
-
-										//지급 성공
-										$is_provision = 1;
-										$resultCode = MY_Controller::STATUS_API_OK;
-										$resultText = MY_Controller::MESSAGE_API_OK;
-										$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
-
-										$receiptPaymentSeq = "";
-										$receiptApprovedPaymentNo = "";
-										$receiptNaverId = "";
-										$receiptPaymentTime = "";
-										$reasonCode = "";
 									}
 									else
 									{
 										$arrayResult = null;
 										//지급 오류
-										$is_provision = 1;
-										$resultCode = MY_Controller::STATUS_CONSUME;
-										$resultText = MY_Controller::MESSAGE_CONSUME;
-										$reasonCode = "03";
+										$is_provision = 0;
+										$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+										$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+										$reasonCode = MY_Controller::REASONCODE_DOESNT_MATCH_RECEIPT;
+									}
+									$receiptPaymentSeq = $paymentSeq;
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = "";
+									if ( array_key_exists("purchaseTime", $arrResponse) )
+									{
+										$receiptPaymentTime = date("Y-m-d H:i:s", $arrResponse["purchaseTime"] / 1000);
+									}
+									else
+									{
+										$receiptPaymentTime = null;
 									}
 								}
-								else
+							}
+						}
+					}
+					else if ( $storeType == "tstore" )
+					{
+						if ( $this->dbPlay->requestBuyIapExists( $pid, $storeType, $paymentSeq ) )
+						{
+							$arrayResult = null;
+							//지급 오류
+							$is_provision = 0;
+							$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+							$receiptPaymentSeq = "";
+							$receiptApprovedPaymentNo = "";
+							$receiptNaverId = "";
+							$receiptPaymentTime = "";
+							$reasonCode = MY_Controller::REASONCODE_RECEIPT_ALREADY_PROVISION;
+						}
+						else
+						{
+							if ( ENVIRONMENT == "production" )
+							{
+								$url = "https://iap.tstore.co.kr/digitalsignconfirm.iap";
+							}
+							else
+							{
+								$url = "https://iapdev.tstore.co.kr/digitalsignconfirm.iap";
+							}
+							//네이버 api 호출  TSTORE_APPID
+
+							$sendData = array("txid" => $paymentSeq, "appid" => MY_Controller::TSTORE_APPID, "signdata" => $signdata );
+							$sendData_string = json_encode( $sendData, JSON_UNESCAPED_UNICODE);
+							$ch = curl_init();
+							curl_setopt($ch, CURLOPT_URL, $url);
+							curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+							curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+							curl_setopt($ch, CURLOPT_SSLVERSION,3); // SSL 버젼 (https 접속시에 필요)
+							curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+							curl_setopt($ch, CURLOPT_POSTFIELDS, $sendData_string);
+							curl_setopt($ch, CURLOPT_HTTPHEADER, array( "Content-Type: application/json", "Content-Length: " . strlen($sendData_string)));
+
+							$arrResponse = json_decode( curl_exec( $ch ), true );
+
+							if ( empty( $arrResponse ) )
+							{
+								$arrayResult = null;
+								//지급 오류
+								$is_provision = 0;
+								$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
+								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
+
+								$receiptPaymentSeq = "";
+								$receiptApprovedPaymentNo = "";
+								$receiptNaverId = "";
+								$receiptPaymentTime = "";
+								$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
+							}
+							else
+							{
+								if ( $arrResponse["status"] != 0 || $arrResponse["detail"] != "0000" )
 								{
 									$arrayResult = null;
 									//지급 오류
 									$is_provision = 0;
-									$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
-									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
-									$reasonCode = "04";
+									$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
+									$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
+
+									$receiptPaymentSeq = "";
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = "";
+									$receiptPaymentTime = "";
+									$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
 								}
-								$receiptPaymentSeq = $paymentSeq;
-								$receiptApprovedPaymentNo = "";
-								$receiptNaverId = $arrResponse["product"][0]["tid"];
-								$receiptPaymentTime = DateTime::createFromFormat("YmdHis", $arrResponse["product"][0]["log_time"]);
-								$receiptPaymentTime = $receiptPaymentTime->format("Y-m-d H:i:s");
+								else
+								{
+									$bpInfo = urldecode( $arrResponse["product"][0]["bp_info"] );
+									$extra   = json_decode( $bpInfo, true );
+
+									if ( $extra["sid"] = $sid && $extra["product"] == $product && $extra["iapcode"] == $arrayProduct[0]["iapcode"] )
+									{
+										if ( $is_consume )
+										{
+											// 지급 처리
+											if ( $pid != $sid )
+											{
+												$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
+												if ( $arrayProduct[0]["bonus"] > 0 )
+												{
+													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
+												}
+
+												if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+												{
+													if ( $arrayProduct[0]["vip_exp"] > 0 )
+													{
+														$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
+														if ( !( empty( $vipInfo ) ) )
+														{
+															$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
+															if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
+															{
+																$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
+																if ( !( empty($vipReward) ) )
+																{
+																	foreach( $vipReward as $row )
+																	{
+																		if ( $row["reward_div"] == "PERM" )
+																		{
+																			$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
+																		}
+																		else
+																		{
+																			$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+																			$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+																		}
+																	}
+																}
+															}
+															$arrayResult["vipinfo"] = $vipInfo[0];
+														}
+														else
+														{
+															$arrayResult["vipinfo"] = null;
+														}
+													}
+												}
+												else
+												{
+													$arrayResult["vipinfo"] = null;
+												}
+											}
+											else
+											{
+												$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
+											}
+
+											//패키지 추가지급 코드
+											$arrayPackageList = $this->dbRef->requestPackageList( $pid, $product )->result_array();
+											if ( !empty($arrayPackageList) )
+											{
+												foreach( $arrayPackageList as $row )
+												{
+													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
+												}
+											}
+											/*
+											if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
+											{
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
+											}
+											else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
+											{
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
+												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
+											}
+											*/
+
+											//지급 성공
+											$is_provision = 1;
+											$resultCode = MY_Controller::STATUS_API_OK;
+											$resultText = MY_Controller::MESSAGE_API_OK;
+											$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
+
+											$receiptPaymentSeq = "";
+											$receiptApprovedPaymentNo = "";
+											$receiptNaverId = "";
+											$receiptPaymentTime = "";
+											$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
+										}
+										else
+										{
+											$arrayResult = null;
+											//지급 오류
+											$is_provision = 1;
+											$resultCode = MY_Controller::STATUS_CONSUME;
+											$resultText = MY_Controller::MESSAGE_CONSUME;
+											$reasonCode = MY_Controller::REASONCODE_CONSUME_FAILED;
+										}
+									}
+									else
+									{
+										$arrayResult = null;
+										//지급 오류
+										$is_provision = 0;
+										$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+										$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+										$reasonCode = MY_Controller::REASONCODE_DOESNT_MATCH_RECEIPT;
+									}
+									$receiptPaymentSeq = $paymentSeq;
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = $arrResponse["product"][0]["tid"];
+									$receiptPaymentTime = DateTime::createFromFormat("YmdHis", $arrResponse["product"][0]["log_time"]);
+									$receiptPaymentTime = $receiptPaymentTime->format("Y-m-d H:i:s");
+								}
 							}
 						}
 					}
-				}
-				if ( $arrayResult != null )
-				{
-					$arrayResult["remain_item"] = $this->dbPlay->requestItem( $pid )->result_array()[0];
-					$curcash = $this->dbPlay->requestItem( $sid )->result_array()[0];
+					if ( $arrayResult != null )
+					{
+						$arrayResult["remain_item"] = $this->dbPlay->requestItem( $pid )->result_array()[0];
+						$curcash = $this->dbPlay->requestItem( $sid )->result_array()[0];
+					}
+					else
+					{
+						$curcash["cash_points"] = 0;
+						$curcash["event_points"] = 0;
+					}
 				}
 				else
 				{
+					$is_provision = 0;
+					$resultCode = MY_Controller::STATUS_DUPLICATE_PURCHASE;
+					$resultText = MY_Controller::MESSAGE_DUPLICATE_PURCHASE;
+					$arrayResult = null;
+					$receiptPaymentSeq = "";
+					$receiptApprovedPaymentNo = "";
+					$receiptNaverId = "";
+					$receiptPaymentTime = "";
+					$reasonCode = MY_Controller::REASONCODE_PACKAGE_STATUS;
 					$curcash["cash_points"] = 0;
 					$curcash["event_points"] = 0;
 				}
@@ -6392,6 +6465,8 @@ class Con_ApiProcess extends MY_Controller {
 //					$result = $result & $this->dbPlay->insertEquipment( $arrayResult["pid"], $arrayEquipment[0] );
 					$result = $result & $this->dbPlay->itemToChar( $arrayResult["pid"], $arrayCharacter[0], "weapon", $arrayInventory[0] );
 					$result = $result & $this->dbPlay->itemToChar( $arrayResult["pid"], $arrayCharacter[1], "weapon", $arrayInventory[1] );
+					$result = $result & $this->dbPlay->itemToChar( $arrayResult["pid"], $arrayCharacter[0], "backpack", $arrayInventory[3] );
+					$result = $result & $this->dbPlay->itemToChar( $arrayResult["pid"], $arrayCharacter[1], "backpack", $arrayInventory[4] );
 				}
 				$this->dbPlay->onEndTransaction( $result );
 			}

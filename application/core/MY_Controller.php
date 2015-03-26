@@ -270,6 +270,8 @@ EOF;
 	const MESSAGE_CONSUME = "NG_ERROR_CONSUME";
 	const STATUS_RECEIPT_INFO_DISCORD = "0385";
 	const MESSAGE_RECEIPT_INFO_DISCORD = "NG_ERROR_RECEIPT_INFO_DISCORD";
+	const STATUS_DUPLICATE_PURCHASE = "0386";
+	const MESSAGE_DUPLICATE_PURCHASE = "NG_ERROR_DUPLICATE_PURCHASE";
 
 	const STATUS_INFO_PVE_RANK = "0391";
 	const MESSAGE_INFO_PVE_RANK = "NG_ERROR_INFO_PVE_RANK";
@@ -318,6 +320,7 @@ EOF;
 	const TBL_PLAYERASSETLOG = "player_asset_logging";
 	const TBL_PLAYERVIP = "player_vip";
 	const TBL_PLAYEREXTRAATTEND = "player_extraattend";
+	const TBL_PLAYERIAP = "player_iap";
 
 		//table in koc_ref database
 	const TBL_DATAFILES = "datafiles";
@@ -325,6 +328,11 @@ EOF;
 	const TBL_PRODUCTPRICE = "product_price";
 	const TBL_DAILYREWARD = "daily_reward";
 	const TBL_GATCHA = "gatcha";
+	const TBL_GATCHA_SIM = "gatcha_sim";
+	const TBL_GATCHA_RESULT = "gatcha_result";
+	const TBL_GATCHA_EVENT = "gatcha_event";
+	const TBL_GATCHA_EVENT_SIM = "gatcha_event_sim";
+	const TBL_GATCHA_EVENT_RESULT = "gatcha_event_result";
 	const TBL_REFCHARACTER = "ref_character";
 	const TBL_ITEM = "item";
 	const TBL_REWARD = "reward";
@@ -419,10 +427,13 @@ EOF;
 	const INVENTORY_TYPE					= "[\"WEAPON\", \"BACKPACK\", \"TECHNIQUE\"]";
 	const ITEM_TYPE							= "[\"WTIK\", \"BTIK\", \"STIK\", \"WEPN\", \"BCPC\", \"SKIL\"]";
 
-//	const GAMEPOINTS_PER_CHARACTER_LEVEL	= 10;
-
 	const GAMEPOINTS_PER_CHARACTER_GRADE	= "[0,100,200,400,600,800,1200]";
 	const GAMEPOINTS_PER_ITEM_GRADE			= "[0,100,200,400,600,800,1200]";
+
+	const PRODUCTTYPE_NORMAL				= "NM";
+	const PRODUCTTYPE_PACKAGE_FOREVER		= "PF";
+	const PRODUCTTYPE_PACKAGE_ENDPOINT		= "PE";
+	const PRODUCTTYPE_PACKAGE_MONTHLY		= "PM";
 
 	//const for points
 	const LIMIT_ENERGY_POINTS				= 999;	// 최대 행성전 에너지 제한
@@ -453,18 +464,6 @@ EOF;
 
 	//const for synthesize
 	const GATCHA_BY_GRADE					= "[\"GAC030000\", \"GAC030001\", \"GAC030002\", \"GAC030003\", \"GAC030004\"]";	//합성에 사용되는 가챠정보
-//	const GATCHA_BY_GRADE_1_PAYMENT			= "10000";
-//	const GATCHA_BY_GRADE_2_PAYMENT			= "20000";
-//	const GATCHA_BY_GRADE_3_PAYMENT			= "30000";
-//	const GATCHA_BY_GRADE_4_PAYMENT			= "40000";
-//	const GATCHA_BY_GRADE_5_PAYMENT			= "50000";
-//	const GATCHA_BY_GRADE_PAYMENT			= "[10000, 20000, 30000, 40000, 50000]";
-//	const GATCHA_BY_GRADE_1_PAYMENT_TYPE	= "GAME_POINTS";
-//	const GATCHA_BY_GRADE_2_PAYMENT_TYPE	= "GAME_POINTS";
-//	const GATCHA_BY_GRADE_3_PAYMENT_TYPE	= "GAME_POINTS";
-//	const GATCHA_BY_GRADE_4_PAYMENT_TYPE	= "GAME_POINTS";
-//	const GATCHA_BY_GRADE_5_PAYMENT_TYPE	= "GAME_POINTS";
-//	const GATCHA_BY_GRADE_PAYMENT_TYPE		= "GAME_POINTS";
 
 	//const for character reach maxlevel
 	const CHARMAXLEV_REWARD_TYPE			= "EVENT_POINTS";
@@ -507,8 +506,6 @@ EOF;
 
 	//const for event
 	const UPGRADE_DIS_EVENT_PRODUCT			= "upgrade";
-	//첫구매 이벤트 진행 여부 true or false
-	const VALID_FIRST_BUY_EVENT				= false;
 
 	//const for achieve
 	const ACHIEVE_REPEATE_FOR_DAILY			= "DAILY";
@@ -523,6 +520,14 @@ EOF;
 	const ARRAY_HOTTIME_GOLD = "[{\"day\":\"0\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"1\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"2\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"3\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"4\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"5\",\"hour\":[\"14\",\"15\"]}, {\"day\":\"6\",\"hour\":[\"20\",\"21\"]}]";
 	const ARRAY_HOTTIME_INCE = "[{\"day\":\"5\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"4\",\"hour\":[\"16\",\"17\",\"18\",\"19\",\"20\",\"21\",\"22\",\"23\"]}]";
 	const ARRAY_HOTTIME_EXPR = "[{\"day\":\"0\",\"hour\":[\"14\",\"15\"]}, {\"day\":\"6\",\"hour\":[\"14\",\"15\"]}]";
+
+	//const for iap
+	const REASONCODE_IAP_NORMAL = "00";
+	const REASONCODE_RECEIPT_ALREADY_PROVISION = "01";
+	const REASONCODE_CANT_GET_RECEIPT = "02";
+	const REASONCODE_CONSUME_FAILED = "03";
+	const REASONCODE_DOESNT_MATCH_RECEIPT = "04";
+	const REASONCODE_PACKAGE_STATUS = "05";
 
 	public $public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
 	public $private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
@@ -1462,16 +1467,34 @@ EOF;
 
 	function requestGatcha( $pid, $id )
 	{
-		$arrayGatcha = $this->dbRef->requestGatcha( $pid, $id )->result_array();
-		if ( empty($arrayGatcha) )
+		$this->load->model('admin/Model_Admin', "dbAdmin");
+		//if ( $this->dbAdmin->requestGatchaEventStatus() )
+		if ( 1 == 0 )
 		{
-			$this->dbRef->insertGatcha( $pid, $id );
-			$arrayGatcha = $this->dbRef->requestGatcha( $pid, $id )->result_array();
-		}
-		$this->dbRef->requestGatchaUpdateProbability( $pid, $arrayGatcha[0]["id"], $arrayGatcha[0]["refid"] );
+			$arrayGatcha = $this->dbRef->requestGatchaEvent( $pid, $id )->result_array();
+			if ( empty($arrayGatcha) )
+			{
+				$this->dbRef->insertGatchaEvent( $pid, $id );
+				$arrayGatcha = $this->dbRef->requestGatchaEvent( $pid, $id )->result_array();
+			}
+			$this->dbRef->requestGatchaEventUpdateProbability( $pid, $arrayGatcha[0]["id"], $arrayGatcha[0]["refid"] );
 
-		$this->dbRef->requestGetGatcha( $id, $arrayGatcha[0]["grade"], $arrayGatcha[0]["refid"], $pid );
-		return $arrayGatcha[0]["refid"];
+			$this->dbRef->requestGetGatchaEvent( $id, $arrayGatcha[0]["grade"], $arrayGatcha[0]["refid"], $pid );
+			return $arrayGatcha[0]["refid"];
+		}
+		else
+		{
+			$arrayGatcha = $this->dbRef->requestGatcha( $pid, $id )->result_array();
+			if ( empty($arrayGatcha) )
+			{
+				$this->dbRef->insertGatcha( $pid, $id );
+				$arrayGatcha = $this->dbRef->requestGatcha( $pid, $id )->result_array();
+			}
+			$this->dbRef->requestGatchaUpdateProbability( $pid, $arrayGatcha[0]["id"], $arrayGatcha[0]["refid"] );
+
+			$this->dbRef->requestGetGatcha( $id, $arrayGatcha[0]["grade"], $arrayGatcha[0]["refid"], $pid );
+			return $arrayGatcha[0]["refid"];
+		}
 	}
 
 	function generateRandomString( $length )

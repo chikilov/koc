@@ -2206,7 +2206,7 @@ class Model_Play extends MY_Model {
 
 	public function requestLogIap( $is_provision, $pid, $sid, $storeType, $product_id, $payment_unit, $payment_type, $payment_value, $paymentSeq, $approvedPaymentNo, $naverId, $paymentTime, $curcash, $reasonCode )
 	{
-		$query = "insert into koc_play.player_iap ( pid, sid, storetype, product_id, payment_unit, payment_type, payment_value, ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERIAP." ( pid, sid, storetype, product_id, payment_unit, payment_type, payment_value, ";
 		$query .= "buy_date, expire_date, is_refund, is_provision, paymentSeq, approvedPaymentNo, naverId, paymentTime, curcash, reasonCode ) ";
 		$query .= "select '".$pid."', '".$sid."', '".$storeType."', '".$product_id."', '".$payment_unit."', '".$payment_type."', '".$payment_value."', ";
 		$query .= "now(), date_add( now(), interval ( duration - 1 ) day ), 0, ".$is_provision.", ";
@@ -2237,7 +2237,8 @@ class Model_Play extends MY_Model {
 
 	public function requestBuyIapExists( $pid, $storeType, $paymentSeq )
 	{
-		$query = "select idx from koc_play.player_iap where pid = '".$pid."' and storetype = '".$storeType."' and paymentSeq = '".$paymentSeq."' and is_provision = 1 ";
+		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERIAP." ";
+		$query .= "where pid = '".$pid."' and storetype = '".$storeType."' and paymentSeq = '".$paymentSeq."' and is_provision = 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -2247,7 +2248,7 @@ class Model_Play extends MY_Model {
 	public function requestEverydayPackageList( $pid )
 	{
 		$query = "select a.idx, a.product_id, a.paymentSeq, a.expire_date, b.type as reward_type, b.value as reward_value, count(c.paymentSeq) as is_reward ";
-		$query .= "from koc_play.player_iap as a inner join koc_ref.".MY_Controller::TBL_PRODUCT." as b ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERIAP." as a inner join koc_ref.".MY_Controller::TBL_PRODUCT." as b ";
 		$query .= "on a.product_id = b.id left outer join koc_play.player_packagereward_log as c ";
 		$query .= "on a.idx = c.order_idx and left(now(), 10) = left(c.reward_datetime, 10) ";
 		$query .= "where a.expire_date >= left( now(), 10 ) and a.product_id = '".MY_Controller::EVERYDAY_PROVISION_PRODUCT_ID."' ";
@@ -2261,8 +2262,8 @@ class Model_Play extends MY_Model {
 	public function requestLimitedPackageList( $pid )
 	{
 		$query = "select a.product_id ";
-		$query .= "from koc_play.player_iap as a inner join koc_ref.".MY_Controller::TBL_PRODUCT." as b on a.product_id = b.id ";
-		$query .= "where a.product_id in ('".MY_Controller::LIMITED_PROVISION_PRODUCT_ID."', '".MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID."') ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERIAP." as a inner join koc_ref.".MY_Controller::TBL_PRODUCT." as b on a.product_id = b.id ";
+		$query .= "where b.product_type = '".MY_Controller::PRODUCTTYPE_PACKAGE_FOREVER."' ";
 		$query .= "and a.is_provision = 1 and a.is_refund = 0 and a.sid = '".$pid."' ";
 		$query .= "group by a.idx, a.product_id, a.paymentSeq, a.expire_date, b.type, b.value ";
 
@@ -2281,11 +2282,11 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-
+/*
 	public function requestFirstBuyCheck( $pid )
 	{
 		$query = "select case when count(idx) > 0 then false else true end as is_first ";
-		$query .= "from koc_play.player_iap as a inner join koc_ref.product as b on a.product_id = b.id ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERIAP." as a inner join koc_ref.product as b on a.product_id = b.id ";
 		$query .= "where pid = '".$pid."' and buy_date between if( year(now()) = 2015 and ( month(now()) = 1 or month(now()) = 2 ), ";
 		$query .= "cast('2015-01-01 00:00:00' as datetime), cast(concat('2015-', right(concat('0', month(now())), 2), '-01 00:00:00') as datetime) ) ";
 		$query .= "and if( year(now()) = 2015 and ( month(now()) = 1 or month(now()) = 2 ), cast('2015-02-28 23:59:59' as datetime), ";
@@ -2295,7 +2296,7 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
 	}
-
+*/
 	public function inventoryExistCheck( $pid )
 	{
 		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and refid = 'OP01000008' ";
@@ -2303,6 +2304,29 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
+	}
+
+	public function requestPackageBuyHistory( $pid, $product_id, $product_type )
+	{
+		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERIAP." ";
+		$query .= "where is_provision = 1 and pid = '".$pid."' ";
+		if ( $product_type == MY_Controller::PRODUCTTYPE_PACKAGE_FOREVER )
+		{
+			$query .= "and product_id = '".$product_id."' ";
+		}
+		else if ( $product_type == MY_Controller::PRODUCTTYPE_PACKAGE_ENDPOINT )
+		{
+			$query .= "and product_id = '".$product_id."' and expire_date >= left(now(), 10) ";
+		}
+		else if ( $product_type == MY_Controller::PRODUCTTYPE_PACKAGE_MONTHLY )
+		{
+			$query .= "and left(buy_date, 7) = left(now(), 7) and product_id in ( ";
+			$query .= "select id from koc_ref.".MY_Controller::TBL_PRODUCT." where product_type = 'PM' and enable = 1 ) ";
+		}
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
 	}
 
 	//테스트용

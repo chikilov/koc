@@ -84,6 +84,15 @@ class Con_ApiProcess extends MY_Controller {
 		$macaddr = $decoded["macaddr"];
 		$uuid = $decoded["uuid"];
 		$package = $decoded["package"];
+		$pushkey = $decoded["pushkey"];
+		if ( array_key_exists("platform", $decoded) )
+		{
+			$platform = $decoded["platform"];
+		}
+		else
+		{
+			$platform = "GCM";
+		}
 
 		//회원가입
 		if( $macaddr )
@@ -123,6 +132,18 @@ class Con_ApiProcess extends MY_Controller {
 
 						$this->dbLogin->updateSession( "1", $macaddr, $cursession );
 						$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+						if ( $pushkey != "" && $pushkey != null )
+						{
+							if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult["pid"], $pushkey ) )
+							{
+								$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+							}
+							else
+							{
+								$this->dbLogin->requestDelDupPushKey( $arrayResult["pid"], $pushkey );
+								$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+							}
+						}
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
 					}
@@ -149,6 +170,18 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbLogin->updateSession( "1", $macaddr, $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					if ( $pushkey != "" && $pushkey != null )
+					{
+						if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult["pid"], $pushkey ) )
+						{
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+						else
+						{
+							$this->dbLogin->requestDelDupPushKey( $arrayResult["pid"], $pushkey );
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+					}
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 				}
@@ -183,6 +216,15 @@ class Con_ApiProcess extends MY_Controller {
 		$affiliateName = $decoded["affiliatename"];
 		$affiliateEmail = $decoded["affiliateemail"];
 		$affiliateProfImg = $decoded["affiliateprofimg"];
+		$pushkey = $decoded["pushkey"];
+		if ( array_key_exists("platform", $decoded) )
+		{
+			$platform = $decoded["platform"];
+		}
+		else
+		{
+			$platform = "GCM";
+		}
 
 		//회원가입
 		if( $affiliateType && $affiliateId )
@@ -223,6 +265,18 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbLogin->updateSession( $affiliateType, $affiliateId, $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					if ( $pushkey != "" && $pushkey != null )
+					{
+						if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult["pid"], $pushkey ) )
+						{
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+						else
+						{
+							$this->dbLogin->requestDelDupPushKey( $arrayResult["pid"], $pushkey );
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+					}
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 				}
@@ -250,6 +304,18 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbLogin->updateAffiliateNameAccount( $arrayResult["pid"], $affiliateName, $affiliateEmail, $affiliateProfImg );
 
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					if ( $pushkey != "" && $pushkey != null )
+					{
+						if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult["pid"], $pushkey ) )
+						{
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+						else
+						{
+							$this->dbLogin->requestDelDupPushKey( $arrayResult["pid"], $pushkey );
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+					}
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 				}
@@ -414,6 +480,15 @@ class Con_ApiProcess extends MY_Controller {
 		$id = $decoded["id"];
 		$password = $decoded["password"];
 		$package = $decoded["package"];
+		$pushkey = $decoded["pushkey"];
+		if ( array_key_exists("platform", $decoded) )
+		{
+			$platform = $decoded["platform"];
+		}
+		else
+		{
+			$platform = "GCM";
+		}
 
 		if( $id && $password )
 		{
@@ -458,6 +533,18 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbLogin->onEndTransaction( $result );
 
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
+					if ( $pushkey != "" && $pushkey != null )
+					{
+						if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult["pid"], $pushkey ) )
+						{
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+						else
+						{
+							$this->dbLogin->requestDelDupPushKey( $arrayResult["pid"], $pushkey );
+							$this->dbLogin->requestRegPushKey( $arrayResult["pid"], $platform, $pushkey );
+						}
+					}
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 				}

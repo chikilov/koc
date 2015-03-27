@@ -182,7 +182,37 @@ class Model_Login extends MY_Model {
 	{
 		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where pid = '".$keyId."' and cursession = '".$cursession."' ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->logw->sysLogWrite( LOG_NOTICE, $keyId, "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function requestCheckDupPushKey( $pid, $pushkey )
+	{
+		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_PUSHKEY." ";
+		$query .= "where registration_id = '".$pushkey."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function requestDelDupPushKey( $pid, $pushkey )
+	{
+		$query = "delete from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_PUSHKEY." ";
+		$query .= "where registration_id = '".$pushkey."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_LOGIN->query($query);
+		return $this->DB_LOGIN->affected_rows();
+	}
+
+	public function requestRegPushKey( $pid, $platform, $pushkey )
+	{
+		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_PUSHKEY." ";
+		$query .= "values ('".$pid."', '".$platform."', '".$pushkey."') ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_LOGIN->query($query);
 		return $this->DB_LOGIN->affected_rows();
 	}

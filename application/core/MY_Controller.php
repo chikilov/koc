@@ -304,6 +304,7 @@ EOF;
 		//table in koc_play database
 	const TBL_ACCOUNT = "account";
 	const TBL_RESTRICTMACADDR = "restrict_mac";
+	const TBL_ACCOUNT_PUSHKEY = "account_pushkey";
 
 	const TBL_PLAYERBASIC = "player_basic";
 	const TBL_PACKAGE_LOG = "package_log";
@@ -1468,8 +1469,7 @@ EOF;
 	function requestGatcha( $pid, $id )
 	{
 		$this->load->model('admin/Model_Admin', "dbAdmin");
-		//if ( $this->dbAdmin->requestGatchaEventStatus() )
-		if ( 1 == 0 )
+		if ( $this->dbAdmin->requestGatchaEventStatus() )
 		{
 			$arrayGatcha = $this->dbRef->requestGatchaEvent( $pid, $id )->result_array();
 			if ( empty($arrayGatcha) )

@@ -1271,6 +1271,7 @@ EOF;
 						}
 					}
 					//첫구매
+					/*
 					if ( array_key_exists( "category", $arrayProduct ) )
 					{
 						if ( $arrayProduct["category"] == "CASH" )
@@ -1284,6 +1285,7 @@ EOF;
 							}
 						}
 					}
+					*/
 
 					$arrayResult["remain_item"] = null;
 				}

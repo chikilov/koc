@@ -2839,7 +2839,16 @@ class Con_ApiProcess extends MY_Controller {
 							$logString .= " 실패\n";
 						}
 						$logString .= "소요시간 : ".$duration."초\n";
-						$logString .= "기본보상 : ".$this->dbRef->getNameForId( $pid, "ASST", $basic_reward_type )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]." => ".$basic_reward_value."\n";
+						$logText = $this->dbRef->getNameForId( $pid, "ASST", $basic_reward_type )->result_array();
+						if ( !empty($logText) )
+						{
+							$logString .= "기본보상 : ".$logText[0][MY_Controller::COMMON_LANGUAGE_COLUMN];
+						}
+						else
+						{
+							$logString .= "기본보상 : ????";
+						}
+						$logString .= " => ".$basic_reward_value."\n";
 						$logString .= "기본경험치 : ";
 						$txtCarray = "";
 						foreach ($cidArray as $cRow)
@@ -2854,17 +2863,41 @@ class Con_ApiProcess extends MY_Controller {
 						$logString .= "진행팀 정보 : [ \n\t아이디 => ".$pid."\n";
 						if ( $cidArray[0]["refid"] != null && $cidArray[0]["refid"] != "" && $cidArray[0]["refid"] != "0" )
 						{
-							$logString .= "\t출격기체1 => +".$cidArray[0]["up_grade"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $cidArray[0]["refid"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[0]["idx"]."),";
+							$logText = $this->dbRef->getNameForId( $pid, "CHAR", $cidArray[0]["refid"] )->result_array();
+							if ( !empty($logText) )
+							{
+								$logString .= "\t출격기체1 => +".$cidArray[0]["up_grade"]." ".$logText[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[0]["idx"]."),";
+							}
+							else
+							{
+								$logString .= "\t출격기체1 => +".$cidArray[0]["up_grade"]." ????(".$cidArray[0]["idx"]."),";
+							}
 							$logString .= "lv.".$cidArray[0]["lev"]."\n";
 						}
 						if ( $cidArray[1]["refid"] != null && $cidArray[1]["refid"] != "" && $cidArray[1]["refid"] != "0" )
 						{
-							$logString .= "\t출격기체2 => +".$cidArray[1]["up_grade"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $cidArray[1]["refid"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[1]["idx"]."),";
+							$logText = $this->dbRef->getNameForId( $pid, "CHAR", $cidArray[1]["refid"] )->result_array();
+							if ( !empty($logText) )
+							{
+								$logString .= "\t출격기체2 => +".$cidArray[1]["up_grade"]." ".$logText[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[1]["idx"]."),";
+							}
+							else
+							{
+								$logString .= "\t출격기체2 => +".$cidArray[1]["up_grade"]." ????(".$cidArray[1]["idx"]."),";
+							}
 							$logString .= "lv.".$cidArray[1]["lev"]."\n";
 						}
 						if ( $cidArray[2]["refid"] != null && $cidArray[2]["refid"] != "" && $cidArray[2]["refid"] != "0" )
 						{
-							$logString .= "\t출격기체3 => +".$cidArray[2]["up_grade"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $cidArray[2]["refid"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[2]["idx"]."),";
+							$logText = $this->dbRef->getNameForId( $pid, "CHAR", $cidArray[2]["refid"] )->result_array();
+							if ( !empty($logText) )
+							{
+								$logString .= "\t출격기체2 => +".$cidArray[2]["up_grade"]." ".$logText[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$cidArray[2]["idx"]."),";
+							}
+							else
+							{
+								$logString .= "\t출격기체2 => +".$cidArray[2]["up_grade"]." ????(".$cidArray[2]["idx"]."),";
+							}
 							$logString .= "lv.".$cidArray[2]["lev"]."\n";
 						}
 						$logString .= " ] ";

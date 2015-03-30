@@ -1267,21 +1267,24 @@ class Model_Play extends MY_Model {
 
 	public function requestRecomFriendList( $pid, $searchVal )
 	{
-		$query = "select f.pid, f.name, if(f.show_prof, f.prof_img, '') as prof_img, f.refid, f.inc_fri, f.friendCount from ( ";
-		$query .= "select a.pid, a.show_prof, a.prof_img, if(a.show_name, if(a.affiliate_name is null or a.affiliate_name = '', ifnull(a.name, '-'), ";
-		$query .= "concat(a.name, '(', a.affiliate_name, ')')), a.name) as name, ";
-		$query .= "d.refid, a.inc_fri, count(e.fid) as friendCount ";
+		$query = "select c.pid, c.name, c.prof_img, e.refid from ( ";
+		$query .= "select a.pid, if(a.affiliate_name is null or a.affiliate_name = '', a.name, concat(a.name, '(', a.affiliate_name, ')')) as name, ";
+		$query .= "if(a.show_prof, a.prof_img, '') as prof_img, a.inc_fri ";
 		$query .= "from koc_play.player_basic as a left outer join ( ";
 		$query .= "select fid from koc_play.player_friend where pid = '".$pid."' and friend_status < 2 ) as b on a.pid = b.fid ";
-		$query .= "left outer join koc_play.player_team as c on a.pid = c.pid and c.team_seq = 0 ";
-		$query .= "left outer join koc_play.player_character as d on c.memb_0 = d.idx ";
-		$query .= "left outer join koc_play.player_friend as e on a.pid = e.pid and e.friend_status = 1 ";
-		$query .= "where b.fid is null and a.name is not null and a.affiliate_name is not null and a.pid != '".$pid."' ";
+		$query .= "where a.pid != '".$pid."' and b.fid is null and a.name is not null and a.affiliate_name is not null ";
 		if ( $searchVal )
 		{
-			$query .= "and ( a.name = '".$searchVal."' or a.affiliate_name = '".$searchVal."' ) ";
+			$query .= "and ( a.name = '".$searchVal."' or a.affiliate_name = '".$searchVal."' ) ) as c ";
 		}
-		$query .= "group by a.pid, a.name, a.affiliate_name, d.refid, a.inc_fri ) as f where f.friendCount < ".MY_Controller::MAX_FRIENDS." + f.inc_fri ";
+		else
+		{
+			$query .= "order by a.login_datetime desc limit 1000 ) as c ";
+		}
+		$query .= "left outer join koc_play.player_team as d on c.pid = d.pid and d.team_seq = 0 ";
+		$query .= "left outer join koc_play.player_character as e on d.memb_0 = e.idx ";
+		$query .= "left outer join koc_play.player_friend as f on c.pid = f.pid and f.friend_status = 1 ";
+		$query .= "group by c.pid, c.name, e.refid, c.inc_fri having count(f.fid) < ".MY_Controller::MAX_FRIENDS." + c.inc_fri ";
 		$query .= "order by rand() desc ";
 		$query .= "limit ".MY_Controller::RECOMMENDED_FRIEND_LIST_COUNT." ";
 
@@ -2490,7 +2493,7 @@ class Model_Play extends MY_Model {
 
 	public function requestMaxCharacter( $pid, $cid )
 	{
-		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set up_grade = 5, level = 30 where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set up_refid = concat('UPCH0', grade, '0005'), up_grade = 5, level = 30 where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -2499,7 +2502,7 @@ class Model_Play extends MY_Model {
 
 	public function requestMaxCharacterAll( $pid )
 	{
-		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set up_grade = 5, level = 30 where pid = '".$pid."' and is_del = 0 ";
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set up_refid = concat('UPCH0', grade, '0005'), up_grade = 5, level = 30 where pid = '".$pid."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

@@ -453,8 +453,10 @@ class Model_Record extends MY_Model {
 
 	public function requestExpGroupCheck( $pid, $exp_group_idx )
 	{
-		$query = "select count(exp_idx) as cnt from koc_record.".MY_Controller::TBL_EXP." where pid = '".$pid."' ";
-		$query .= "and exp_group_idx = '".$exp_group_idx."' and is_enemy = 1 and reward_datetime < now() ";
+		$query = "select count(a.exp_idx) as cnt from koc_record.".MY_Controller::TBL_EXP." as a ";
+		$query .= "inner join koc_record.".MY_Controller::TBL_EXPGRP." as b on a.exp_group_idx = b.exp_group_idx ";
+		$query .= "where a.pid = '".$pid."' and a.exp_group_idx = '".$exp_group_idx."' and a.is_enemy = 1 and a.reward_datetime < now() ";
+		$query .= "and b.is_clear = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

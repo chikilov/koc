@@ -1272,7 +1272,7 @@ class Model_Play extends MY_Model {
 		$query .= "if(a.show_prof, a.prof_img, '') as prof_img, a.inc_fri ";
 		$query .= "from koc_play.player_basic as a left outer join ( ";
 		$query .= "select fid from koc_play.player_friend where pid = '".$pid."' and friend_status < 2 ) as b on a.pid = b.fid ";
-		$query .= "where a.pid != '".$pid."' and b.fid is null and a.name is not null and a.affiliate_name is not null ";
+		$query .= "where a.pid != '".$pid."' and b.fid is null and (a.name is not null or a.affiliate_name is not null) ";
 		if ( $searchVal )
 		{
 			$query .= "and ( a.name = '".$searchVal."' or a.affiliate_name = '".$searchVal."' ) ) as c ";
@@ -2532,5 +2532,12 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 	//테스트용
+
+	public function requestDupId( $id )
+	{
+		$query = "select pid from koc_account.".MY_Controller::TBL_ACCOUNT." where id = '".$id."' ";
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
+	}
 }
 ?>

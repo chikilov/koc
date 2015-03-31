@@ -66,5 +66,15 @@ class Model_Log extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_LOG->query($query);
 	}
+
+	public function requestErrLog( $pid, $status, $request, $logtype, $logcontent )
+	{
+		$query = "insert into ".$this->DB_LOG->database.".".MY_Controller::TBL_PLAYERERRLOG.SERVERGROUP." ( pid, status, logtype, request, logcontent, log_date ) values ";
+		$query .= "( '".$pid."', '".$status."', '".$logtype."', '".$request."', '".$logcontent."', now() ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_LOG->query($query);
+		return $this->DB_LOG->affected_rows();
+	}
 }
 ?>

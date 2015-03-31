@@ -318,6 +318,7 @@ EOF;
 	const TBL_PLAYERCOLLECTION = "player_collection";
 	const TBL_PLAYERFRIEND = "player_friend";
 	const TBL_PLAYERLOG = "player_log";
+	const TBL_PLAYERERRLOG = "player_errlog";
 	const TBL_PLAYERASSETLOG = "player_asset_logging";
 	const TBL_PLAYERVIP = "player_vip";
 	const TBL_PLAYEREXTRAATTEND = "player_extraattend";
@@ -724,6 +725,10 @@ EOF;
 					$this->benchmark->mark('total_execution_time_endbf');
 					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+					if ( $status != "0200" )
+					{
+						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
+					}
 
 					if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
 					{
@@ -761,6 +766,10 @@ EOF;
 					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+					if ( $status != "0200" )
+					{
+						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
+					}
 					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
 					{
 						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
@@ -797,6 +806,10 @@ EOF;
 					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
 					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+					if ( $status != "0200" )
+					{
+						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
+					}
 					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
 					{
 						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
@@ -878,8 +891,25 @@ EOF;
         {
             $called_name = $_SERVER['REQUEST_URI'];
         }
-		$this->load->model("api/Model_Log", "dbLog");
      	$this->dbLog->requestLog( $pid, $called_name, $logcontent );
+    }
+
+    function onSysErrLogWriteDb( $pid, $status, $request, $logcontent )
+    {
+	    if ( mb_substr($_SERVER['REQUEST_URI'], mb_strlen($_SERVER['REQUEST_URI']) - 1, 1) == "/" )
+	    {
+		    $called_name = mb_substr($_SERVER['REQUEST_URI'], 0, mb_strrpos($_SERVER['REQUEST_URI'], "/"));
+	    }
+	    else
+	    {
+    	    $called_name = $_SERVER['REQUEST_URI'];
+		}
+        $called_name = mb_substr($called_name, -(mb_strlen($called_name) - mb_strrpos($called_name, "/") - 1));
+        if ( $called_name == "" || $called_name == null )
+        {
+            $called_name = $_SERVER['REQUEST_URI'];
+        }
+     	$this->dbLog->requestErrLog( $pid, $status, $request, $called_name, $logcontent );
     }
 
 	function verifyPackage( $package )

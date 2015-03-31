@@ -6508,7 +6508,7 @@ class Con_ApiProcess extends MY_Controller {
 		$prefix = $decoded["prefix"];
 		$maxSeq = $decoded["maxSeq"];
 
-		for ( $seqi = 1; $seqi <= $maxSeq; $seqi++ )
+		for ( $seqi = 230000; $seqi <= $maxSeq + 230000; $seqi++ )
 		{
 			$id = $prefix;
 			for ( $j = 0; $j < strlen($maxSeq) - strlen($seqi); $j++ )
@@ -6517,6 +6517,7 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			$id = $id.$seqi;
 			$password = "1111";
+			$macaddr = "A".$seqi;
 
 			//아이디 중복 체크
 			if ($this->dbPlay->requestDupId( $id ) > 0)
@@ -6530,7 +6531,7 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				//회원 가입처리
 				$this->dbPlay->onBeginTransaction();
-				$arrayResult["pid"] = $this->dbPlay->requestJoin( $id, $password, $macaddr );
+				$arrayResult["pid"] = $this->dbLogin->requestJoin( $id, $password, $macaddr );
 				if ( count($arrayResult) < 1 )
 				{
 					$resultCode = MY_Controller::STATUS_UPDATE_NOTHING;

@@ -4565,6 +4565,7 @@ class Con_ApiProcess extends MY_Controller {
 		}
 		$pid = $decoded["pid"];
 		$aid = $decoded["aid"];
+		$aid = array_unique($aid, SORT_LOCALE_STRING);
 
 		if( $pid && $aid )
 		{

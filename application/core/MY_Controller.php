@@ -62,8 +62,8 @@ EOF;
 	const STATUS_RESTRICT_MAC = "0013";
 	const MESSAGE_RESTRICT_MAC = "NG_ERROR_RESTRICT_MAC";
 
-	const STATUS_RENAME = "0021";
-	const MESSAGE_RENAME = "NG_ERROR_RENAME";
+//	const STATUS_RENAME = "0021";
+//	const MESSAGE_RENAME = "NG_ERROR_RENAME";
 	const STATUS_DUPLICATE_UPDATE_ID = "0022";
 	const MESSAGE_DUPLICATE_UPDATE_ID = "NG_ERROR_DUPLICATE_UPDATE_ID";
 
@@ -536,7 +536,6 @@ EOF;
 
 	function __construct(){
 		parent::__construct();
-
 // 점검중 처리
 //		define("HEALTHCHECK" , true);
 /*
@@ -584,7 +583,18 @@ EOF;
 			{
 				if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 				{
-					if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
+					if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+					{
+						$_POST["data"] = $_POST["data"];
+					}
+					else
+					{						
+						$_POST["data"] = $this->dec( $_POST["data"] );												
+					}
+				}
+				else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+				{
+					if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 					{
 						$_POST["data"] = $_POST["data"];
 					}
@@ -602,7 +612,21 @@ EOF;
 		}
 
 		$this->load->library( 'LogW', TRUE );
+//		$this->load->library( 'cimongo/Cimongo', TRUE );
 
+//$mongo_data = $this->cimongo->get("testData");
+//foreach($mongo_data->result_array() as $row)
+//{
+//	foreach( $row as $key=>$val )
+//	{
+//		if ( $key != "_id" )
+//		{
+//			echo $row[$key]."<br />";
+//		}
+//	}
+//}
+
+//exit(0);
 		//db init
 		$this->load->model("api/Model_Mail", "dbMail");
 		$this->load->model("api/Model_Play", "dbPlay");

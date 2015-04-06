@@ -1374,12 +1374,13 @@ class Model_Play extends MY_Model {
 
 	public function requestAddFriend( $pid, $fid, $status )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERFRIEND." (pid, fid, fname, faffiliate_name, fprof_img, friend_status, last_present_time, login_datetime) ";
-		$query .= "select '".$pid."' as pid, pid as fid, name as fname, affiliate_name as faffiliate_name, if(show_prof, prof_img, '') as fprof_img, ".$status." as friend_status, ";
-		$query .= "null as last_present_time, login_datetime ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
+		$query .= "(pid, fid, fname, faffiliate_name, fprof_img, friend_status, last_present_time, login_datetime) ";
+		$query .= "select '".$pid."' as pid, pid as fid, name as fname, affiliate_name as faffiliate_name, if(show_prof, prof_img, '') as fprof_img, ";
+		$query .= $status." as friend_status, null as last_present_time, login_datetime ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$fid."' and not exists ( ";
 		$query .= "select fid from koc_play.".MY_Controller::TBL_PLAYERFRIEND." where fid = '".$fid."' and pid = '".$pid."' ";
-		$query .= "and friend_status in (".MY_Controller::FRIEND_STATUS_REQUEST.", ".MY_Controller::FRIEND_STATUS_ACCEPTED.") )";
+		$query .= "and friend_status in (".MY_Controller::FRIEND_STATUS_REQUEST.", ".MY_Controller::FRIEND_STATUS_ACCEPTED.") ) ";
 		$query .= "on duplicate key update friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -1443,6 +1444,15 @@ class Model_Play extends MY_Model {
 		$query = "select (".MY_Controller::FRIEND_PRESENT_TIME." - TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) ";
 		$query .= "as last_present_time from koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
 		$query .= "where pid = '".$pid."' and fid = '".$fid."' and friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestFriendshipPointAll( $pid )
+	{
+		$query = "select fid from koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
+		$query .= "where pid = '".$pid."' and (1440 + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) < 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

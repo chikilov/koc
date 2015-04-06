@@ -356,18 +356,10 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else
 			{
-				if ( $this->dbPlay->requestUpdateNamePlay( $pid, $name ) )
-				{
-					$resultCode = MY_Controller::STATUS_API_OK;
-					$resultText = MY_Controller::MESSAGE_API_OK;
-					$arrayResult = null;
-				}
-				else
-				{
-					$resultCode = MY_Controller::STATUS_RENAME;
-					$resultText = MY_Controller::MESSAGE_RENAME;
-					$arrayResult = null;
-				}
+				$this->dbPlay->requestUpdateNamePlay( $pid, $name );
+				$resultCode = MY_Controller::STATUS_API_OK;
+				$resultText = MY_Controller::MESSAGE_API_OK;
+				$arrayResult = null;
 			}
 		}
 		else
@@ -921,7 +913,7 @@ class Con_ApiProcess extends MY_Controller {
 				$this->dbPlay->updateAffiliateNamePlay( $pid, $affiliateName, $accountResult[0]["prof_img"] );
 
 				//valid user check
-				$tmpArray = $this->dbPlay->requestPlayerSel($pid)->result_array();
+				$tmpArray = $this->dbPlay->requestPlayerIns($pid)->result_array();
 				if (empty($tmpArray))
 				{
 					$resultCode = MY_Controller::STATUS_NO_PLAYER;
@@ -5032,8 +5024,7 @@ class Con_ApiProcess extends MY_Controller {
 					$cexp = $cexp + $bexp;
 					$rewardInfo = $arrayResult["rewardobject"];
 
-					$result = (bool)$this->dbRecord->updateExplorationReward( $pid, $exp_group_idx, $exp_idx );
-					$result = $result & (bool)$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::EXPLORATION_REWARD_TITLE, $arrayResult["rewardobject"]["article_value"], $arrayResult["rewardobject"]["attach_value"], MY_Controller::NORMAL_EXPIRE_TERM );
+					$result = (bool)$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::EXPLORATION_REWARD_TITLE, $arrayResult["rewardobject"]["article_value"], $arrayResult["rewardobject"]["attach_value"], MY_Controller::NORMAL_EXPIRE_TERM );
 				}
 				if ( $cexp > MY_Controller::CHAR_EXP_FOR_MAXLEV )
 				{
@@ -5043,6 +5034,7 @@ class Con_ApiProcess extends MY_Controller {
 
 				$result = $result & (bool)$this->dbPlay->updateCharacter( $pid, $cid, $clev, $cexp );
 				$this->dbPlay->updateCollection( $pid, $crefid, $clev );
+				$this->dbRecord->updateExplorationReward( $pid, $exp_group_idx, $exp_idx );
 				$is_reward = $this->dbPlay->requestCollection( $pid, $crefid )->result_array();
 				$mlRewardList = array();
 				if ( !empty( $is_reward ) )
@@ -5837,7 +5829,7 @@ class Con_ApiProcess extends MY_Controller {
 		if( $pid && $fid )
 		{
 			$last_present_time = $this->dbPlay->requestFriendshipPointTime( $pid, $fid )->result_array()[0]["last_present_time"];
-			if ( $last_present_time )
+			if ( $last_present_time < 0 )
 			{
 				$this->dbPlay->onBeginTransaction();
 				$this->dbMail->onBeginTransaction();
@@ -5864,6 +5856,50 @@ class Con_ApiProcess extends MY_Controller {
 				$resultCode = MY_Controller::STATUS_FRIENDSHIP_LIMIT;
 				$resultText = MY_Controller::MESSAGE_FRIENDSHIP_LIMIT;
 				$arrayResult = null;
+			}
+		}
+		else
+		{
+			$resultCode = MY_Controller::STATUS_NO_MATCHING_PARAMETER;
+			$resultText = MY_Controller::MESSAGE_NO_MATCHING_PARAMETER;
+			$arrayResult = null;
+		}
+
+		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $pid, $_POST["data"] );
+	}
+
+	public function requestFriendshipPointAll()
+	{
+		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+		if ( array_key_exists("pid", $decoded) )
+		{
+			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
+		}
+		else
+		{
+			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
+		}
+		$pid = $decoded["pid"];
+
+		if( $pid )
+		{
+			$arrayResult = $this->dbPlay->requestFriendshipPointAll( $pid )->result_array();
+			if ( empty($arrayResult) )
+			{
+				$resultCode = MY_Controller::STATUS_FRIENDSHIP_LIMIT;
+				$resultText = MY_Controller::STATUS_FRIENDSHIP_LIMIT;
+			}
+			else
+			{
+				foreach( $arrayResult as $idx => $row )
+				{
+					$result = (bool)$this->dbMail->sendMail( $row["fid"], $pid, MY_Controller::FRIENDSHIP_SEND_TITLE, MY_Controller::FRIENDSHIP_ARTICLE_ID, MY_Controller::FRIENDSHIP_SEND_BASIC_VALUE, MY_Controller::NORMAL_EXPIRE_TERM );
+					$this->dbPlay->requestFriendshipPoint( $pid, $row["fid"] );
+					$this->onSysLogWriteDb( $pid, $row["fid"]."우정 선물" );
+					$arrayResult[$idx]["res"] = intval($result);
+				}
+				$resultCode = MY_Controller::STATUS_API_OK;
+				$resultText = MY_Controller::MESSAGE_API_OK;
 			}
 		}
 		else
@@ -6687,7 +6723,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestSendMail()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+		$decoded = json_decode( stripslashes ( $_POST["data"] ), TRUE );
+		
 		$pid = $decoded["pid"];
 		$sid = $decoded["sid"];
 		$title = $decoded["title"];

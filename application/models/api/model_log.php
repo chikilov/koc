@@ -9,6 +9,8 @@ class Model_Log extends MY_Model {
 		$this->DB_LOG->trans_strict(FALSE);
 
 		$this->DB_LOG->query("SET NAMES utf8");
+
+		$this->load->library( 'cimongo/Cimongo', TRUE );
 	}
 
 	public function __destruct() {
@@ -69,6 +71,21 @@ class Model_Log extends MY_Model {
 
 	public function requestErrLog( $pid, $status, $request, $logtype, $logcontent )
 	{
+		if ( ENVIRONMENT != "product" )
+		{
+			$this->cimongo->insert(
+				MY_Controller::TBL_PLAYERERRLOG.SERVERGROUP,
+				array(
+					"pid" => $pid,
+					"status" => $status,
+					"request" => $request,
+					"logtype" => $logtype,
+					"logcontent" => $logcontent,
+					"log_datetime" => new MongoDate()
+				)
+			);
+		}
+
 		$query = "insert into ".$this->DB_LOG->database.".".MY_Controller::TBL_PLAYERERRLOG.SERVERGROUP." ( pid, status, logtype, request, logcontent, log_date ) values ";
 		$query .= "( '".$pid."', '".$status."', '".$logtype."', '".$request."', '".$logcontent."', now() ) ";
 

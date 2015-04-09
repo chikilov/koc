@@ -534,23 +534,12 @@ EOF;
 
 	public $public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
 	public $private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
+	public $decoded;
 
 	function __construct(){
 		parent::__construct();
-// 점검중 처리
-//		define("HEALTHCHECK" , true);
-/*
-		define("HEALTHCHECK" , false);
+		$this->load->library( 'LogW', TRUE );
 
-		if ( HEALTHCHECK )
-		{
-			$this->benchmark->mark('total_execution_time_endbf');
-			$strReturn = json_encode( array( 'resultCd'=>MY_Controller::STATUS_SERVER_OFFLINE, 'resultMsg'=>MY_Controller::MESSAGE_SERVER_OFFLINE, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024) ), JSON_UNESCAPED_UNICODE);
-
-			echo $strReturn;
-			exit;
-		}
-*/
 		if ( ENVIRONMENT == 'production' )
 		{
 			error_reporting(E_ALL);
@@ -609,25 +598,18 @@ EOF;
 					$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
 				}
 			}
-			//}
+
+			$this->decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+			if ( array_key_exists("pid", $this->decoded) )
+			{
+				$this->logw->sysLogWrite( LOG_NOTICE, $this->decoded["pid"], "requestData : ".$_POST["data"] );
+			}
+			else
+			{
+				$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
+			}
 		}
 
-		$this->load->library( 'LogW', TRUE );
-//		$this->load->library( 'cimongo/Cimongo', TRUE );
-
-//$mongo_data = $this->cimongo->get("testData");
-//foreach($mongo_data->result_array() as $row)
-//{
-//	foreach( $row as $key=>$val )
-//	{
-//		if ( $key != "_id" )
-//		{
-//			echo $row[$key]."<br />";
-//		}
-//	}
-//}
-
-//exit(0);
 		//db init
 		$this->load->model("api/Model_Mail", "dbMail");
 		$this->load->model("api/Model_Play", "dbPlay");
@@ -758,11 +740,11 @@ EOF;
 					{
 						if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
 						{
-							$_POST["data"] = $_POST["data"];
+							$strReturn = $strReturn;
 						}
 						else
 						{
-							$_POST["data"] = $this->NG_ENCRYPT( $_POST["data"] );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 					else
@@ -787,9 +769,11 @@ EOF;
 
 				case 'staging':
 //					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
-					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 					if ( $status != "0200" )
 					{
 						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
@@ -827,9 +811,11 @@ EOF;
 
 				case 'production':
 //					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
-					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 					if ( $status != "0200" )
 					{
 						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
@@ -1327,22 +1313,6 @@ EOF;
 							}
 						}
 					}
-					//첫구매
-					/*
-					if ( array_key_exists( "category", $arrayProduct ) )
-					{
-						if ( $arrayProduct["category"] == "CASH" )
-						{
-							if ( MY_Controller::VALID_FIRST_BUY_EVENT )
-							{
-								if ( $this->dbPlay->requestFirstBuyCheck( $sid )->result_array()[0]["is_first"] )
-								{
-									$this->dbMail->sendMail( $sid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct["attach_value"], false );
-								}
-							}
-						}
-					}
-					*/
 
 					$arrayResult["remain_item"] = null;
 				}

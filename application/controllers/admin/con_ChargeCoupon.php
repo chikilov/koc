@@ -13,6 +13,7 @@ class Con_ChargeCoupon extends MY_Controller {
 
 	public function view( $subnavi = 0, $searchParam = "", $searchValue = "" )
 	{
+
 		$data = array( 'subnavi' => $subnavi, 'searchParam' => $searchParam, 'searchValue' => $searchValue );
 		$this->load->view( 'admin/view_ChargeCoupon_'.$subnavi, $data );
 	}

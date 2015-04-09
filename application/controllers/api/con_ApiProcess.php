@@ -12,18 +12,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestJoin()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$id = $decoded["id"];
-		$password = $decoded["password"];
-		$macaddr = $decoded["macaddr"];
+		$id = $this->decoded["id"];
+		$password = $this->decoded["password"];
+		$macaddr = $this->decoded["macaddr"];
 
 		//회원가입
 		if( $id && $password && $macaddr )
@@ -72,22 +63,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestGuestLogin()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$macaddr = $this->decoded["macaddr"];
+		$uuid = $this->decoded["uuid"];
+		$package = $this->decoded["package"];
+		$pushkey = $this->decoded["pushkey"];
+		if ( array_key_exists("platform", $this->decoded) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$macaddr = $decoded["macaddr"];
-		$uuid = $decoded["uuid"];
-		$package = $decoded["package"];
-		$pushkey = $decoded["pushkey"];
-		if ( array_key_exists("platform", $decoded) )
-		{
-			$platform = $decoded["platform"];
+			$platform = $this->decoded["platform"];
 		}
 		else
 		{
@@ -199,27 +181,18 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAffiliateLogin()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$macaddr = $this->decoded["macaddr"];
+		$uuid = $this->decoded["uuid"];
+		$package = $this->decoded["package"];
+		$affiliateType = $this->decoded["affiliatetype"];
+		$affiliateId = $this->decoded["affiliateid"];
+		$affiliateName = $this->decoded["affiliatename"];
+		$affiliateEmail = $this->decoded["affiliateemail"];
+		$affiliateProfImg = $this->decoded["affiliateprofimg"];
+		$pushkey = $this->decoded["pushkey"];
+		if ( array_key_exists("platform", $this->decoded) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$macaddr = $decoded["macaddr"];
-		$uuid = $decoded["uuid"];
-		$package = $decoded["package"];
-		$affiliateType = $decoded["affiliatetype"];
-		$affiliateId = $decoded["affiliateid"];
-		$affiliateName = $decoded["affiliatename"];
-		$affiliateEmail = $decoded["affiliateemail"];
-		$affiliateProfImg = $decoded["affiliateprofimg"];
-		$pushkey = $decoded["pushkey"];
-		if ( array_key_exists("platform", $decoded) )
-		{
-			$platform = $decoded["platform"];
+			$platform = $this->decoded["platform"];
 		}
 		else
 		{
@@ -333,17 +306,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateName()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$name = $decoded["name"];
+		$pid = $this->decoded["pid"];
+		$name = $this->decoded["name"];
 
 		//회원가입
 		if( $pid && $name )
@@ -374,17 +338,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateIncresement()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$slottype = $decoded["slottype"];
+		$pid = $this->decoded["pid"];
+		$slottype = $this->decoded["slottype"];
 
 		if( $pid && $slottype )
 		{
@@ -460,22 +415,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLogin()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$id = $this->decoded["id"];
+		$password = $this->decoded["password"];
+		$package = $this->decoded["package"];
+		$pushkey = $this->decoded["pushkey"];
+		if ( array_key_exists("platform", $this->decoded) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$id = $decoded["id"];
-		$password = $decoded["password"];
-		$package = $decoded["package"];
-		$pushkey = $decoded["pushkey"];
-		if ( array_key_exists("platform", $decoded) )
-		{
-			$platform = $decoded["platform"];
+			$platform = $this->decoded["platform"];
 		}
 		else
 		{
@@ -554,17 +500,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMailList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$category = $decoded["category"];
+		$pid = $this->decoded["pid"];
+		$category = $this->decoded["category"];
 
 		if( $pid )
 		{
@@ -591,17 +528,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMailReceipt()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$idx = $decoded["idx"];
+		$pid = $this->decoded["pid"];
+		$idx = $this->decoded["idx"];
 
 		if( $pid && $idx )
 		{
@@ -649,17 +577,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMailReceiptAll()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$attach_type = $decoded["attach_type"];
+		$pid = $this->decoded["pid"];
+		$attach_type = $this->decoded["attach_type"];
 
 		if( $pid && $attach_type )
 		{
@@ -740,16 +659,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMailCount()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -770,18 +680,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateShowProfile()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$show_prof = $decoded["show_prof"];
-		$show_name = $decoded["show_name"];
+		$pid = $this->decoded["pid"];
+		$show_prof = $this->decoded["show_prof"];
+		$show_name = $this->decoded["show_name"];
 
 		if ( $pid )
 		{
@@ -802,16 +703,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestPlayer()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -1060,17 +952,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestDeployCharacters()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$teamInfo = $decoded["teamInfo"];
+		$pid = $this->decoded["pid"];
+		$teamInfo = $this->decoded["teamInfo"];
 		//배열 빈값 제거
 		$teamInfo = array_filter($teamInfo, "is_numeric");
 
@@ -1129,17 +1012,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateTactic()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$tactinfo = $decoded["tactinfo"];
+		$pid = $this->decoded["pid"];
+		$tactinfo = $this->decoded["tactinfo"];
 
 		if( $pid )
 		{
@@ -1162,22 +1036,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestProductList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$pid = $this->decoded["pid"];
+		$appId = $this->decoded["appid"];
+		$storeType = strtolower( $this->decoded["storetype"] );
+		$storeVersion = $this->decoded["store_version"];
+		if ( array_key_exists( "country_code", $this->decoded ) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$appId = $decoded["appid"];
-		$storeType = strtolower( $decoded["storetype"] );
-		$storeVersion = $decoded["store_version"];
-		if ( array_key_exists( "country_code", $decoded ) )
-		{
-			$country_code = $decoded["country_code"];
+			$country_code = $this->decoded["country_code"];
 		}
 		else
 		{
@@ -1215,19 +1080,10 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestEquipToChar()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$cid = $decoded["cid"];
-		$slotseq = $decoded["slotSeq"];
-		$iid = $decoded["iid"];
+		$pid = $this->decoded["pid"];
+		$cid = $this->decoded["cid"];
+		$slotseq = $this->decoded["slotSeq"];
+		$iid = $this->decoded["iid"];
 
 		if ( $pid && $cid && $slotseq && $iid )
 		{
@@ -1290,16 +1146,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAttendEvent()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if ( $pid )
 		{
@@ -1341,16 +1188,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExtraAttendEvent()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if ( $pid )
 		{
@@ -1411,16 +1249,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExtraAttendList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if ( $pid && date("Ymd") > "20150215" && date("Ymd") < "20150223" )
 		{
@@ -1443,26 +1272,17 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestBuyProduct()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$pid = $this->decoded["pid"];
+		$product = $this->decoded["product"];
+		if ( array_key_exists( "country_code", $this->decoded ) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$product = $decoded["product"];
-		if ( array_key_exists( "country_code", $decoded ) )
-		{
-			$country_code = $decoded["country_code"];
+			$country_code = $this->decoded["country_code"];
 		}
 		else
 		{
 			$country_code = "";
 		}
-		$storeType = strtolower( $decoded["storetype"] );
+		$storeType = strtolower( $this->decoded["storetype"] );
 
 		if ( $pid && $storeType && $product )
 		{
@@ -1540,32 +1360,23 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestBuyIap()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
+		$pid = $this->decoded["pid"];
+		$product = $this->decoded["product"];
+		$sid = $this->decoded["sid"];
+		$storeType = strtolower( $this->decoded["storetype"] );
+		$paymentSeq = $this->decoded["receipt"];
+		if ( array_key_exists( "signdata", $this->decoded ) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
+			$signdata = $this->decoded["signdata"];
 		}
-		else
+		if ( array_key_exists( "productId", $this->decoded ) )
 		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
+			$productId = $this->decoded["productId"];
 		}
-		$pid = $decoded["pid"];
-		$product = $decoded["product"];
-		$sid = $decoded["sid"];
-		$storeType = strtolower( $decoded["storetype"] );
-		$paymentSeq = $decoded["receipt"];
-		if ( array_key_exists( "signdata", $decoded ) )
+		$is_consume = $this->decoded["consume"];
+		if ( array_key_exists( "country_code", $this->decoded ) )
 		{
-			$signdata = $decoded["signdata"];
-		}
-		if ( array_key_exists( "productId", $decoded ) )
-		{
-			$productId = $decoded["productId"];
-		}
-		$is_consume = $decoded["consume"];
-		if ( array_key_exists( "country_code", $decoded ) )
-		{
-			$country_code = $decoded["country_code"];
+			$country_code = $this->decoded["country_code"];
 		}
 		else
 		{
@@ -2306,6 +2117,147 @@ class Con_ApiProcess extends MY_Controller {
 							}
 						}
 					}
+					else if ( $storeType == "ios" )
+					{
+						if ( ENVIRONMENT == "production" )
+						{
+							$verify_host = "https://buy.itunes.apple.com/verifyReceipt";
+						}
+						else
+						{
+							$verify_host = "https://sandbox.itunes.apple.com/verifyReceipt";
+						}
+
+						$ch = curl_init();
+						curl_setopt($ch, CURLOPT_URL, $verify_host);
+				        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+				        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+				        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				        curl_setopt($ch, CURLOPT_POST, true);
+				        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array( "receipt-data" => $paymentSeq )));
+				        $arrResponse = json_decode( curl_exec( $ch ), true );
+
+						if ( $arrResponse["status"] != 0 )
+						{
+							$arrayResult = null;
+							//지급 오류
+							$is_provision = 0;
+							$resultCode = MY_Controller::STATUS_RECEIPT_INFO;
+							$resultText = MY_Controller::MESSAGE_RECEIPT_INFO;
+
+							$receiptPaymentSeq = "";
+							$receiptApprovedPaymentNo = "";
+							$receiptNaverId = $arrResponse["status"];
+							$receiptPaymentTime = "";
+							$reasonCode = MY_Controller::REASONCODE_CANT_GET_RECEIPT;
+						}
+						else
+						{
+							if ( $arrResponse["receipt"]["product_id"] == $arrayProduct[0]["iapcode"] )
+							{
+								if ( $is_consume )
+								{
+									// 지급 처리
+									if ( $pid != $sid )
+									{
+										$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]["type"], $arrayProduct[0]["attach_value"], false );
+										if ( $arrayProduct[0]["bonus"] > 0 )
+										{
+											$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, "EVENT_POINTS", $arrayProduct[0]["bonus"], false );
+										}
+
+										if ( array_key_exists( "vip_exp", $arrayProduct[0] ) )
+										{
+											if ( $arrayProduct[0]["vip_exp"] > 0 )
+											{
+												$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct[0]["vip_exp"] )->result_array();
+												if ( !( empty( $vipInfo ) ) )
+												{
+													$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
+													if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
+													{
+														$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
+														if ( !( empty($vipReward) ) )
+														{
+															foreach( $vipReward as $row )
+															{
+																if ( $row["reward_div"] == "PERM" )
+																{
+																	$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
+																}
+																else
+																{
+																	$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], false );
+																	$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
+																}
+															}
+														}
+													}
+													$arrayResult["vipinfo"] = $vipInfo[0];
+												}
+												else
+												{
+													$arrayResult["vipinfo"] = null;
+												}
+											}
+										}
+										else
+										{
+											$arrayResult["vipinfo"] = null;
+										}
+									}
+									else
+									{
+										$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $sid, "상품구매(".$product.")" );
+									}
+
+									//패키지 추가지급 코드
+									$arrayPackageList = $this->dbRef->requestPackageList( $pid, $product )->result_array();
+									if ( !empty($arrayPackageList) )
+									{
+										foreach( $arrayPackageList as $row )
+										{
+											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
+										}
+									}
+
+									//지급 성공
+									$is_provision = 1;
+									$resultCode = MY_Controller::STATUS_API_OK;
+									$resultText = MY_Controller::MESSAGE_API_OK;
+									$arrayResult["payment_info"] = array( "payment_type" => $arrayProduct[0]["payment_type"], "payment_value" => $arrayProduct[0]["payment_value"] );
+
+									$receiptPaymentSeq = "";
+									$receiptApprovedPaymentNo = "";
+									$receiptNaverId = "";
+									$receiptPaymentTime = "";
+									$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
+								}
+								else
+								{
+									$arrayResult = null;
+									//지급 오류
+									$is_provision = 1;
+									$resultCode = MY_Controller::STATUS_CONSUME;
+									$resultText = MY_Controller::MESSAGE_CONSUME;
+									$reasonCode = MY_Controller::REASONCODE_CONSUME_FAILED;
+								}
+							}
+							else
+							{
+								$arrayResult = null;
+								//지급 오류
+								$is_provision = 0;
+								$resultCode = MY_Controller::STATUS_RECEIPT_INFO_DISCORD;
+								$resultText = MY_Controller::MESSAGE_RECEIPT_INFO_DISCORD;
+								$reasonCode = MY_Controller::REASONCODE_DOESNT_MATCH_RECEIPT;
+							}
+							$receiptPaymentSeq = $paymentSeq;
+							$receiptApprovedPaymentNo = "";
+							$receiptNaverId = $arrResponse["receipt"]["transaction_id"];
+							$receiptPaymentTime = substr($arrResponse["receipt"]["purchase_date"], 0, 19);
+						}
+					}
 					if ( $arrayResult != null )
 					{
 						$arrayResult["remain_item"] = $this->dbPlay->requestItem( $pid )->result_array()[0];
@@ -2346,22 +2298,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingStartStepForPVE()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$stageid = $decoded["stageid"];
-		$fid = $decoded["friendid"];
-		$instant_item[0] = $decoded["instant_item1"];
-		$instant_item[1] = $decoded["instant_item2"];
-		$instant_item[2] = $decoded["instant_item3"];
-		$instant_item[3] = $decoded["instant_item4"];
+		$pid = $this->decoded["pid"];
+		$stageid = $this->decoded["stageid"];
+		$fid = $this->decoded["friendid"];
+		$instant_item[0] = $this->decoded["instant_item1"];
+		$instant_item[1] = $this->decoded["instant_item2"];
+		$instant_item[2] = $this->decoded["instant_item3"];
+		$instant_item[3] = $this->decoded["instant_item4"];
 		if ( $instant_item[0] )
 		{
 			$instant_itemName[] = $this->dbRef->getNameForId($pid, "PRODUCT", $instant_item[0])->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN];
@@ -2543,37 +2486,28 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingRewardStepForPVE()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$stageid = $decoded["stageid"];
-		$logid = $decoded["logid"];
-		$cidArray[0]["idx"] = $decoded["cid_0"];
-		$cidArray[1]["idx"] = $decoded["cid_1"];
-		$cidArray[2]["idx"] = $decoded["cid_2"];
-		$cidArray[0]["refid"] = $decoded["refid_0"];
-		$cidArray[1]["refid"] = $decoded["refid_1"];
-		$cidArray[2]["refid"] = $decoded["refid_2"];
-		$cidArray[0]["exp"] = $decoded["exp_0"];
-		$cidArray[1]["exp"] = $decoded["exp_1"];
-		$cidArray[2]["exp"] = $decoded["exp_2"];
-		$cidArray[0]["lev"] = $decoded["lev_0"];
-		$cidArray[1]["lev"] = $decoded["lev_1"];
-		$cidArray[2]["lev"] = $decoded["lev_2"];
-		$cidArray[0]["up_grade"] = $decoded["up_grade_0"];
-		$cidArray[1]["up_grade"] = $decoded["up_grade_1"];
-		$cidArray[2]["up_grade"] = $decoded["up_grade_2"];
-		$basic_reward_type = $decoded["basic_reward_type"];
-		$basic_reward_value = $decoded["basic_reward_value"];
-		$duration = $decoded["duration"];
-		$is_clear = $decoded["is_clear"];
+		$pid = $this->decoded["pid"];
+		$stageid = $this->decoded["stageid"];
+		$logid = $this->decoded["logid"];
+		$cidArray[0]["idx"] = $this->decoded["cid_0"];
+		$cidArray[1]["idx"] = $this->decoded["cid_1"];
+		$cidArray[2]["idx"] = $this->decoded["cid_2"];
+		$cidArray[0]["refid"] = $this->decoded["refid_0"];
+		$cidArray[1]["refid"] = $this->decoded["refid_1"];
+		$cidArray[2]["refid"] = $this->decoded["refid_2"];
+		$cidArray[0]["exp"] = $this->decoded["exp_0"];
+		$cidArray[1]["exp"] = $this->decoded["exp_1"];
+		$cidArray[2]["exp"] = $this->decoded["exp_2"];
+		$cidArray[0]["lev"] = $this->decoded["lev_0"];
+		$cidArray[1]["lev"] = $this->decoded["lev_1"];
+		$cidArray[2]["lev"] = $this->decoded["lev_2"];
+		$cidArray[0]["up_grade"] = $this->decoded["up_grade_0"];
+		$cidArray[1]["up_grade"] = $this->decoded["up_grade_1"];
+		$cidArray[2]["up_grade"] = $this->decoded["up_grade_2"];
+		$basic_reward_type = $this->decoded["basic_reward_type"];
+		$basic_reward_value = $this->decoded["basic_reward_value"];
+		$duration = $this->decoded["duration"];
+		$is_clear = $this->decoded["is_clear"];
 		if ( $is_clear < 0 )
 		{
 			$is_clear = 0;
@@ -2927,21 +2861,12 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingRetryRewardStepForPVE()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$logid = $decoded["logid"];
-		$stageid = $decoded["stageid"];
-		$rid = $decoded["rid"];
-		$rpattern = $decoded["rpattern"];
-		$rseq = $decoded["rseq"];
+		$pid = $this->decoded["pid"];
+		$logid = $this->decoded["logid"];
+		$stageid = $this->decoded["stageid"];
+		$rid = $this->decoded["rid"];
+		$rpattern = $this->decoded["rpattern"];
+		$rseq = $this->decoded["rseq"];
 
 		if( $pid )
 		{
@@ -3088,23 +3013,14 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingStartStepForPVB()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$stageid = $decoded["stageid"];
-		$use_cash = $decoded["use_cash"];
-		$level = $decoded["level"];
-		$instant_item[0] = $decoded["instant_item1"];
-		$instant_item[1] = $decoded["instant_item2"];
-		$instant_item[2] = $decoded["instant_item3"];
-		$instant_item[3] = $decoded["instant_item4"];
+		$pid = $this->decoded["pid"];
+		$stageid = $this->decoded["stageid"];
+		$use_cash = $this->decoded["use_cash"];
+		$level = $this->decoded["level"];
+		$instant_item[0] = $this->decoded["instant_item1"];
+		$instant_item[1] = $this->decoded["instant_item2"];
+		$instant_item[2] = $this->decoded["instant_item3"];
+		$instant_item[3] = $this->decoded["instant_item4"];
 		if ( $instant_item[0] )
 		{
 			$instant_itemName[] = $this->dbRef->getNameForId($pid, "PRODUCT", $instant_item[0])->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN];
@@ -3204,37 +3120,37 @@ class Con_ApiProcess extends MY_Controller {
 				$logString .= $this->dbRef->getNameForId( $pid, "PVBSTAGE", $stageid )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]." 레벨 => ".$level."\n";
 
 				$logString .= "진행팀 정보 : [ \n\t아이디 => ".$pid."\n";
-				if ( $decoded["op"] != null && $decoded["op"] != "" && $decoded["op"] != "0" )
+				if ( $this->decoded["op"] != null && $this->decoded["op"] != "" && $this->decoded["op"] != "0" )
 				{
-					$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_0"] != null && $decoded["pilot_0"] != "" && $decoded["pilot_0"] != "0" )
+				if ( $this->decoded["pilot_0"] != null && $this->decoded["pilot_0"] != "" && $this->decoded["pilot_0"] != "0" )
 				{
-					$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_1"] != null && $decoded["pilot_1"] != "" && $decoded["pilot_1"] != "0" )
+				if ( $this->decoded["pilot_1"] != null && $this->decoded["pilot_1"] != "" && $this->decoded["pilot_1"] != "0" )
 				{
-					$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_2"] != null && $decoded["pilot_2"] != "" && $decoded["pilot_2"] != "0" )
+				if ( $this->decoded["pilot_2"] != null && $this->decoded["pilot_2"] != "" && $this->decoded["pilot_2"] != "0" )
 				{
-					$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
 
-				if ( $decoded["refid_0"] != null && $decoded["refid_0"] != "" && $decoded["refid_0"] != "0" )
+				if ( $this->decoded["refid_0"] != null && $this->decoded["refid_0"] != "" && $this->decoded["refid_0"] != "0" )
 				{
-					$logString .= "\t출격기체1 => +".$decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_0"]."),";
-					$logString .= "lv.".$decoded["lev_0"]."\n";
+					$logString .= "\t출격기체1 => +".$this->decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_0"]."),";
+					$logString .= "lv.".$this->decoded["lev_0"]."\n";
 				}
-				if ( $decoded["refid_1"] != null && $decoded["refid_1"] != "" && $decoded["refid_1"] != "0" )
+				if ( $this->decoded["refid_1"] != null && $this->decoded["refid_1"] != "" && $this->decoded["refid_1"] != "0" )
 				{
-					$logString .= "\t출격기체2 => +".$decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_1"]."), ";
-					$logString .= "lv.".$decoded["lev_1"]."\n";
+					$logString .= "\t출격기체2 => +".$this->decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_1"]."), ";
+					$logString .= "lv.".$this->decoded["lev_1"]."\n";
 				}
-				if ( $decoded["refid_2"] != null && $decoded["refid_2"] != "" && $decoded["refid_2"] != "0" )
+				if ( $this->decoded["refid_2"] != null && $this->decoded["refid_2"] != "" && $this->decoded["refid_2"] != "0" )
 				{
-					$logString .= "\t출격기체3 => +".$decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_2"]."), ";
-					$logString .= "lv.".$decoded["lev_2"]."\n";
+					$logString .= "\t출격기체3 => +".$this->decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_2"]."), ";
+					$logString .= "lv.".$this->decoded["lev_2"]."\n";
 				}
 				$logString .= " ] ";
 
@@ -3286,23 +3202,14 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingResultStepForPVB()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$logid = $decoded["logid"];
-		$score = $decoded["score"];
-		$level = $decoded["level"];
-		$stageid = $decoded["stageid"];
+		$pid = $this->decoded["pid"];
+		$logid = $this->decoded["logid"];
+		$score = $this->decoded["score"];
+		$level = $this->decoded["level"];
+		$stageid = $this->decoded["stageid"];
 		$rstageid = substr($stageid, 0, strlen($stageid) - strlen($level)).$level;
 		$stageReward = $this->dbRef->requestStageReward( $pid, $rstageid )->result_array();
-		$is_clear = $decoded["is_clear"];
+		$is_clear = $this->decoded["is_clear"];
 		if ( $is_clear < 0 )
 		{
 			$is_clear = 0;
@@ -3365,21 +3272,12 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingStartStepForSURVIVAL()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$use_cash = $decoded["use_cash"];
-		$instant_item[0] = $decoded["instant_item1"];
-		$instant_item[1] = $decoded["instant_item2"];
-		$instant_item[2] = $decoded["instant_item3"];
-		$instant_item[3] = $decoded["instant_item4"];
+		$pid = $this->decoded["pid"];
+		$use_cash = $this->decoded["use_cash"];
+		$instant_item[0] = $this->decoded["instant_item1"];
+		$instant_item[1] = $this->decoded["instant_item2"];
+		$instant_item[2] = $this->decoded["instant_item3"];
+		$instant_item[3] = $this->decoded["instant_item4"];
 		if ( $instant_item[0] )
 		{
 			$instant_itemName[] = $this->dbRef->getNameForId($pid, "PRODUCT", $instant_item[0])->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN];
@@ -3479,37 +3377,37 @@ class Con_ApiProcess extends MY_Controller {
 				$logString = "생존 시작\n";
 
 				$logString .= "진행팀 정보 : \n\t아이디 => ".$pid."\n";
-				if ( $decoded["op"] != null && $decoded["op"] != "" && $decoded["op"] != "0" )
+				if ( $this->decoded["op"] != null && $this->decoded["op"] != "" && $this->decoded["op"] != "0" )
 				{
-					$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_0"] != null && $decoded["pilot_0"] != "" && $decoded["pilot_0"] != "0" )
+				if ( $this->decoded["pilot_0"] != null && $this->decoded["pilot_0"] != "" && $this->decoded["pilot_0"] != "0" )
 				{
-					$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_1"] != null && $decoded["pilot_1"] != "" && $decoded["pilot_1"] != "0" )
+				if ( $this->decoded["pilot_1"] != null && $this->decoded["pilot_1"] != "" && $this->decoded["pilot_1"] != "0" )
 				{
-					$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
-				if ( $decoded["pilot_2"] != null && $decoded["pilot_2"] != "" && $decoded["pilot_2"] != "0" )
+				if ( $this->decoded["pilot_2"] != null && $this->decoded["pilot_2"] != "" && $this->decoded["pilot_2"] != "0" )
 				{
-					$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+					$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 				}
 
-				if ( $decoded["refid_0"] != null && $decoded["refid_0"] != "" && $decoded["refid_0"] != "0" )
+				if ( $this->decoded["refid_0"] != null && $this->decoded["refid_0"] != "" && $this->decoded["refid_0"] != "0" )
 				{
-					$logString .= "\t출격기체1 => +".$decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_0"]."),";
-					$logString .= "lv.".$decoded["lev_0"]."\n";
+					$logString .= "\t출격기체1 => +".$this->decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_0"]."),";
+					$logString .= "lv.".$this->decoded["lev_0"]."\n";
 				}
-				if ( $decoded["refid_1"] != null && $decoded["refid_1"] != "" && $decoded["refid_1"] != "0" )
+				if ( $this->decoded["refid_1"] != null && $this->decoded["refid_1"] != "" && $this->decoded["refid_1"] != "0" )
 				{
-					$logString .= "\t출격기체2 => +".$decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_1"]."), ";
-					$logString .= "lv.".$decoded["lev_1"]."\n";
+					$logString .= "\t출격기체2 => +".$this->decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_1"]."), ";
+					$logString .= "lv.".$this->decoded["lev_1"]."\n";
 				}
-				if ( $decoded["refid_2"] != null && $decoded["refid_2"] != "" && $decoded["refid_2"] != "0" )
+				if ( $this->decoded["refid_2"] != null && $this->decoded["refid_2"] != "" && $this->decoded["refid_2"] != "0" )
 				{
-					$logString .= "\t출격기체3 => +".$decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_2"]."), ";
-					$logString .= "lv.".$decoded["lev_2"]."\n";
+					$logString .= "\t출격기체3 => +".$this->decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_2"]."), ";
+					$logString .= "lv.".$this->decoded["lev_2"]."\n";
 				}
 
 				$itemLog = "";
@@ -3560,20 +3458,11 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingResultStepForSURVIVAL()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$logid = $decoded["logid"];
-		$score = $decoded["score"];
-		$game_points = $decoded["game_points"];
-		$round = $decoded["round"];
+		$pid = $this->decoded["pid"];
+		$logid = $this->decoded["logid"];
+		$score = $this->decoded["score"];
+		$game_points = $this->decoded["game_points"];
+		$round = $this->decoded["round"];
 
 		if( $pid && $logid )
 		{
@@ -3614,22 +3503,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingStartStepForPVP()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$use_cash = $decoded["use_cash"];
-		$instant_item[0] = $decoded["instant_item1"];
-		$instant_item[1] = $decoded["instant_item2"];
-		$instant_item[2] = $decoded["instant_item3"];
-		$instant_item[3] = $decoded["instant_item4"];
-		$tactInfo = $decoded["tactinfo"];
+		$pid = $this->decoded["pid"];
+		$use_cash = $this->decoded["use_cash"];
+		$instant_item[0] = $this->decoded["instant_item1"];
+		$instant_item[1] = $this->decoded["instant_item2"];
+		$instant_item[2] = $this->decoded["instant_item3"];
+		$instant_item[3] = $this->decoded["instant_item4"];
+		$tactInfo = $this->decoded["tactinfo"];
 		if ( $instant_item[0] )
 		{
 			$instant_itemName[] = $this->dbRef->getNameForId($pid, "PRODUCT", $instant_item[0])->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN];
@@ -3830,36 +3710,36 @@ class Con_ApiProcess extends MY_Controller {
 						// 로그 문자열 만들기 시작
 						$logString = "1:1대전 시작\n";
 						$logString .= "진행팀 정보 : \n\t아이디 => ".$pid."\n";
-						if ( $decoded["op"] != null && $decoded["op"] != "" && $decoded["op"] != "0" )
+						if ( $this->decoded["op"] != null && $this->decoded["op"] != "" && $this->decoded["op"] != "0" )
 						{
-							$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+							$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 						}
-						if ( $decoded["pilot_0"] != null && $decoded["pilot_0"] != "" && $decoded["pilot_0"] != "0" )
+						if ( $this->decoded["pilot_0"] != null && $this->decoded["pilot_0"] != "" && $this->decoded["pilot_0"] != "0" )
 						{
-							$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+							$logString .= "\t파일럿1 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 						}
-						if ( $decoded["pilot_1"] != null && $decoded["pilot_1"] != "" && $decoded["pilot_1"] != "0" )
+						if ( $this->decoded["pilot_1"] != null && $this->decoded["pilot_1"] != "" && $this->decoded["pilot_1"] != "0" )
 						{
-							$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+							$logString .= "\t파일럿2 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 						}
-						if ( $decoded["pilot_2"] != null && $decoded["pilot_2"] != "" && $decoded["pilot_2"] != "0" )
+						if ( $this->decoded["pilot_2"] != null && $this->decoded["pilot_2"] != "" && $this->decoded["pilot_2"] != "0" )
 						{
-							$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+							$logString .= "\t파일럿3 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["pilot_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 						}
-						if ( $decoded["refid_0"] != null && $decoded["refid_0"] != "" && $decoded["refid_0"] != "0" )
+						if ( $this->decoded["refid_0"] != null && $this->decoded["refid_0"] != "" && $this->decoded["refid_0"] != "0" )
 						{
-							$logString .= "\t출격기체1 => +".$decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_0"]."),";
-							$logString .= "lv.".$decoded["lev_0"].", 전략".$decoded["tact_0"]."\n";
+							$logString .= "\t출격기체1 => +".$this->decoded["up_grade_0"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_0"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_0"]."),";
+							$logString .= "lv.".$this->decoded["lev_0"].", 전략".$this->decoded["tact_0"]."\n";
 						}
-						if ( $decoded["refid_1"] != null && $decoded["refid_1"] != "" && $decoded["refid_1"] != "0" )
+						if ( $this->decoded["refid_1"] != null && $this->decoded["refid_1"] != "" && $this->decoded["refid_1"] != "0" )
 						{
-							$logString .= "\t출격기체2 => +".$decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_1"]."), ";
-							$logString .= "lv.".$decoded["lev_1"].", 전략".$decoded["tact_1"]."\n";
+							$logString .= "\t출격기체2 => +".$this->decoded["up_grade_1"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_1"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_1"]."), ";
+							$logString .= "lv.".$this->decoded["lev_1"].", 전략".$this->decoded["tact_1"]."\n";
 						}
-						if ( $decoded["refid_2"] != null && $decoded["refid_2"] != "" && $decoded["refid_2"] != "0" )
+						if ( $this->decoded["refid_2"] != null && $this->decoded["refid_2"] != "" && $this->decoded["refid_2"] != "0" )
 						{
-							$logString .= "\t출격기체3 => +".$decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$decoded["cid_2"]."), ";
-							$logString .= "lv.".$decoded["lev_2"].", 전략".$decoded["tact_2"]."\n";
+							$logString .= "\t출격기체3 => +".$this->decoded["up_grade_2"]." ".$this->dbRef->getNameForId( $pid, "CHAR", $this->decoded["refid_2"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."(".$this->decoded["cid_2"]."), ";
+							$logString .= "lv.".$this->decoded["lev_2"].", 전략".$this->decoded["tact_2"]."\n";
 						}
 
 						$logString .= "상대팀 정보 : \n\t아이디 => ".$enemy_info["pid"]."\n";
@@ -3953,22 +3833,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLoggingResultStepForPVP()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$logid = $decoded["logid"];
-		$is_clear = $decoded["is_clear"];
-		$duration = $decoded["duration"];
-		$remain_home = $decoded["remain_home"];
-		$killed_away = $decoded["killed_away"];
-		$pvp = $decoded["pvp"];
+		$pid = $this->decoded["pid"];
+		$logid = $this->decoded["logid"];
+		$is_clear = $this->decoded["is_clear"];
+		$duration = $this->decoded["duration"];
+		$remain_home = $this->decoded["remain_home"];
+		$killed_away = $this->decoded["killed_away"];
+		$pvp = $this->decoded["pvp"];
 		if ( $duration == null || $duration == "" )
 		{
 			$duration = 0;
@@ -4074,18 +3945,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpgradeCharacter()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$targetIdx = $decoded["targetIdx"];
-		$sourceIdx = $decoded["sourceIdx"];
+		$pid = $this->decoded["pid"];
+		$targetIdx = $this->decoded["targetIdx"];
+		$sourceIdx = $this->decoded["sourceIdx"];
 		$arrChar = array( $targetIdx, $sourceIdx );
 
 		if( $pid && $targetIdx && $sourceIdx )
@@ -4228,18 +4090,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestSynthesize()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$targetIdx = $decoded["targetIdx"];
-		$sourceIdx = $decoded["sourceIdx"];
+		$pid = $this->decoded["pid"];
+		$targetIdx = $this->decoded["targetIdx"];
+		$sourceIdx = $this->decoded["sourceIdx"];
 		$arrChar = array( $targetIdx, $sourceIdx );
 
 		if( $pid && $targetIdx && $sourceIdx )
@@ -4348,20 +4201,11 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestEvolution()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$targetIdx = $decoded["targetIdx"];
-		$sourceIdx = $decoded["sourceIdx"];
-		$targetId = $decoded["targetId"];
-		$sourceId = $decoded["sourceId"];
+		$pid = $this->decoded["pid"];
+		$targetIdx = $this->decoded["targetIdx"];
+		$sourceIdx = $this->decoded["sourceIdx"];
+		$targetId = $this->decoded["targetId"];
+		$sourceId = $this->decoded["sourceId"];
 		$arrChar = array( $targetIdx, $sourceIdx );
 
 		if( $pid && $targetIdx && $sourceIdx )
@@ -4460,16 +4304,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAchieveList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -4503,17 +4338,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAchieveStatusUpdate()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$arrayAchieve = $decoded["arrayAchieve"];
+		$pid = $this->decoded["pid"];
+		$arrayAchieve = $this->decoded["arrayAchieve"];
 
 		if( $pid && $arrayAchieve )
 		{
@@ -4540,17 +4366,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAchieveReward()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$aid = $decoded["aid"];
+		$pid = $this->decoded["pid"];
+		$aid = $this->decoded["aid"];
 		$aid = array_unique($aid, SORT_LOCALE_STRING);
 
 		if( $pid && $aid )
@@ -4666,16 +4483,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestPVERank()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -4695,18 +4503,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestSellProduct()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$sellType = $decoded["sell_type"];
-		$sellIdx = $decoded["sell_idx"];
+		$pid = $this->decoded["pid"];
+		$sellType = $this->decoded["sell_type"];
+		$sellIdx = $this->decoded["sell_idx"];
 
 		if( $pid && $sellType && $sellIdx )
 		{
@@ -4801,16 +4600,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExplorationList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -4851,25 +4641,16 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExplorationStart()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$exp_group_idx = $decoded["exp_group_idx"];
-		$exp_idx = $decoded["exp_idx"];
-		$cid = $decoded["cid"];
-		$refid = $decoded["refid"];
-		$up_grade = $decoded["up_grade"];
-		$lev = $decoded["lev"];
-		$esi = floatval( $decoded["esi"] );
-		$cgrade = $decoded["cgrade"];
-		$grade = $decoded["grade"];
+		$pid = $this->decoded["pid"];
+		$exp_group_idx = $this->decoded["exp_group_idx"];
+		$exp_idx = $this->decoded["exp_idx"];
+		$cid = $this->decoded["cid"];
+		$refid = $this->decoded["refid"];
+		$up_grade = $this->decoded["up_grade"];
+		$lev = $this->decoded["lev"];
+		$esi = floatval( $this->decoded["esi"] );
+		$cgrade = $this->decoded["cgrade"];
+		$grade = $this->decoded["grade"];
 		$exp_time_rate = floatval( json_decode(MY_Controller::EXP_TIME_FOR_CHAR, true)[$cgrade] );
 
 		if( $pid && $exp_group_idx && $exp_idx && $cid )
@@ -4901,18 +4682,18 @@ class Con_ApiProcess extends MY_Controller {
 					$logString .= "탐색 그룹 => ".$exp_group_idx.", 탐색 행성 => ".$exp_idx."\n";
 					$logString .= "탐색 등급 => ".$grade.", 탐색 비용 => ".MY_Controller::EXP_COST_BASIC_MULTIPLE * $grade."\n";
 					$logString .= "진행팀 정보 : \n\t아이디 => ".$pid."\n";
-					if ( array_key_exists("op", $decoded) )
+					if ( array_key_exists("op", $this->decoded) )
 					{
-						if ( $decoded["op"] != null && $decoded["op"] != "" && $decoded["op"] != "0" )
+						if ( $this->decoded["op"] != null && $this->decoded["op"] != "" && $this->decoded["op"] != "0" )
 						{
-							$arrayName = $this->dbRef->getNameForId( $pid, "ITEM", $decoded["op"] )->result_array();
+							$arrayName = $this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["op"] )->result_array();
 							if ( !empty($arrayName) && array_key_exists( MY_Controller::COMMON_LANGUAGE_COLUMN, $arrayName ) )
 							{
-								$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
+								$logString .= "\t오퍼레이터 => ".$this->dbRef->getNameForId( $pid, "ITEM", $this->decoded["op"] )->result_array()[0][MY_Controller::COMMON_LANGUAGE_COLUMN]."\n";
 							}
 							else
 							{
-								$logString .= "\t오퍼레이터 => ITEMNAME_".$decoded["op"]."\n";
+								$logString .= "\t오퍼레이터 => ITEMNAME_".$this->decoded["op"]."\n";
 							}
 						}
 					}
@@ -4968,21 +4749,12 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExplorationResult()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$exp_group_idx = $decoded["exp_group_idx"];
-		$exp_idx = $decoded["exp_idx"];
-		$grade = $decoded["grade"];
-		$cid = $decoded["cid"];
-		$crefid = $decoded["crefid"];
+		$pid = $this->decoded["pid"];
+		$exp_group_idx = $this->decoded["exp_group_idx"];
+		$exp_idx = $this->decoded["exp_idx"];
+		$grade = $this->decoded["grade"];
+		$cid = $this->decoded["cid"];
+		$crefid = $this->decoded["crefid"];
 
 		$rid = $this->dbRecord->getRewardIdFromExp( $pid, $exp_group_idx, $exp_idx )->result_array();
 
@@ -5113,84 +4885,13 @@ class Con_ApiProcess extends MY_Controller {
 
 		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $pid, $_POST["data"] );
 	}
-/*
-	public function requestExplorationReward()
-	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$exp_group_idx = $decoded["exp_group_idx"];
-		$exp_idx = $decoded["exp_idx"];
 
-		if( $pid && $exp_group_idx && $exp_idx )
-		{
-			$rewardInfo = $this->dbRecord->requestExplorationReward( $pid, $exp_group_idx, $exp_idx )->result_array();
-			if ( empty( $rewardInfo ) )
-			{
-				$resultCode = MY_Controller::STATUS_EXPLORATE_REWARD_EMPTY;
-				$resultText = MY_Controller::MESSAGE_EXPLORATE_REWARD_EMPTY;
-				$arrayResult = null;
-			}
-			else
-			{
-				if ( $rewardInfo[0]["reward_type"] == "EXP_POINTS" )
-				{
-					$resultCode = MY_Controller::STATUS_EXPLORATE_REWARD_EMPTY;
-					$resultText = MY_Controller::MESSAGE_EXPLORATE_REWARD_EMPTY;
-					$arrayResult = null;
-				}
-				else
-				{
-					$result = (bool)$this->dbRecord->updateExplorationReward( $pid, $exp_group_idx, $exp_idx );
-					$result = $result & (bool)$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::EXPLORATION_REWARD_TITLE, $rewardInfo[0]["article_value"], $rewardInfo[0]["attach_value"], MY_Controller::NORMAL_EXPIRE_TERM );
-
-					if ( $result )
-					{
-						$resultCode = MY_Controller::STATUS_API_OK;
-						$resultText = MY_Controller::MESSAGE_API_OK;
-						$arrayResult = null;
-					}
-					else
-					{
-						$resultCode = MY_Controller::STATUS_EXPLORATE_REWARD_GIVE;
-						$resultText = MY_Controller::MESSAGE_EXPLORATE_REWARD_GIVE;
-						$arrayResult = null;
-					}
-				}
-			}
-		}
-		else
-		{
-			$resultCode = MY_Controller::STATUS_NO_MATCHING_PARAMETER;
-			$resultText = MY_Controller::MESSAGE_NO_MATCHING_PARAMETER;
-			$arrayResult = null;
-		}
-
-		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $pid, $_POST["data"] );
-	}
-*/
 	public function requestExplorationReset()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$exp_group_idx = $decoded["exp_group_idx"];
-		$exp_idx = $decoded["exp_idx"];
-		$cid = $decoded["cid"];
+		$pid = $this->decoded["pid"];
+		$exp_group_idx = $this->decoded["exp_group_idx"];
+		$exp_idx = $this->decoded["exp_idx"];
+		$cid = $this->decoded["cid"];
 
 		if( $pid && $exp_group_idx && $exp_idx && $cid )
 		{
@@ -5219,17 +4920,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestExplorationGroupResult()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$exp_group_idx = $decoded["exp_group_idx"];
+		$pid = $this->decoded["pid"];
+		$exp_group_idx = $this->decoded["exp_group_idx"];
 
 		if( $pid && $exp_group_idx )
 		{
@@ -5289,16 +4981,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestCollectionList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -5319,17 +5002,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestRankingInfoPVP()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$page = $decoded["page"];
+		$pid = $this->decoded["pid"];
+		$page = $this->decoded["page"];
 
 		if( $pid && $page )
 		{
@@ -5363,17 +5037,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestRankingInfoPVB()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$page = $decoded["page"];
+		$pid = $this->decoded["pid"];
+		$page = $this->decoded["page"];
 
 		if( $pid && $page )
 		{
@@ -5432,17 +5097,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestRankingInfoSURVIVAL()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$page = $decoded["page"];
+		$pid = $this->decoded["pid"];
+		$page = $this->decoded["page"];
 
 		if( $pid && $page )
 		{
@@ -5474,17 +5130,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMyFriendList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$status = $decoded["status"];
+		$pid = $this->decoded["pid"];
+		$status = $this->decoded["status"];
 
 		if( $pid )
 		{
@@ -5504,17 +5151,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestOtherPlayer()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$oid = $decoded["oid"];
+		$pid = $this->decoded["pid"];
+		$oid = $this->decoded["oid"];
 
 		if( $pid && $oid )
 		{
@@ -5556,16 +5194,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestPVEFriendList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if ( $pid )
 		{
@@ -5585,17 +5214,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestRecomFriendList()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$searchVal = $decoded["searchval"];
+		$pid = $this->decoded["pid"];
+		$searchVal = $this->decoded["searchval"];
 
 		if( $pid )
 		{
@@ -5615,17 +5235,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestAddFriend()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$fid = $decoded["fid"];
+		$pid = $this->decoded["pid"];
+		$fid = $this->decoded["fid"];
 
 		if( $pid && $fid )
 		{
@@ -5667,18 +5278,9 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestReplyAddFriend()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$fid = $decoded["fid"];
-		$status = $decoded["status"];
+		$pid = $this->decoded["pid"];
+		$fid = $this->decoded["fid"];
+		$status = $this->decoded["status"];
 
 		if( $pid && $fid && $status )
 		{
@@ -5750,17 +5352,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestDelFriend()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$fid = $decoded["fid"];
+		$pid = $this->decoded["pid"];
+		$fid = $this->decoded["fid"];
 
 		if( $pid && $fid )
 		{
@@ -5808,17 +5401,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestFriendshipPoint()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$fid = $decoded["fid"];
+		$pid = $this->decoded["pid"];
+		$fid = $this->decoded["fid"];
 
 		if( $pid && $fid )
 		{
@@ -5864,16 +5448,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestFriendshipPointAll()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -5913,17 +5488,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestChangeOperator()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$iid = $decoded["iid"];
+		$pid = $this->decoded["pid"];
+		$iid = $this->decoded["iid"];
 
 		if( $pid )
 		{
@@ -5945,19 +5511,10 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestChangePilot()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$slotseq = $decoded["slotseq"];
+		$pid = $this->decoded["pid"];
+		$slotseq = $this->decoded["slotseq"];
 		$teamSeq = substr($slotseq, 0, 1);
-		$iid = $decoded["iid"];
+		$iid = $this->decoded["iid"];
 
 		if( $pid && $slotseq )
 		{
@@ -5987,17 +5544,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestWeeklyReward()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$rewardtype = $decoded["rewardtype"];
+		$pid = $this->decoded["pid"];
+		$rewardtype = $this->decoded["rewardtype"];
 
 		if( $pid && $rewardtype )
 		{
@@ -6094,16 +5642,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestRetirePlayer()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -6133,17 +5672,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestCharacterProvisioning()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$cid = $decoded["cid"];
+		$pid = $this->decoded["pid"];
+		$cid = $this->decoded["cid"];
 
 		if( $pid )
 		{
@@ -6165,17 +5695,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestItemProvisioning()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$iid = $decoded["iid"];
+		$pid = $this->decoded["pid"];
+		$iid = $this->decoded["iid"];
 
 		if( $pid )
 		{
@@ -6195,17 +5716,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMaxCharacter()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$cid = $decoded["characters"];
+		$pid = $this->decoded["pid"];
+		$cid = $this->decoded["characters"];
 
 		if( $pid )
 		{
@@ -6229,16 +5741,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestMaxCharacterAll()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -6258,16 +5761,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestInit()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
+		$pid = $this->decoded["pid"];
 
 		if( $pid )
 		{
@@ -6330,16 +5824,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUpdateFile()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$device = $decoded["device"];
+		$device = $this->decoded["device"];
 		if ( $device == "ANDROID" )
 		{
 			$device = "AND";
@@ -6383,19 +5868,10 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestLevelChange()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$cid = $decoded["cid"];
-		$clev = $decoded["clev"];
-		$cexp = $decoded["cexp"];
+		$pid = $this->decoded["pid"];
+		$cid = $this->decoded["cid"];
+		$clev = $this->decoded["clev"];
+		$cexp = $this->decoded["cexp"];
 
 		if( $pid && $cid && $clev && $cexp )
 		{
@@ -6428,18 +5904,9 @@ class Con_ApiProcess extends MY_Controller {
 	//삭제예정
 	public function requestEquipToPlayer()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$slotseq = $decoded["slotSeq"];
-		$iid = $decoded["iid"];
+		$pid = $this->decoded["pid"];
+		$slotseq = $this->decoded["slotSeq"];
+		$iid = $this->decoded["iid"];
 
 		if ( $pid && $slotseq && $iid )
 		{
@@ -6490,17 +5957,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestUnEquipToPlayer()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$pid = $decoded["pid"];
-		$iid = $decoded["iid"];
+		$pid = $this->decoded["pid"];
+		$iid = $this->decoded["iid"];
 
 		if ( $pid && $iid )
 		{
@@ -6532,17 +5990,8 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestTestLoop()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		if ( array_key_exists("pid", $decoded) )
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, $decoded["pid"], "requestData : ".$_POST["data"] );
-		}
-		else
-		{
-			$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-		}
-		$prefix = $decoded["prefix"];
-		$maxSeq = $decoded["maxSeq"];
+		$prefix = $this->decoded["prefix"];
+		$maxSeq = $this->decoded["maxSeq"];
 
 		for ( $seqi = 230000; $seqi <= $maxSeq + 230000; $seqi++ )
 		{
@@ -6722,13 +6171,13 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestSendMail()
 	{
-		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-		$pid = $decoded["pid"];
-		$sid = $decoded["sid"];
-		$title = $decoded["title"];
-		$attach_type = $decoded["attach_type"];
-		$attach_value = $decoded["attach_value"];
-		$expire_date = $decoded["expire_date"];
+		$this->decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
+		$pid = $this->decoded["pid"];
+		$sid = $this->decoded["sid"];
+		$title = $this->decoded["title"];
+		$attach_type = $this->decoded["attach_type"];
+		$attach_value = $this->decoded["attach_value"];
+		$expire_date = $this->decoded["expire_date"];
 
 		if ( $this->dbMail->sendMail( $pid, $sid, $title, $attach_type, $attach_value, $expire_date ) )
 		{

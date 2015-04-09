@@ -311,7 +311,7 @@ class Model_Record extends MY_Model {
 		$query = "insert into koc_record.".MY_Controller::TBL_EXP." ";
 		$query .= "( pid, exp_group_idx, exp_idx, is_enemy, grade, exp_ori_sec, exp_experience, exp_status, exp_cost, ";
 		$query .= "reward_id ) ";
-		$query .= "select '".$pid."', '".$group_idx."', (@row := @row + 1) as idx, if(e.idx is null, 0, 1) as is_enemy, b.grade, c.time, ";
+		$query .= "select '".$pid."', '".$group_idx."', b.idx as idx, if(e.idx is null, 0, 1) as is_enemy, b.grade, c.time, ";
 		$query .= "c.exp, 0, b.grade * ".MY_Controller::EXP_COST_BASIC_MULTIPLE.", ";
 		$query .= "if(e.idx is null, concat('RWEXP0', b.grade, '001'), concat('RWEXC0', b.grade, '001')) from ( ";
 		$query .= "select idx, case ";

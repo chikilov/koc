@@ -305,6 +305,7 @@ EOF;
 	const TBL_ACCOUNT = "account";
 	const TBL_RESTRICTMACADDR = "restrict_mac";
 	const TBL_ACCOUNT_PUSHKEY = "account_pushkey";
+	const TBL_ACCOUNT_CURSESSION = "account_cursession";
 
 	const TBL_PLAYERBASIC = "player_basic";
 	const TBL_PACKAGE_LOG = "package_log";
@@ -544,7 +545,7 @@ EOF;
 		if ( HEALTHCHECK )
 		{
 			$this->benchmark->mark('total_execution_time_endbf');
-			$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>MY_Controller::STATUS_SERVER_OFFLINE, 'resultMsg'=>MY_Controller::MESSAGE_SERVER_OFFLINE, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024) ), JSON_UNESCAPED_UNICODE));
+			$strReturn = json_encode( array( 'resultCd'=>MY_Controller::STATUS_SERVER_OFFLINE, 'resultMsg'=>MY_Controller::MESSAGE_SERVER_OFFLINE, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024) ), JSON_UNESCAPED_UNICODE);
 
 			echo $strReturn;
 			exit;
@@ -576,7 +577,7 @@ EOF;
 				}
 				else
 				{
-					$_POST["data"] = $this->dec( $_POST["data"] );
+					$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
 				}
 			}
 			else
@@ -588,8 +589,8 @@ EOF;
 						$_POST["data"] = $_POST["data"];
 					}
 					else
-					{						
-						$_POST["data"] = $this->dec( $_POST["data"] );												
+					{
+						$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
 					}
 				}
 				else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
@@ -600,12 +601,12 @@ EOF;
 					}
 					else
 					{
-						$_POST["data"] = $this->dec( $_POST["data"] );
+						$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
 					}
 				}
 				else
 				{
-					$_POST["data"] = $this->dec( $_POST["data"] );
+					$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
 				}
 			}
 			//}
@@ -666,7 +667,6 @@ EOF;
 						if ( array_key_exists( "cursession", $requestData ) )
 						{
 							$cursession = $requestData["cursession"];
-							$cursession = "forAdmin";
 							if ( !($this->dbLogin->requestSessionCheck( $keyId, $cursession )) && $cursession != "forAdmin" )
 							{
 								$resultCode = MY_Controller::STATUS_LOGIN_DUP;
@@ -708,26 +708,14 @@ EOF;
 		}
 	}
 
-	function enc( $string, $key = NULL ) {
+	function NG_ENCRYPT( $string, $key = NULL ) {
         $key = $key == NULL ? DEFAULTKEY : $key;
         return base64_encode(openssl_encrypt($string, "aes-256-cbc", $key, true, str_repeat(chr(0), 16)));
     }
 
-	function dec( $encrypted_string, $key = NULL ) {
+    function NG_DECRYPT( $encrypted_string, $key = NULL ) {
         $key = $key == NULL ? DEFAULTKEY : $key;
         return openssl_decrypt(base64_decode($encrypted_string), "aes-256-cbc", $key, true, str_repeat(chr(0), 16));
-    }
-
-	function NG_ENCRYPT( $src )
-    {
-        $result = $src;
-        return $result;
-    }
-
-    function NG_DECRYPT( $src )
-    {
-        $result = $src;
-        return $result;
     }
 
 	function index()
@@ -741,14 +729,26 @@ EOF;
 		{
 			$pid = "0";
 		}
+		$cur_date = $this->dbPlay->getCurrentTimeUTC()->result_array();
+		if ( empty( $cur_date ) )
+		{
+			$cur_date = date("Y-m-d H:i:s");
+		}
+		else
+		{
+			$cur_date = $cur_date[0]["curTime"];
+		}
 		if (defined('ENVIRONMENT'))
 		{
 			switch (ENVIRONMENT)
 			{
 				case 'development':
-					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+//					$this->benchmark->mark('total_execution_time_endbf');
+//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+
+//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 					if ( $status != "0200" )
 					{
 						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
@@ -762,7 +762,7 @@ EOF;
 						}
 						else
 						{
-							$_POST["data"] = $this->enc( $_POST["data"] );
+							$_POST["data"] = $this->NG_ENCRYPT( $_POST["data"] );
 						}
 					}
 					else
@@ -775,21 +775,21 @@ EOF;
 							}
 							else
 							{
-								$strReturn = $this->enc( $strReturn );
+								$strReturn = $this->NG_ENCRYPT( $strReturn );
 							}
 						}
 						else
 						{
-							$strReturn = $this->enc( $strReturn );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 				break;
 
 				case 'staging':
-					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->benchmark->mark('total_execution_time_endbf');
+					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
-					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 					if ( $status != "0200" )
 					{
 						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
@@ -802,7 +802,7 @@ EOF;
 						}
 						else
 						{
-							$strReturn = $this->enc( $strReturn );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 					else
@@ -815,21 +815,21 @@ EOF;
 							}
 							else
 							{
-								$strReturn = $this->enc( $strReturn );
+								$strReturn = $this->NG_ENCRYPT( $strReturn );
 							}
 						}
 						else
 						{
-							$strReturn = $this->enc( $strReturn );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 				break;
 
 				case 'production':
-					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->benchmark->mark('total_execution_time_endbf');
+					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
-					$strReturn = $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $this->dbPlay->getCurrentTimeUTC()->result_array()[0]["curTime"], 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 					if ( $status != "0200" )
 					{
 						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
@@ -842,7 +842,7 @@ EOF;
 						}
 						else
 						{
-							$strReturn = $this->enc( $strReturn );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 					else
@@ -855,12 +855,12 @@ EOF;
 							}
 							else
 							{
-								$strReturn = $this->enc( $strReturn );
+								$strReturn = $this->NG_ENCRYPT( $strReturn );
 							}
 						}
 						else
 						{
-							$strReturn = $this->enc( $strReturn );
+							$strReturn = $this->NG_ENCRYPT( $strReturn );
 						}
 					}
 				break;
@@ -881,13 +881,15 @@ EOF;
 			switch (ENVIRONMENT)
 			{
 				case 'development':
-					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->benchmark->mark('total_execution_time_endbf');
+//					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 				break;
 
 				case 'staging':
-					$this->benchmark->mark('total_execution_time_endbf');
-					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//					$this->benchmark->mark('total_execution_time_endbf');
+//					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
 				case 'production':
 				break;
@@ -897,7 +899,8 @@ EOF;
 			}
 		}
 
-		return $this->NG_ENCRYPT(json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE));
+		//return json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+		return json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 	}
 
 	function onSysLogWriteDb( $pid, $logcontent )

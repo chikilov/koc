@@ -846,7 +846,6 @@ class Model_Play extends MY_Model {
 	{
 		$query = "select utc_timestamp() as curTime from dual ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
 
@@ -1452,7 +1451,8 @@ class Model_Play extends MY_Model {
 	public function requestFriendshipPointAll( $pid )
 	{
 		$query = "select fid from koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
-		$query .= "where pid = '".$pid."' and (1440 + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) < 0 ";
+		$query .= "where pid = '".$pid."' and friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
+		$query .= "and (86400 + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) < 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

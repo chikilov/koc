@@ -130,7 +130,7 @@ class Con_ApiProcess extends MY_Controller {
 						$arrayResult["cursession"] = $cursession;
 						$result = (bool)$arrayResult["pid"];
 
-						$this->dbLogin->updateSession( "1", $macaddr, $cursession );
+						$this->dbLogin->updateSession( $arrayResult["pid"], $cursession );
 						$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 						if ( $pushkey != "" && $pushkey != null )
 						{
@@ -167,7 +167,7 @@ class Con_ApiProcess extends MY_Controller {
 						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
 					}
 
-					$this->dbLogin->updateSession( "1", $macaddr, $cursession );
+					$this->dbLogin->updateSession( $arrayResult["pid"], $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 					if ( $pushkey != "" && $pushkey != null )
@@ -262,7 +262,7 @@ class Con_ApiProcess extends MY_Controller {
 						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
 					}
 
-					$this->dbLogin->updateSession( $affiliateType, $affiliateId, $cursession );
+					$this->dbLogin->updateSession( $arrayResult["pid"], $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult["pid"], "로그인 성공" );
 					if ( $pushkey != "" && $pushkey != null )
@@ -299,7 +299,7 @@ class Con_ApiProcess extends MY_Controller {
 						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
 					}
 
-					$this->dbLogin->updateSession( $affiliateType, $affiliateId, $cursession );
+					$this->dbLogin->updateSession( $arrayResult["pid"], $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->dbLogin->updateAffiliateNameAccount( $arrayResult["pid"], $affiliateName, $affiliateEmail, $affiliateProfImg );
 
@@ -516,7 +516,7 @@ class Con_ApiProcess extends MY_Controller {
 						$checkCount = $this->dbLogin->checkDup( $cursession ); // 중복체크
 					}
 
-					$this->dbLogin->updateSession( "0", $id, $cursession );
+					$this->dbLogin->updateSession( $arrayResult["pid"], $cursession );
 					$arrayResult["cursession"] = $cursession;
 					$this->dbPlay->onBeginTransaction();
 					$result = (bool)$this->dbPlay->updateLoginTimeForMe( $arrayResult["pid"] );
@@ -1907,24 +1907,18 @@ class Con_ApiProcess extends MY_Controller {
 							if ( ENVIRONMENT == "production" )
 							{
 								$kurl = "http://m.koccommon.tntgame.co.kr/refresh.php";
+								$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
 							}
 							else
 							{
 								$kurl = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/refresh.php";
+								$sFileName = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/token.htm";
 							}
 							$kch = curl_init();
 							curl_setopt($kch, CURLOPT_URL, $kurl);
 							curl_setopt($kch, CURLOPT_RETURNTRANSFER, 1);
 							curl_exec( $kch );
 
-							if ( ENVIRONMENT == "production" )
-							{
-								$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
-							}
-							else
-							{
-								$sFileName = "http://".$_SERVER['HTTP_HOST']."/koc/static/upload/token.htm";
-							}
 							$sResult = json_decode(file_get_contents($sFileName),true);
 							$url = "https://www.googleapis.com/androidpublisher/v1.1/applications/com.tntgame.koc.google/inapp/".$arrayProduct[0]["iapcode"]."/purchases/".$paymentSeq;
 							$url .= "?access_token=".$sResult["access_token"];
@@ -5883,23 +5877,28 @@ class Con_ApiProcess extends MY_Controller {
 
 		if( $pid )
 		{
-			$arrayResult = $this->dbPlay->requestFriendshipPointAll( $pid )->result_array();
-			if ( empty($arrayResult) )
+			$arrResult = $this->dbPlay->requestFriendshipPointAll( $pid )->result_array();
+			if ( empty($arrResult) )
 			{
 				$resultCode = MY_Controller::STATUS_FRIENDSHIP_LIMIT;
 				$resultText = MY_Controller::STATUS_FRIENDSHIP_LIMIT;
+				$arrayResult = null;
 			}
 			else
 			{
-				foreach( $arrayResult as $idx => $row )
+				foreach( $arrResult as $idx => $row )
 				{
 					$result = (bool)$this->dbMail->sendMail( $row["fid"], $pid, MY_Controller::FRIENDSHIP_SEND_TITLE, MY_Controller::FRIENDSHIP_ARTICLE_ID, MY_Controller::FRIENDSHIP_SEND_BASIC_VALUE, MY_Controller::NORMAL_EXPIRE_TERM );
-					$this->dbPlay->requestFriendshipPoint( $pid, $row["fid"] );
-					$this->onSysLogWriteDb( $pid, $row["fid"]."우정 선물" );
-					$arrayResult[$idx]["res"] = intval($result);
+					if ( $result )
+					{
+						$this->dbPlay->requestFriendshipPoint( $pid, $row["fid"] );
+						$this->onSysLogWriteDb( $pid, $row["fid"]."우정 선물" );
+					}
+					$arrResult[$idx]["res"] = intval($result);
 				}
 				$resultCode = MY_Controller::STATUS_API_OK;
 				$resultText = MY_Controller::MESSAGE_API_OK;
+				$arrayResult["flist"] = $arrResult;
 			}
 		}
 		else
@@ -6723,8 +6722,7 @@ class Con_ApiProcess extends MY_Controller {
 
 	public function requestSendMail()
 	{
-		$decoded = json_decode( stripslashes ( $_POST["data"] ), TRUE );
-		
+		$decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
 		$pid = $decoded["pid"];
 		$sid = $decoded["sid"];
 		$title = $decoded["title"];

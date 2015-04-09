@@ -149,38 +149,26 @@ class Model_Login extends MY_Model {
 
 	public function checkDup( $cursession )
 	{
-		$query = "select cursession from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where cursession = '".$cursession."' ";
+		$query = "select cursession from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_CURSESSION." where cursession = '".$cursession."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		$this->DB_LOGIN->query($query);
 		return $this->DB_LOGIN->affected_rows();
 	}
 
-	public function updateSession( $affiliateType, $affiliateId, $cursession )
+	public function updateSession( $pid, $cursession )
 	{
-		if ( $affiliateType == "0" )
-		{
-			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' where id = '".$affiliateId."' ";
-		}
-		else if ( $affiliateType == "1" )
-		{
-			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' ";
-			$query .= "where affiliate_id is null and id is null and macaddr = '".$affiliateId."' ";
-		}
-		else
-		{
-			$query = "update ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." set cursession = '".$cursession."' ";
-			$query .= "where affiliate_type = '".$affiliateType."' and affiliate_id = '".$affiliateId."' ";
-		}
+		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_CURSESSION." values ('".$pid."', '".$cursession."') ";
+		$query .= "on duplicate key update cursession = '".$cursession."' ";
 
-		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_LOGIN->query($query);
 		return $this->DB_LOGIN->affected_rows();
 	}
 
 	public function requestSessionCheck( $keyId, $cursession )
 	{
-		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." where pid = '".$keyId."' and cursession = '".$cursession."' ";
+		$query = "select pid from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT_CURSESSION." where pid = '".$keyId."' and cursession = '".$cursession."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $keyId, "sql : ".$query );
 		$this->DB_LOGIN->query($query);

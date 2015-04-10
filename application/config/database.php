@@ -131,7 +131,7 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "3" )
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud0612@';
 	//replication slave
-	$db['default_sel']['hostname'] = '172.18.47.80';
+	$db['default_sel']['hostname'] = '172.18.54.80';
 	$db['default_sel']['username'] = 'webuser';
 	$db['default_sel']['password'] = 'dudrud0612@';
 	//replication master

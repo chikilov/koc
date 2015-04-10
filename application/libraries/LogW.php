@@ -7,7 +7,7 @@
  */
 class LogW {
 
-	public function sysLogWrite( $m_LogLevel, $pid, $m_LogMessage )
+	public function sysLogWrite( $m_LogLevel, $pid, $m_LogMessage, $status = "0200" )
 	{
 		if ( mb_substr($_SERVER['REQUEST_URI'], mb_strlen($_SERVER['REQUEST_URI']) - 1, 1) == "/" )
 	    {
@@ -77,7 +77,19 @@ class LogW {
 			error_log( date("Y-m-d H:i:s")." : ".$called_name." : ".$m_LogMessage, 3, $logFileName);
 			error_log( "\n", 3, $logFileName);
 		}
+
+		if ( $status != STATUS_API_OK )
+		{
+			$this->onSysErrLogWriteDb( $pid, $status, $called_name, $m_LogMessage );
+		}
 	}
+
+    public function onSysErrLogWriteDb( $pid, $status, $called_name, $logcontent )
+    {
+		$CI =& get_instance();
+		$CI->load->model('api/Model_Log', 'dbLog');
+     	$CI->dbLog->requestErrLog( $pid, $status, $_POST["data"], $called_name, $logcontent );
+    }
 
 	public function admLogWrite( $m_LogLevel, $m_LogMessage )
 	{

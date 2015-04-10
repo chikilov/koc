@@ -47,7 +47,7 @@ EOF;
 	const MESSAGE_NO_MATCHING_PARAMETER = "NG_ERROR_COMMON";
 	const STATUS_SERVER_OFFLINE = "0002";
 	const MESSAGE_SERVER_OFFLINE = "NG_ERROR_SERVER_OFFLINE";
-	const STATUS_API_OK = "0200";
+	const STATUS_API_OK = STATUS_API_OK;
 	const MESSAGE_API_OK = "NG_SUCCESS";
 	const STATUS_LOGIN_DUP = "0300";
 	const MESSAGE_LOGIN_DUP = "NG_ERROR_LOGIN_DUP";
@@ -540,13 +540,13 @@ EOF;
 		parent::__construct();
 		$this->load->library( 'LogW', TRUE );
 
+		define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
 		if ( ENVIRONMENT == 'production' )
 		{
 			error_reporting(E_ALL);
 			ini_set('display_errors', TRUE);
 			ini_set('display_startup_errors', TRUE);
 			define('URLBASE', '/koc'.MY_Controller::VERSION_FOR_ANDROID.'/');
-			define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
 		}
 		else if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'staging' )
 		{
@@ -554,60 +554,16 @@ EOF;
 			ini_set('display_errors', TRUE);
 			ini_set('display_startup_errors', TRUE);
 			define('URLBASE', '/koc/');
-			define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
 		}
 		if ( array_key_exists( "data", $_POST ) )
 		{
-			if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
+			$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
+			$this->decoded = json_decode( stripslashes( $_POST["data"] ), TRUE );
+			if ( array_key_exists("pid", $this->decoded) == false )
 			{
-				if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-				{
-					$_POST["data"] = $_POST["data"];
-				}
-				else
-				{
-					$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
-				}
+				$this->decoded["pid"] = "0";
 			}
-			else
-			{
-				if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
-				{
-					if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
-					{
-						$_POST["data"] = $_POST["data"];
-					}
-					else
-					{
-						$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
-					}
-				}
-				else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
-				{
-					if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-					{
-						$_POST["data"] = $_POST["data"];
-					}
-					else
-					{
-						$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
-					}
-				}
-				else
-				{
-					$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
-				}
-			}
-
-			$this->decoded = json_decode ( stripslashes ( $_POST["data"] ), TRUE );
-			if ( array_key_exists("pid", $this->decoded) )
-			{
-				$this->logw->sysLogWrite( LOG_NOTICE, $this->decoded["pid"], "requestData : ".$_POST["data"] );
-			}
-			else
-			{
-				$this->logw->sysLogWrite( LOG_NOTICE, "0", "requestData : ".$_POST["data"] );
-			}
+			$this->logw->sysLogWrite( LOG_NOTICE, $this->decoded["pid"], "requestData : ".$_POST["data"] );
 		}
 
 		//db init
@@ -690,14 +646,74 @@ EOF;
 		}
 	}
 
-	function NG_ENCRYPT( $string, $key = NULL ) {
-        $key = $key == NULL ? DEFAULTKEY : $key;
-        return base64_encode(openssl_encrypt($string, "aes-256-cbc", $key, true, str_repeat(chr(0), 16)));
+	function NG_ENCRYPT( $string, $key = NULL )
+	{
+		$is_enc = true;
+	    if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		else if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		{
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( $is_enc )
+		{
+			$key = $key == NULL ? DEFAULTKEY : $key;
+			return base64_encode(openssl_encrypt($string, "aes-256-cbc", $key, true, str_repeat(chr(0), 16)));
+		}
+		else
+		{
+			return $string;
+		}
     }
 
-    function NG_DECRYPT( $encrypted_string, $key = NULL ) {
-        $key = $key == NULL ? DEFAULTKEY : $key;
-        return openssl_decrypt(base64_decode($encrypted_string), "aes-256-cbc", $key, true, str_repeat(chr(0), 16));
+    function NG_DECRYPT( $encrypted_string, $key = NULL )
+    {
+		$is_enc = true;
+	    if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		else if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		{
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( $is_enc )
+		{
+			$key = $key == NULL ? DEFAULTKEY : $key;
+			return openssl_decrypt(base64_decode($encrypted_string), "aes-256-cbc", $key, true, str_repeat(chr(0), 16));
+	    }
+	    else
+	    {
+		    return $encrypted_string;
+	    }
     }
 
 	function index()
@@ -720,141 +736,14 @@ EOF;
 		{
 			$cur_date = $cur_date[0]["curTime"];
 		}
-		if (defined('ENVIRONMENT'))
-		{
-			switch (ENVIRONMENT)
-			{
-				case 'development':
-//					$this->benchmark->mark('total_execution_time_endbf');
-//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+//		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 
-//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					if ( $status != "0200" )
-					{
-						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
-					}
+//		$this->benchmark->mark('total_execution_time_endbf');
+//		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".$strReturn, $status );
 
-					if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
-					{
-						if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-						{
-							$strReturn = $strReturn;
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-					else
-					{
-						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
-						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-							{
-								$strReturn = $strReturn;
-							}
-							else
-							{
-								$strReturn = $this->NG_ENCRYPT( $strReturn );
-							}
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-				break;
-
-				case 'staging':
-//					$this->benchmark->mark('total_execution_time_endbf');
-//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-
-//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					if ( $status != "0200" )
-					{
-						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
-					}
-					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
-					{
-						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-						{
-							$strReturn = $strReturn;
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-					else
-					{
-						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
-						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-							{
-								$strReturn = $strReturn;
-							}
-							else
-							{
-								$strReturn = $this->NG_ENCRYPT( $strReturn );
-							}
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-				break;
-
-				case 'production':
-//					$this->benchmark->mark('total_execution_time_endbf');
-//					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-
-//					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-					if ( $status != "0200" )
-					{
-						$this->onSysErrLogWriteDb( $pid, $status, $_POST["data"], $strReturn );
-					}
-					if ( array_key_exists("HTTP_REFERER", $_SERVER ) )
-					{
-						if ( strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-						{
-							$strReturn = $strReturn;
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-					else
-					{
-						if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
-						{
-							if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") || $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
-							{
-								$strReturn = $strReturn;
-							}
-							else
-							{
-								$strReturn = $this->NG_ENCRYPT( $strReturn );
-							}
-						}
-						else
-						{
-							$strReturn = $this->NG_ENCRYPT( $strReturn );
-						}
-					}
-				break;
-
-				default:
-					exit('The application environment is not set correctly.');
-			}
-		}
+		$strReturn = $this->NG_ENCRYPT( $strReturn );
 
 		return $strReturn;
 	}
@@ -862,28 +751,7 @@ EOF;
 	function ADM_RETURN_MESSAGE( $status, $message, $arrayResult, $reqData )
 	{
 		$userId = "";//$this->session->userdata('userId_session');
-		if (defined('ENVIRONMENT'))
-		{
-			switch (ENVIRONMENT)
-			{
-				case 'development':
-//					$this->benchmark->mark('total_execution_time_endbf');
-//					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-				break;
-
-				case 'staging':
-//					$this->benchmark->mark('total_execution_time_endbf');
-//					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-					$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
-
-				case 'production':
-				break;
-
-				default:
-					exit('The application environment is not set correctly.');
-			}
-		}
+		$this->logw->admLogWrite( LOG_NOTICE, "reponseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 
 		//return json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 		return json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'admin_id'=>$userId, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
@@ -907,49 +775,13 @@ EOF;
      	$this->dbLog->requestLog( $pid, $called_name, $logcontent );
     }
 
-    function onSysErrLogWriteDb( $pid, $status, $request, $logcontent )
-    {
-	    if ( mb_substr($_SERVER['REQUEST_URI'], mb_strlen($_SERVER['REQUEST_URI']) - 1, 1) == "/" )
-	    {
-		    $called_name = mb_substr($_SERVER['REQUEST_URI'], 0, mb_strrpos($_SERVER['REQUEST_URI'], "/"));
-	    }
-	    else
-	    {
-    	    $called_name = $_SERVER['REQUEST_URI'];
-		}
-        $called_name = mb_substr($called_name, -(mb_strlen($called_name) - mb_strrpos($called_name, "/") - 1));
-        if ( $called_name == "" || $called_name == null )
-        {
-            $called_name = $_SERVER['REQUEST_URI'];
-        }
-     	$this->dbLog->requestErrLog( $pid, $status, $request, $called_name, $logcontent );
-    }
-
-	function verifyPackage( $package )
-	{
-		$this->dbPlay->updatePackage( $package );
-		return true;
-	}
-
-	function NG_IS_VALID_APPID( $appId )
-    {
-        if( NULL == $appId )
-            return false;
-
-        return true;
-    }
-
     // RSA 공개키를 사용하여 문자열을 암호화한다.
 	// 암호화할 때는 비밀번호가 필요하지 않다.
 	// 오류가 발생할 경우 false를 반환한다.
 
 	function rsa_encrypt( $plaintext )
 	{
-	    // 용량 절감과 보안 향상을 위해 평문을 압축한다.
-//	    $plaintext = gzcompress($plaintext);
-
 	    // 공개키를 사용하여 암호화한다.
-
 	    $pubkey_decoded = openssl_pkey_get_public( $this->public_key );
 	    if ($pubkey_decoded === false) return false;
 
@@ -977,11 +809,7 @@ EOF;
 
 	function rsa_encrypt_array( $plaintext )
 	{
-	    // 용량 절감과 보안 향상을 위해 평문을 압축한다.
-//	    $plaintext = gzcompress($plaintext);
-
 	    // 공개키를 사용하여 암호화한다.
-
 	    $pubkey_decoded = openssl_pkey_get_public( $this->public_key );
 	    if ($pubkey_decoded === false) return false;
 
@@ -1006,10 +834,6 @@ EOF;
 
 	    return substr($ciphertext, 1, strlen($ciphertext) - 1);
 	}
-
-	// RSA 개인키를 사용하여 문자열을 복호화한다.
-	// 복호화할 때는 비밀번호가 필요하다.
-	// 오류가 발생할 경우 false를 반환한다.
 
 	function rsa_decrypt($ciphertext)
 	{
@@ -1038,8 +862,6 @@ EOF;
 		}
 		openssl_free_key($privkey_decoded);
 
-	    // 압축을 해제하여 평문을 얻는다.
-//	    $plaintext = gzuncompress($plaintext);
 	    if ($plaintext === false) return false;
 
 	    // 이상이 없는 경우 평문을 반환한다.
@@ -1072,8 +894,6 @@ EOF;
 		    $rowplaintext = $decrypted;
 			openssl_free_key($privkey_decoded);
 
-		    // 압축을 해제하여 평문을 얻는다.
-	//	    $plaintext = gzuncompress($plaintext);
 		    if ($rowplaintext === false) return false;
 		    $plaintext .= $rowplaintext;
 		}

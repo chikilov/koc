@@ -527,7 +527,7 @@ class Model_Play extends MY_Model {
 		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
 */
 		$query = "select idx, grade, level, refid, weapon, backpack, skill_0, skill_1, skill_2 from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
-		$query .= "where pid = '".$pid."' and idx = '".$idx."' ";
+		$query .= "where pid = '".$pid."' and idx in ('".join("', '", $idx)."') ";
 		$query .= "and is_del = 0 and (exp_idx is null or exp_idx < 1) ";
 		$query .= "and idx not in ( select ifnull(memb_0, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
 		$query .= "select ifnull(memb_1, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
@@ -539,7 +539,12 @@ class Model_Play extends MY_Model {
 
 	public function requestItemGrade( $pid, $idx )
 	{
-		$query = "select idx, grade, refid from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
+		$query = "select idx, grade, refid from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx in ('".join("', '", $idx)."') and is_del = 0 ";
+		$query .= "and idx not in ( select ifnull(weapon, 0) from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." where pid = '".$pid."' union ";
+		$query .= "select ifnull(backpack, 0) from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." where pid = '".$pid."' union ";
+		$query .= "select ifnull(skill_0, 0) from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." where pid = '".$pid."' union ";
+		$query .= "select ifnull(skill_1, 0) from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." where pid = '".$pid."' union ";
+		$query .= "select ifnull(skill_2, 0) from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." where pid = '".$pid."' )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

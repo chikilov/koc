@@ -1055,7 +1055,7 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				$storeType = "editor";
 			}
-			if ( $this->NG_IS_VALID_APPID( $appId ) )
+			if ( $appId )
 			{
 				$resultCode = MY_Controller::STATUS_API_OK;
 				$resultText = MY_Controller::MESSAGE_API_OK;
@@ -1476,23 +1476,6 @@ class Con_ApiProcess extends MY_Controller {
 								$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
 							}
 						}
-						/*
-						if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-						{
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-						}
-						else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-						{
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-						}
-						*/
 
 						//지급 성공
 						$is_provision = 1;
@@ -1646,23 +1629,6 @@ class Con_ApiProcess extends MY_Controller {
 													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
 												}
 											}
-											/*
-											if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-											{
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-											}
-											else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-											{
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-											}
-											*/
 
 											//지급 성공
 											$is_provision = 1;
@@ -1843,23 +1809,6 @@ class Con_ApiProcess extends MY_Controller {
 														$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
 													}
 												}
-												/*
-												if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-												{
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-												}
-												else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-												{
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-												}
-												*/
 
 												//지급 성공
 												$is_provision = 1;
@@ -2059,23 +2008,6 @@ class Con_ApiProcess extends MY_Controller {
 													$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row["type"], $row["value"], false );
 												}
 											}
-											/*
-											if ( $product == MY_Controller::LIMITED_PROVISION_PRODUCT_ID )
-											{
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAT060002", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC020000", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "ENERGY_POINTS", "10", false );
-											}
-											else if ( $product == MY_Controller::HAPPYNEWYEAR_PROVISION_PRODUCT_ID )
-											{
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAC060005", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAW020006", "1", false );
-												$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, "GAME_POINTS", "50000", false );
-											}
-											*/
 
 											//지급 성공
 											$is_provision = 1;
@@ -4506,6 +4438,11 @@ class Con_ApiProcess extends MY_Controller {
 		$pid = $this->decoded["pid"];
 		$sellType = $this->decoded["sell_type"];
 		$sellIdx = $this->decoded["sell_idx"];
+		if ( !is_array($sellIdx) )
+		{
+			$sellIdx = array($sellIdx);
+		}
+		$sellIdx = array_filter(array_filter(array_unique($sellIdx), "is_numeric"));
 
 		if( $pid && $sellType && $sellIdx )
 		{
@@ -4513,33 +4450,37 @@ class Con_ApiProcess extends MY_Controller {
 			if ( $sellType == "CHARACTER" )
 			{
 				$sellInfo = $this->dbPlay->requestCharacterGradeLev( $pid, $sellIdx )->result_array();
-				if ( !empty($sellInfo) )
+				if ( !empty($sellInfo) && count($sellInfo) == count($sellIdx) )
 				{
-					$sellInfo = $sellInfo[0];
-					if ( $sellInfo["weapon"] != null && $sellInfo["weapon"] != "" )
+					$sellPoint = 0;
+					$result = true;
+					$txtSellInfo = "";
+					foreach( $sellInfo as $row )
 					{
-						$this->dbPlay->deletePlayerItem( $pid, $sellInfo["weapon"] );
+						if ( $row["weapon"] != null && $row["weapon"] != "" )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row["weapon"] );
+						}
+						if ( $row["backpack"] != null && $row["backpack"] != "" )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row["backpack"] );
+						}
+						if ( $row["skill_0"] != null && $row["skill_0"] != "" )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row["skill_0"] );
+						}
+						if ( $row["skill_1"] != null && $row["skill_1"] != "" )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row["skill_1"] );
+						}
+						if ( $row["skill_2"] != null && $row["skill_2"] != "" )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row["skill_2"] );
+						}
+						$sellPoint += json_decode(MY_Controller::GAMEPOINTS_PER_CHARACTER_GRADE, true)[$row["grade"]];
+						$result = $result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $row["idx"] );
+						$txtSellInfo .= "코드".$row["refid"].", 등급:".$row["grade"].", 레벨:".$row["level"].", 고유키:".$row["idx"]."\n";
 					}
-					if ( $sellInfo["backpack"] != null && $sellInfo["backpack"] != "" )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $sellInfo["backpack"] );
-					}
-					if ( $sellInfo["skill_0"] != null && $sellInfo["skill_0"] != "" )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $sellInfo["skill_0"] );
-					}
-					if ( $sellInfo["skill_1"] != null && $sellInfo["skill_1"] != "" )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $sellInfo["skill_1"] );
-					}
-					if ( $sellInfo["skill_2"] != null && $sellInfo["skill_2"] != "" )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $sellInfo["skill_2"] );
-					}
-					$sellPoint = json_decode(MY_Controller::GAMEPOINTS_PER_CHARACTER_GRADE, true)[$sellInfo["grade"]];
-//					$sellPoint = $sellPoint + ($sellInfo["level"] * MY_Controller::GAMEPOINTS_PER_CHARACTER_LEVEL);
-					$result = (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sellIdx );
-					$txtSellInfo = "코드".$sellInfo["refid"].", 등급:".$sellInfo["grade"].", 레벨:".$sellInfo["level"].", 고유키:".$sellInfo["idx"];
 				}
 				else
 				{
@@ -4550,12 +4491,18 @@ class Con_ApiProcess extends MY_Controller {
 			}
 			else if ( $sellType == "ITEM" || $sellType == "OPERATOR" || $sellType == "PILOT" )
 			{
-				$sellInfo = $this->dbPlay->requestItemGrade( $pid, $sellIdx )->result_array()[0];
-				if ( count($sellInfo) > 0 )
+				$sellInfo = $this->dbPlay->requestItemGrade( $pid, $sellIdx )->result_array();
+				if ( !empty($sellInfo) && count($sellInfo) == count($sellIdx) )
 				{
-					$sellPoint = json_decode(MY_Controller::GAMEPOINTS_PER_ITEM_GRADE, true)[$sellInfo["grade"]];
-					$result = (bool)$this->dbPlay->deletePlayerItem( $pid, $sellIdx );
-					$txtSellInfo = "코드".$sellInfo["refid"].", 등급:".$sellInfo["grade"].", 고유키:".$sellInfo["idx"];
+					$sellPoint = 0;
+					$result = true;
+					$txtSellInfo = "";
+					foreach( $sellInfo as $row )
+					{
+						$sellPoint += json_decode(MY_Controller::GAMEPOINTS_PER_ITEM_GRADE, true)[$row["grade"]];
+						$result = $result & (bool)$this->dbPlay->deletePlayerItem( $pid, $row["idx"] );
+						$txtSellInfo .= "코드".$row["refid"].", 등급:".$row["grade"].", 고유키:".$row["idx"]."\n";
+					}
 				}
 				else
 				{

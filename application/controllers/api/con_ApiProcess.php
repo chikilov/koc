@@ -825,6 +825,7 @@ class Con_ApiProcess extends MY_Controller {
 							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::ACCESS_EVENT_REWARD_TITLE, $row["evt_target"], $row["evt_value"], MY_Controller::NORMAL_EXPIRE_TERM );
 						}
 					}
+					/* 2015 설맞이 오퍼레이터 지급 이벤트
 					if ( !($this->dbPlay->inventoryExistCheck( $pid )) && date("Ymd") > "20150215" && date("Ymd") < "20150223" )
 					{
 						$this->dbPlay->inventoryProvision( $pid, "OP01000008" );
@@ -834,6 +835,7 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$arrayResult["addeditemlist"] = null;
 					}
+					*/
 
 					$arrayResult["name"] = $tmpArray["name"];
 					$arrayResult["show_prof"] = $tmpArray["show_prof"];
@@ -2320,6 +2322,7 @@ class Con_ApiProcess extends MY_Controller {
 								if ( $hour == $curhour )
 								{
 									$is_GoldHot = true;
+									break;
 								}
 							}
 						}
@@ -2336,6 +2339,7 @@ class Con_ApiProcess extends MY_Controller {
 								if ( $hour == $curhour )
 								{
 									$is_ExprHot = true;
+									break;
 								}
 							}
 						}

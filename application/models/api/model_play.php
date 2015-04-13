@@ -2314,7 +2314,7 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
 	}
-*/
+
 	public function inventoryExistCheck( $pid )
 	{
 		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and refid = 'OP01000008' ";
@@ -2323,6 +2323,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
+*/
 
 	public function requestPackageBuyHistory( $pid, $product_id, $product_type )
 	{

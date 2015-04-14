@@ -446,7 +446,7 @@ EOF;
 	const LIMIT_MODES_SURVIVAL				= 999;	// 최대 생존 에너지 제한
 	const LIMIT_GAME_POINTS					= 9999999;	// 최대 골드 제한
 	const LIMIT_CASH_POINTS					= 99999;	// 최대 캐시포인트 제한
-	const LIMIT_FRIENDSHIP_POINTS			= 999;	// 최대 우정포인트 제한
+	const LIMIT_FRIENDSHIP_POINTS			= 1000;	// 최대 우정포인트 제한
 
 	const COMMON_USE_CODE					= "use";
 	const COMMON_SAVE_CODE					= "save";

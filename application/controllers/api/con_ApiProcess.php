@@ -137,8 +137,8 @@ class Con_ApiProcess extends MY_Controller {
 				if ( $arrayResult["limit_type"] == "R" )
 				{
 					$this->onSysLogWriteDb( $arrayResult["pid"], "탈퇴 유저 로그인 시도" );
-					$resultCode = MY_Controller::STATUS_INFO_ID;
-					$resultText = MY_Controller::MESSAGE_INFO_ID;
+					$resultCode = MY_Controller::STATUS_REJECT_ID;
+					$resultText = MY_Controller::MESSAGE_REJECT_ID;
 				}
 				else
 				{
@@ -260,8 +260,8 @@ class Con_ApiProcess extends MY_Controller {
 				if ( $arrayResult["limit_type"] == "R" )
 				{
 					$this->onSysLogWriteDb( $arrayResult["pid"], "탈퇴 유저 로그인 시도" );
-					$resultCode = MY_Controller::STATUS_INFO_ID;
-					$resultText = MY_Controller::MESSAGE_INFO_ID;
+					$resultCode = MY_Controller::STATUS_REJECT_ID;
+					$resultText = MY_Controller::MESSAGE_REJECT_ID;
 				}
 				else
 				{
@@ -579,13 +579,13 @@ class Con_ApiProcess extends MY_Controller {
 	{
 		$pid = $this->decoded["pid"];
 		$attach_type = $this->decoded["attach_type"];
+		$idx = $this->decoded["idx"];
 
 		if( $pid && $attach_type )
 		{
 			$this->dbMail->onBeginTransaction();
 			$this->dbPlay->onBeginTransaction();
-			$sumValue = $this->dbMail->mailValueSummary( $pid, $attach_type )->result_array();
-			$procIdx = $this->dbMail->mailListReceiptAll( $pid, $attach_type )->result_array();
+			$sumValue = $this->dbMail->mailValueSummary( $pid, $attach_type, $idx )->result_array();
 			if ( empty($sumValue) )
 			{
 				$resultCode = MY_Controller::STATUS_NO_DATA;
@@ -595,25 +595,11 @@ class Con_ApiProcess extends MY_Controller {
 			else
 			{
 				$this->calcurateEnergy( $pid );
-				$result = (bool)$this->dbMail->mailReceiptAll( $pid, $attach_type );
+				$result = (bool)$this->dbMail->mailReceiptAll( $pid, $attach_type, $idx );
 				if ( $result )
 				{
 					$sumValue = $sumValue[0]["attach_value"];
-					$logProc = "";
-					if ( !empty($procIdx) )
-					{
-						foreach( $procIdx as $row )
-						{
-							if ( $logProc == "" )
-							{
-								$logProc = $row["idx"];
-							}
-							else
-							{
-								$logProc .= ", ".$row["idx"];
-							}
-						}
-					}
+					$logProc = join(",", $idx);
 					$result2 = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, $attach_type, $sumValue, "메일 수령(".$logProc.")" );
 					$result = $result & $result2;
 
@@ -625,10 +611,7 @@ class Con_ApiProcess extends MY_Controller {
 						$arrayResult["addedType"] = $attach_type;
 						$arrayResult["addedPoints"] = $sumValue;
 
-						foreach( $procIdx as $row )
-						{
-							$arrayResult["procIdx"][] = $row["idx"];
-						}
+						$arrayResult["procIdx"] = $idx;
 					}
 					else
 					{

@@ -86,11 +86,11 @@ class Model_Mail extends MY_Model {
 		return $this->DB_INS->affected_rows();
 	}
 
-	public function mailReceiptAll( $pid, $attach_type )
+	public function mailReceiptAll( $pid, $attach_type, $idx )
 	{
 		$query = "update koc_mail.".MY_Controller::TBL_MAIL." set is_receive = 1, receive_date = now() ";
-		$query .= "where attach_type = '".$attach_type."' ";
-		$query .= "and pid = '".$pid."' and is_receive = 0 and (expire_date >= now() or expire_date is null) ";
+		$query .= "where idx in ('".join("', '", $idx)."') and pid = '".$pid."' and attach_type = '".$attach_type."' ";
+		$query .= "and is_receive = 0 and (expire_date >= now() or expire_date is null) ";
 
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
@@ -120,6 +120,7 @@ class Model_Mail extends MY_Model {
 			$query .= "and b.article_value not in ('ENERGY_POINTS', 'FRIENDSHIP_POINTS') ";
 			$query .= "and b.article_type not in ('CTIK', 'WTIK', 'BTIK', 'STIK') ";
 		}
+		$query .= "order by ifnull(a.expire_date, '9999-12-31 23:59:59') asc ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -174,20 +175,20 @@ class Model_Mail extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function mailValueSummary( $pid, $attach_type )
+	public function mailValueSummary( $pid, $attach_type, $idx )
 	{
 		$query = "select sum(attach_value) as attach_value ";
-		$query .= "from koc_mail.".MY_Controller::TBL_MAIL." where pid = '".$pid."' and attach_type = '".$attach_type."' ";
+		$query .= "from koc_mail.".MY_Controller::TBL_MAIL." where idx in ('".join("', '", $idx)."') and pid = '".$pid."' and attach_type = '".$attach_type."' ";
 		$query .= "and is_receive = 0 and (expire_date >= now() or expire_date is null) group by attach_type ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
 
-	public function mailListReceiptAll( $pid, $attach_type )
+	public function mailListReceiptAll( $pid, $attach_type, $idx )
 	{
 		$query = "select idx ";
-		$query .= "from koc_mail.".MY_Controller::TBL_MAIL." where pid = '".$pid."' and attach_type = '".$attach_type."' ";
+		$query .= "from koc_mail.".MY_Controller::TBL_MAIL." where idx in ('".join("', '", $idx)."') and pid = '".$pid."' and attach_type = '".$attach_type."' ";
 		$query .= "and is_receive = 0 and (expire_date >= now() or expire_date is null) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );

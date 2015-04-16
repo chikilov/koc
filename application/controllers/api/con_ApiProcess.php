@@ -2036,7 +2036,7 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else if ( $storeType == "ios" )
 					{
-						$paymentSeqParse = preg_replace( '/\n/s', '', $paymentSeqParse );
+						$paymentSeqParse = preg_replace( '/\n/s', '', base64_decode( $paymentSeq ) );
 						$paymentSeqParse = preg_replace( '/\s/s', '', $paymentSeqParse );
 						$paymentSeqParse = preg_replace( '/;/s', ',', $paymentSeqParse );
 						$paymentSeqParse = preg_replace( '/,}/s', '}', $paymentSeqParse );

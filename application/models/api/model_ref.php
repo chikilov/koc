@@ -98,6 +98,10 @@ class Model_Ref extends MY_Model {
 		$query .= "left outer join ( select product_id from koc_ref.product_price where country_code = 'KR' ) as c on b.product_id = c.product_id ";
 		$query .= "left outer join koc_admin.event_discount as d on a.id = d.evt_target ";
 		$query .= "where ( a.version = 0 or a.version >= ".$storeVersion." ) and a.enable = 1 and a.expiration_time >= now() ";
+		if ( $storeType == "ios" )
+		{
+			$query .= "and target = 'SELF' ";
+		}
 		if ( $country_code == "" || $country_code == null )
 		{
 			$query .= "and b.is_default = 1 ";

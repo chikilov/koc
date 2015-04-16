@@ -541,7 +541,7 @@ EOF;
 		$this->load->library( 'LogW', TRUE );
 
 		define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
-		if ( ENVIRONMENT == 'production' )
+		if ( ENVIRONMENT == 'production' || ENVIRONMENT == 'exam' )
 		{
 			error_reporting(E_ALL);
 			ini_set('display_errors', TRUE);

@@ -7,17 +7,17 @@ class Con_ApiProcess extends MY_Controller {
 
 	function index()
 	{
-		$this->load->view("error/403_Forbidden");
+		$this->load->view( 'error/403_Forbidden' );
 	}
 
 	public function requestJoin()
 	{
-		$id = $this->decoded["id"];
-		$password = $this->decoded["password"];
-		$macaddr = $this->decoded["macaddr"];
+		$id = $this->decoded['id'];
+		$password = $this->decoded['password'];
+		$macaddr = $this->decoded['macaddr'];
 
 		//회원가입
-		if( $id && $password && $macaddr )
+		if ( $id && $password && $macaddr )
 		{
 			//아이디 중복 체크
 			if ( $this->dbLogin->requestDupId( $id ) > 0 )
@@ -1501,7 +1501,7 @@ class Con_ApiProcess extends MY_Controller {
 							//네이버 api 호출
 							$ch = curl_init();
 							curl_setopt($ch, CURLOPT_URL, $encrypted_url);
-							if ( ENVIRONMENT == "production" )
+							if ( ENVIRONMENT == "production" || ENVIRONMENT == 'exam' )
 							{
 								curl_setopt($ch, CURLOPT_HTTPHEADER, array("IAP_KEY:".MY_Controller::PROD_IAP_KEY));
 							}
@@ -1666,7 +1666,7 @@ class Con_ApiProcess extends MY_Controller {
 						}
 						else
 						{
-							if ( ENVIRONMENT == "production" )
+							if ( ENVIRONMENT == "production" || ENVIRONMENT == 'exam' )
 							{
 								$kurl = "http://m.koccommon.tntgame.co.kr/refresh.php";
 								$sFileName = "http://m.koccommon.tntgame.co.kr/token.htm";
@@ -1868,7 +1868,7 @@ class Con_ApiProcess extends MY_Controller {
 						}
 						else
 						{
-							if ( ENVIRONMENT == "production" )
+							if ( ENVIRONMENT == "production" || ENVIRONMENT == 'exam' )
 							{
 								$url = "https://iap.tstore.co.kr/digitalsignconfirm.iap";
 							}
@@ -2036,7 +2036,24 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else if ( $storeType == "ios" )
 					{
-						if ( ENVIRONMENT == "production" )
+						$paymentSeqParse = preg_replace( '/\n/s', '', $paymentSeqParse );
+						$paymentSeqParse = preg_replace( '/\s/s', '', $paymentSeqParse );
+						$paymentSeqParse = preg_replace( '/;/s', ',', $paymentSeqParse );
+						$paymentSeqParse = preg_replace( '/,}/s', '}', $paymentSeqParse );
+						$paymentSeqParse = preg_replace( '/"="/s', '":"', $paymentSeqParse );
+						$paymentSeqParse = json_decode( $paymentSeqParse, true );
+
+						$verify_host = "";
+						if ( $paymentSeqParse['environment'] == 'Sandbox' )
+						{
+							$verify_host = "https://sandbox.itunes.apple.com/verifyReceipt";
+						}
+						else
+						{
+							$verify_host = "https://buy.itunes.apple.com/verifyReceipt";
+						}
+						/*
+						if ( ENVIRONMENT == "production" || ENVIRONMENT == 'exam' )
 						{
 							$verify_host = "https://buy.itunes.apple.com/verifyReceipt";
 						}
@@ -2044,6 +2061,7 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$verify_host = "https://sandbox.itunes.apple.com/verifyReceipt";
 						}
+						*/
 
 						$ch = curl_init();
 						curl_setopt($ch, CURLOPT_URL, $verify_host);

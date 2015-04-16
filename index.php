@@ -19,8 +19,6 @@ ob_start();
  *
  */
 
-$subfix = "_check";
-
 if (
 	//L4
 	$_SERVER['HTTP_HOST'] == '211.110.6.34'
@@ -93,6 +91,16 @@ else if (
 	define('SUBFIX', '');
 }
 else if (
+	//for exam
+	$_SERVER['HTTP_HOST'] == '101.79.109.242'
+	|| $_SERVER['HTTP_HOST'] == 'm.kocdev.tntgame.co.kr'
+)
+{
+	define('ENVIRONMENT', 'exam');
+	define('SERVERGROUP', '');
+	define('SUBFIX', '');
+}
+else if (
 	$_SERVER['HTTP_HOST'] == 'm.koclogin.tntgame.co.kr'
 )
 {
@@ -153,7 +161,9 @@ if ( defined('ENVIRONMENT') )
 		case 'development':
 			error_reporting(E_ALL);
 		break;
-
+		case 'exam':
+			error_reporting(E_ALL);
+		break;
 		case 'staging':
 			error_reporting(E_ALL);
 		break;

@@ -44,7 +44,7 @@ class Con_CouponView extends MY_Controller {
 					$couponInfo = $couponInfo1;
 				}
 				// 이미 사용된 쿠폰인 경우
-				if ( $couponInfo[0]["coupon_user_id"] > 0 )
+				if ( $couponInfo[0]["coupon_type"] == 'R' &&  $couponInfo[0]["coupon_user_id"] > 0 )
 				{
 					$result = "DUPLICATE";
 				}

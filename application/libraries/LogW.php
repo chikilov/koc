@@ -11,14 +11,7 @@ class LogW {
 
 	public function __construct()
 	{
-		if ( ENVIRONMENT == 'production' || ENVIRONMENT == 'staging' )
-		{
-			$this->dirPrefix = 'c:\\tmp\\';
-		}
-		else
-		{
-			$this->dirPrefix = '/tmp/';
-		}
+		$this->dirPrefix = LOGROOT;
 	}
 
 	public function sysLogWrite( $m_LogLevel, $pid, $m_LogMessage, $status = '0200' )
@@ -39,18 +32,21 @@ class LogW {
 
 		if ( is_dir( $this->dirPrefix.date( 'Ymd' ) ) == false )
 		{
-		    mkdir( $this->dirPrefix.date( 'Ymd' ), 0777, true );
+			$old = umask(0);
+			mkdir( $this->dirPrefix.date( 'Ymd' ), 0777, true );
+			umask($old);
 		}
-		$logFileName = $this->dirPrefix.date( 'Ymd' ).'\\logfile_'.date( 'Ymd' ).'_'.$pid.'.log';
+		$logFileName = $this->dirPrefix.date( 'Ymd' ).'/logfile_'.date( 'Ymd' ).'_'.$pid.'.log';
 
 		if ( file_exists( $logFileName ) == false )
 		{
 			fopen( $logFileName, 'w' );
+			$old = umask(0);
+			chmod($logFileName, 0777);
+			umask($old);
 		}
 
-		error_log( '\n', 3, $logFileName );
-		error_log( date( 'Y-m-d H:i:s' ).' : '.$called_name.' : '.$m_LogMessage, 3, $logFileName);
-		error_log( '\n', 3, $logFileName );
+		error_log( date( 'Y-m-d H:i:s' ).' : '.$called_name.' : '.$m_LogMessage.PHP_EOL, 3, $logFileName);
 
 		if ( $status != STATUS_API_OK )
 		{
@@ -76,9 +72,7 @@ class LogW {
 				fopen($logFileName, 'w');
 			}
 
-			error_log( '\n', 3, $logFileName );
-			error_log( date( 'Y-m-d H:i:s' ).' : '.$m_LogMessage, 3, $logFileName );
-			error_log( '\n', 3, $logFileName );
+			error_log( date( 'Y-m-d H:i:s' ).' : '.$m_LogMessage.PHP_EOL, 3, $logFileName );
 		}
 	}
 }

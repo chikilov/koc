@@ -171,7 +171,7 @@ class Model_Play extends MY_Model {
 
 	public function requestInventory( $pid )
 	{
-		$query = "select idx, refid, expire ";
+		$query = "select idx, refid, up_grade, up_refid, up_exp, expire ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ";
 		$query .= "where pid = '".$pid."' and is_del = 0 and (expire > now() or expire is null) ";
 
@@ -479,9 +479,9 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->affected_rows();
 	}
 
-	public function requestItemExists( $pid, $arrIdx )
+	public function requestItemExists( $pid, $idx )
 	{
-		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx in ('".join("', '", $arrIdx)."') ";
+		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx = '".$idx."' ";
 		$query .= "and is_del = 0 and expire > now() ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -561,6 +561,17 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->affected_rows();
 	}
 
+	public function requestUnequipToChar( $pid, $cid, $slotseq, $iid )
+	{
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set ";
+		$query .= $slotseq." = null ";
+		$query .= "where pid = '".$pid."' and idx = '".$cid."' and ".$slotseq." = '".$iid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
 	public function requestEquipAvailableCheck( $pid, $cid, $slotseq, $iid )
 	{
 		$query = "select idx, ".$slotseq." from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
@@ -585,6 +596,16 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
+	public function requestUnequipAvailableCheck( $pid, $cid, $slotseq, $iid )
+	{
+		$query = "select a.idx, b.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
+		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b on a.".$slotseq." = b.idx ";
+		$query .= "where a.pid = '".$pid."' and a.idx = '".$cid."' and b.idx = '".$iid."' and b.is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
 	public function requestEquipDelCheck( $pid, $iid )
 	{
 		$query = "select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where idx = '".$iid."' and pid = '".$pid."' ";
@@ -597,6 +618,16 @@ class Model_Play extends MY_Model {
 	public function deleteInventory( $pid, $iid )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set is_del = 1, del_date = now() where pid = '".$pid."' and idx = '".$iid."' and is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function deleteInventoryArray( $pid, $iid )
+	{
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set is_del = 1, del_date = now() where pid = '".$pid."' ";
+		$query .= "and idx in ('".join( "','", $iid )."') and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -670,15 +701,15 @@ class Model_Play extends MY_Model {
 
 	public function inventoryProvision( $pid, $iid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ( pid, refid, grade, expire, is_del, reg_date) ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ( pid, refid, grade, up_grade, up_refid, up_exp, expire, is_del, reg_date) ";
 		$query .= "select '".$pid."' as pid, '".$iid."' as refid, grade, ";
 		if ( $iid == "OP01000008" )
 		{
-			$query .= "'2015-02-28 23:59:59' as expire, 0 as is_del, now() as reg_date ";
+			$query .= "0 as up_grade, null as up_refid, 0 as up_exp, '2015-02-28 23:59:59' as expire, 0 as is_del, now() as reg_date ";
 		}
 		else
 		{
-			$query .= "if(duration = '0', null, date_add(now(), interval duration hour)) as expire, 0 as is_del, now() as reg_date ";
+			$query .= "0 as up_grade, null as up_refid, 0 as up_exp, if(duration = '0', null, date_add(now(), interval duration hour)) as expire, 0 as is_del, now() as reg_date ";
 		}
 		$query .= "from koc_ref.".MY_Controller::TBL_ITEM." where id = '".$iid."'";
 
@@ -789,12 +820,35 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->affected_rows();
 	}
 
+	public function requestItemLevExp( $pid, $targetIdx )
+	{
+		$query = "select grade, up_grade, up_exp ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where idx = '".$targetIdx."' and pid = '".$pid."' ";
+		$query .= "and is_del = 0 and ( expire is null or expire < now() ) and up_grade < ".MY_Controller::ITEM_MAX_LEV." ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
 	public function updateCharacter( $pid, $cid, $clev, $cexp )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set ";
 		$query .= "level = '".$clev."', ";
 		$query .= "exp = ".$cexp." ";
 		$query .= "where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function updateItem( $pid, $iid, $ilev, $iexp, $iReference )
+	{
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." set ";
+		$query .= "up_grade = '".$ilev."', ";
+		$query .= "up_exp = '".$iexp."', ";
+		$query .= "up_refid = '".$iReference."' ";
+		$query .= "where pid = '".$pid."' and idx = '".$iid."' and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -980,6 +1034,15 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
+	public function requestItemResult( $pid, $idx )
+	{
+		$query = "select idx, up_grade, up_refid, up_exp from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ";
+		$query .= "where pid = '".$pid."' and idx = '".$idx."' and is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
 	public function IsEmptySpace( $pid, $IsEmptySpace, $count )
 	{
 		if ( $IsEmptySpace == "CHARACTER" )
@@ -1025,6 +1088,40 @@ class Model_Play extends MY_Model {
 		$query .= "and idx not in ( select ifnull(memb_0, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
 		$query .= "select ifnull(memb_1, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
 		$query .= "select ifnull(memb_2, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestItemsSynthesize( $pid, $arrIdx, $itemType, $maxLev )
+	{
+/* 튜닝 및 간단히 확인된 쿼리이나 확신이 서지 않음
+		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
+		$query .= "where a.pid = '".$pid."' and a.idx in ('".join("', '", $arrIdx)."') ";
+		$query .= "and a.up_grade = ".MY_Controller::MAX_UPGRADE." and a.level = ".MY_Controller::MAX_LEVEL." and a.is_del = 0 and (a.exp_idx is null or a.exp_idx < 1) ";
+		$query .= "and a.idx != ifnull(b.memb_0, 0) and a.idx != ifnull(b.memb_1, 0) and a.idx != ifnull(b.memb_2, 0) ";
+		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
+*/
+		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as a ";
+		if ( $itemType == 'technique' )
+		{
+			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as b on (a.idx = b.skill_0 or a.idx = b.skill_1 or a.idx = b.skill_2) ";
+		}
+		else
+		{
+			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as b on a.idx = b.".$itemType." ";
+		}
+		$query .= "where a.pid = '".$pid."' and a.idx in ('".join( "', '", $arrIdx )."') ";
+		$query .= "and a.up_grade = '".$maxLev."' and a.is_del = 0 ";
+		if ( $itemType == 'technique' )
+		{
+			$query .= "and b.skill_0 is null and b.skill_1 is null and b.skill_2 is null ";
+		}
+		else
+		{
+			$query .= "and b.".$itemType." is null ";
+		}
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -1300,10 +1397,11 @@ class Model_Play extends MY_Model {
 	{
 		$query = "select a.pid as fid, if(b.show_name, if(b.affiliate_name is null or b.affiliate_name = '', ifnull(b.name, '-'), ";
 		$query .= "concat(b.name, '(', b.affiliate_name, ')')), b.name) as fname, b.prof_img as fprof_img, b.login_datetime, ";
-		$query .= "ifnull(last_present_time, '1900-01-01 00:00:00') as last_present_time, d.refid ";
+		$query .= "ifnull(e.last_present_time, '1900-01-01 00:00:00') as last_present_time, d.refid ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERFRIEND." as a inner join koc_play.".MY_Controller::TBL_PLAYERBASIC." as b on a.pid = b.pid ";
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d on c.memb_0 = d.idx ";
+		$query .= "left outer join koc_play.player_friend as e on a.fid = e.pid and a.pid = e.fid and a.friend_status = e.friend_status ";
 		$query .= "where a.fid = '".$pid."' and a.friend_status = ".$status." ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -1445,7 +1543,7 @@ class Model_Play extends MY_Model {
 
 	public function requestFriendshipPointTime( $pid, $fid )
 	{
-		$query = "select (".MY_Controller::FRIEND_PRESENT_TIME." - TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) ";
+		$query = "select (".MY_Controller::FRIEND_PRESENT_TIME." + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) ";
 		$query .= "as last_present_time from koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
 		$query .= "where pid = '".$pid."' and fid = '".$fid."' and friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
 
@@ -1457,7 +1555,7 @@ class Model_Play extends MY_Model {
 	{
 		$query = "select fid from koc_play.".MY_Controller::TBL_PLAYERFRIEND." ";
 		$query .= "where pid = '".$pid."' and friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
-		$query .= "and (86400 + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) < 0 ";
+		$query .= "and (".MY_Controller::FRIEND_PRESENT_TIME." + TIME_TO_SEC(TIMEDIFF(ifnull(last_present_time, '1900-01-01 00:00:00'), now()))) < 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -2346,6 +2444,24 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_SEL->query($query);
 		return $this->DB_SEL->affected_rows();
+	}
+
+	public function requestCharacterClassCheck( $pid, $cid )
+	{
+		$query = "select b.vocation from player_character as a inner join koc_ref.ref_character as b on a.refid = b.id ";
+		$query .= "where a.idx = '".$cid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestItemClassCheck( $pid, $iid )
+	{
+		$query = "select b.vocation from player_inventory as a inner join koc_ref.item as b on a.refid = b.id ";
+		$query .= "where a.idx = '".$iid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
 	}
 
 	//테스트용

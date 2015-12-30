@@ -137,7 +137,7 @@ class Model_Admin extends MY_Model {
 		$query = "insert into koc_admin.event_access ";
 		$query .= "( start_date, end_date, evt_category, evt_target, evt_value, evt_reason, is_valid, reg_date, reg_id ) values ";
 		$query .= "('".$start_date."', '".$end_date."', '".$evt_category."', '".$evt_target."', '".$evt_value."', '".$evt_reason."', ";
-		$query .= "1, now(), '".$this->session->userdata('userId_session')."') ";
+		$query .= "1, now(), '') ";
 
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
@@ -585,7 +585,7 @@ class Model_Admin extends MY_Model {
 		$query .= "from koc_admin.coupon_basic_info as a left outer join koc_admin.coupon_detail_info as b on a.group_id = b.group_id ";
 		$query .= "left outer join koc_admin.coupon_reward_info as c on a.group_id = c.group_id ";
 		$query .= "where a.static_code = '".$coupon_id."' ";
-		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date ";
+		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date limit 1 ";
 
 		return $this->DB_INS->query($query);
 	}
@@ -597,7 +597,7 @@ class Model_Admin extends MY_Model {
 		$query .= "from koc_admin.coupon_basic_info as a left outer join koc_admin.coupon_detail_info as b on a.group_id = b.group_id ";
 		$query .= "left outer join koc_admin.coupon_reward_info as c on a.group_id = c.group_id ";
 		$query .= "where b.coupon_id = '".$coupon_id."' ";
-		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date ";
+		$query .= "and a.is_valid = 1 and now() between a.start_date and a.end_date limit 1 ";
 
 		return $this->DB_INS->query($query);
 	}

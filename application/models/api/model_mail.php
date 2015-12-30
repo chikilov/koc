@@ -96,13 +96,15 @@ class Model_Mail extends MY_Model {
 		return $this->DB_INS->affected_rows();
 	}
 
-	public function mailList( $pid, $category )
+	public function mailList( $pid )//, $category )
 	{
-		$query = "select a.idx, a.sid, a.title, a.attach_type, a.attach_value, a.send_date, a.expire_date, b.article_type, b.article_value, ";
+		$query = "select a.idx, a.sid, a.title, if(b.article_value = 'ENERGY_POINTS', 1, if(b.article_value = 'ENERGY_POINTS', 2, if(b.article_type in ('CTIK', 'WTIK', 'BTIK', 'STIK'), 3, 4))) as category, ";
+		$query .= "a.attach_type, a.attach_value, a.send_date, a.expire_date, b.article_type, b.article_value, ";
 		$query .= "if( a.sid = 0, '', concat( ifnull( c.name, '익명' ), '(', ifnull( c.affiliate_name, '익명' ), ')' )) as sname ";
 		$query .= "from koc_mail.".MY_Controller::TBL_MAIL." as a inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.attach_type = b.article_id ";
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERBASIC." as c on a.sid = c.pid ";
 		$query .= "where a.pid = '".$pid."' and a.is_receive = 0 and (a.expire_date >= now() or a.expire_date is null) ";
+/*
 		if ( $category == "1" )
 		{
 			$query .= "and b.article_value = 'ENERGY_POINTS' ";
@@ -120,6 +122,7 @@ class Model_Mail extends MY_Model {
 			$query .= "and b.article_value not in ('ENERGY_POINTS', 'FRIENDSHIP_POINTS') ";
 			$query .= "and b.article_type not in ('CTIK', 'WTIK', 'BTIK', 'STIK') ";
 		}
+*/
 		$query .= "order by ifnull(a.expire_date, '9999-12-31 23:59:59') asc ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );

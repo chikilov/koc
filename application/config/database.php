@@ -48,6 +48,7 @@
 $active_group = '';
 $active_record = TRUE;
 
+/*
 if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 {
 	//log single
@@ -63,7 +64,7 @@ if ( ENVIRONMENT == 'production' && SERVERGROUP == "1" )
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud0612@';
 	//replication slave
-	$db['default_sel']['hostname'] = '172.18.56.250';
+	$db['default_sel']['hostname'] = '172.18.45.247';
 	$db['default_sel']['username'] = 'webuser';
 	$db['default_sel']['password'] = 'dudrud0612@';
 	//replication master
@@ -97,7 +98,7 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "2" )
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud0612@';
 	//replication slave
-	$db['default_sel']['hostname'] = '172.18.45.122';
+	$db['default_sel']['hostname'] = '172.18.47.229';
 	$db['default_sel']['username'] = 'webuser';
 	$db['default_sel']['password'] = 'dudrud0612@';
 	//replication master
@@ -150,39 +151,41 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "3" )
 	$db['default_ins']['dbdriver'] = 'mysql';
 	$db['default_ins']['pconnect'] = TRUE;
 }
-else if ( ENVIRONMENT == 'exam' )
+else
+*/
+if ( ENVIRONMENT == 'staging' )
 {
 	//log single
-	$db['log']['hostname'] = '101.79.109.242';
+	$db['log']['hostname'] = 'rh-log-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['log']['username'] = 'webuser';
-	$db['log']['password'] = 'dudrud0612@';
+	$db['log']['password'] = 'dudrud78';
 	//login single
-	$db['login']['hostname'] = '101.79.109.242';
+	$db['login']['hostname'] = 'rh-login-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['login']['username'] = 'webuser';
-	$db['login']['password'] = 'dudrud0612@';
+	$db['login']['password'] = 'dudrud78';
 
-	$db['default']['hostname'] = '101.79.109.242';
+	$db['default']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['default']['username'] = 'webuser';
-	$db['default']['password'] = 'dudrud0612@';
+	$db['default']['password'] = 'dudrud78';
 	//replication slave
-	$db['default_sel']['hostname'] = '101.79.109.242';
+	$db['default_sel']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['default_sel']['username'] = 'webuser';
-	$db['default_sel']['password'] = 'dudrud0612@';
+	$db['default_sel']['password'] = 'dudrud78';
 	//replication master
-	$db['default_ins']['hostname'] = '101.79.109.242';
+	$db['default_ins']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['default_ins']['username'] = 'webuser';
-	$db['default_ins']['password'] = 'dudrud0612@';
+	$db['default_ins']['password'] = 'dudrud78';
 
-	$db['login']['dbdriver'] = 'mysql';
-	$db['login']['pconnect'] = TRUE;
-	$db['log']['dbdriver'] = 'mysql';
-	$db['log']['pconnect'] = TRUE;
-	$db['default']['dbdriver'] = 'mysql';
-	$db['default']['pconnect'] = TRUE;
-	$db['default_sel']['dbdriver'] = 'mysql';
-	$db['default_sel']['pconnect'] = TRUE;
-	$db['default_ins']['dbdriver'] = 'mysql';
-	$db['default_ins']['pconnect'] = TRUE;
+	$db['login']['dbdriver'] = 'mysqli';
+	$db['login']['pconnect'] = FALSE;
+	$db['log']['dbdriver'] = 'mysqli';
+	$db['log']['pconnect'] = FALSE;
+	$db['default']['dbdriver'] = 'mysqli';
+	$db['default']['pconnect'] = FALSE;
+	$db['default_sel']['dbdriver'] = 'mysqli';
+	$db['default_sel']['pconnect'] = FALSE;
+	$db['default_ins']['dbdriver'] = 'mysqli';
+	$db['default_ins']['pconnect'] = FALSE;
 }
 else if ( ENVIRONMENT == 'development' )
 {
@@ -219,28 +222,6 @@ else if ( ENVIRONMENT == 'development' )
 	$db['default_ins']['dbdriver'] = 'mysqli';
 	$db['default_ins']['pconnect'] = FALSE;
 }
-else if ( ENVIRONMENT == 'staging' )
-{
-	// getsebool -a |grep httpd 외부에서 데이터베이스 접근하도록 설정되어있는 지 확인
-	// setsebool httpd_can_network_connect_db=on 설정해야함.
-	$db['default']['hostname'] = '54.64.86.88';
-	$db['default']['username'] = 'root';
-	$db['default']['password'] = 'dudrud';
-	//replication slave
-	$db['default_sel']['hostname'] = '54.64.86.88';
-	$db['default_sel']['username'] = 'root';
-	$db['default_sel']['password'] = 'dudrud';
-	//replication master
-	$db['default_ins']['hostname'] = '54.64.86.88';
-	$db['default_ins']['username'] = 'root';
-	$db['default_ins']['password'] = 'dudrud';
-	$db['default']['dbdriver'] = 'mysql';
-	$db['default']['pconnect'] = TRUE;
-	$db['default_sel']['dbdriver'] = 'mysql';
-	$db['default_sel']['pconnect'] = TRUE;
-	$db['default_ins']['dbdriver'] = 'mysql';
-	$db['default_ins']['pconnect'] = TRUE;
-}
 $db['login']['dbprefix'] = '';
 $db['login']['db_debug'] = FALSE;
 $db['login']['cache_on'] = FALSE;
@@ -274,11 +255,11 @@ $db['default_ins']['dbcollat'] = 'utf8_general_ci';
 
 //20150224 loginserver add
 $db['koc_play_login'] = $db['login'];
-$db['koc_play_login']['database'] = 'koc_account'.SUBFIX;
+$db['koc_play_login']['database'] = 'koc_account';
 
 //20150224 loginserver add
 $db['koc_play_log'] = $db['log'];
-$db['koc_play_log']['database'] = 'koc_play'.SUBFIX;
+$db['koc_play_log']['database'] = 'koc_play';
 
 //20141210rep	$db['koc_mail'] = $db['default'];
 $db['koc_mail_sel'] = $db['default_sel'];

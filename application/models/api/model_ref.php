@@ -313,6 +313,17 @@ class Model_Ref extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
+	public function requestUpgradeItemInfo( $pid, $itemType, $sourceIdx )
+	{
+		$query = "select sum(exp) as exp, payment_type, sum(payment_value) as payment_value ";
+		$query .= "from koc_ref.".MY_Controller::TBL_UPGRADEITEM." as a inner join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b ";
+		$query .= "on a.grade = b.grade and a.current_step = b.up_grade ";
+		$query .= "where catergory = '".$itemType."' and b.idx in ('".join( "','", $sourceIdx )."') group by payment_type ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
 	public function requestAchieveType( $pid, $aid )
 	{
 		$query = "select id, repeate from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." ";
@@ -419,10 +430,12 @@ class Model_Ref extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function requestExpInfo()
+	public function requestExpInfo( $pid, $itemType, $grade, $exp )
 	{
-		$query = "select level, exp from koc_ref.".MY_Controller::TBL_LEVINFO." ";
+		$query = "select current_step as level, reference from koc_ref.".MY_Controller::TBL_ITEMLEVINFO." ";
+		$query .= "where catergory = '".$itemType."' and grade = '".$grade."' and '".$exp."' between min_exp and max_exp ";
 
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
 

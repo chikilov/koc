@@ -1,11 +1,11 @@
 <?php
 class MY_Controller extends CI_Controller {
 	//const for version
-	const VERSION_FOR_ANDROID = "10100";
+	const VERSION_FOR_ANDROID = '10300';
 
 	//const for updatefile
-	const DOWNLOAD_URL = "static/StreamingAssets/";
-	const NOTICE_URL = "index.php/pages/notice/listnotice/view";
+	const DOWNLOAD_URL = 'static/StreamingAssets/';
+	const NOTICE_URL = 'index.php/pages/notice/listnotice/view';
 
 	//const for encrypt
 	const INIT_ENCRYPTION_SERVER_PUBLICKEY = <<<EOF
@@ -35,27 +35,27 @@ wTAtMVZ7ieX9t5cS9MLgi73HgK0vwGt+LVrPul9+cYk=
 EOF;
 
 	//const for naver api
-	const CP_ID	= "AD_1003737";
-	const TEST_IAP_KEY = "ctXmVCPZm8";
-	const PROD_IAP_KEY = "K6Pb3rHwae";
+	const CP_ID	= 'AD_1003737';
+	const TEST_IAP_KEY = 'ctXmVCPZm8';
+	const PROD_IAP_KEY = 'K6Pb3rHwae';
 
 	//const for tstore api
-	const TSTORE_APPID = "OA00683672";
+	const TSTORE_APPID = 'OA00683672';
 
 	//const for common response
-	const STATUS_NO_MATCHING_PARAMETER = "0001";
-	const MESSAGE_NO_MATCHING_PARAMETER = "NG_ERROR_COMMON";
-	const STATUS_SERVER_OFFLINE = "0002";
-	const MESSAGE_SERVER_OFFLINE = "NG_ERROR_SERVER_OFFLINE";
+	const STATUS_NO_MATCHING_PARAMETER = '0001';
+	const MESSAGE_NO_MATCHING_PARAMETER = 'NG_ERROR_COMMON';
+	const STATUS_SERVER_OFFLINE = '0002';
+	const MESSAGE_SERVER_OFFLINE = 'NG_ERROR_SERVER_OFFLINE';
 	const STATUS_API_OK = STATUS_API_OK;
-	const MESSAGE_API_OK = "NG_SUCCESS";
-	const STATUS_LOGIN_DUP = "0300";
-	const MESSAGE_LOGIN_DUP = "NG_ERROR_LOGIN_DUP";
-	const STATUS_INSERT_ROW = "0500";
-	const MESSAGE_INSERT_ROW = "NG_ERROR_INSERT_ROW";
+	const MESSAGE_API_OK = 'NG_SUCCESS';
+	const STATUS_LOGIN_DUP = '0300';
+	const MESSAGE_LOGIN_DUP = 'NG_ERROR_LOGIN_DUP';
+	const STATUS_INSERT_ROW = '0500';
+	const MESSAGE_INSERT_ROW = 'NG_ERROR_INSERT_ROW';
 
 	//const for each error response
-	const STATUS_CREATE_DUPLICATE_ID = "0011";
+	const STATUS_CREATE_DUPLICATE_ID = '0011';
 	const MESSAGE_CREATE_DUPLICATE_ID = "NG_ERROR_CREATE_DUPLICATE_ID";
 	const STATUS_CREATE_ID = "0012";
 	const MESSAGE_CREATE_ID = "NG_ERROR_CREATE_ID";
@@ -110,6 +110,8 @@ EOF;
 	const MESSAGE_EQUIP_DELETE_ITEM = "NG_ERROR_EQUIP_DELETE_ITEM";
 	const STATUS_EQUIP_ITEM = "0103";
 	const MESSAGE_EQUIP_ITEM = "NG_ERROR_EQUIP_ITEM";
+	const STATUS_EQUIP_CLASS_ERROR_ITEM = "0104";
+	const MESSAGE_EQUIP_CLASS_ERROR_ITEM = "NG_ERROR_EQUIP_CLASS_ERROR_ITEM";
 
 	const STATUS_BUYITEM_ERROR_ITEM = "0111";
 	const MESSAGE_BUYITEM_ERROR_ITEM = "NG_ERROR_BUYITEM_ERROR_ITEM";
@@ -286,6 +288,22 @@ EOF;
 	const STATUS_EVOLUTION_FAIL = "0413";
 	const MESSAGE_EVOLUTION_FAIL = "NG_ERROR_EVOLUTION_FAIL";
 
+	const STATUS_UPGRADE_NON_ITEM = '0421';
+	const MESSAGE_UPGRADE_NON_ITEM = 'NG_ERROR_UPGRADE_NON_ITEM';
+	const STATUS_UPGRADE_ITEM_LOAD_COST = '0422';
+	const MESSAGE_UPGRADE_ITEM_LOAD_COST = 'NG_ERROR_UPGRADE_LOAD_COST';
+	const STATUS_UPGRADE_ITEM_RACK_COST = '0423';
+	const MESSAGE_UPGRADE_ITEM_RACK_COST = 'NG_ERROR_UPGRADE_RACK_COST';
+	const STATUS_UPGRADE_RESULT_ITEM = '0424';
+	const MESSAGE_UPGRADE_RESULT_ITEM = 'NG_ERROR_UPGRADE_RESULT_ITEM';
+
+	const STATUS_SYNTHESIZE_NON_ITEM = '0431';
+	const MESSAGE_SYNTHESIZE_NON_ITEM = 'NG_ERROR_SYNTHESIZE_NON_ITEM';
+	const STATUS_SYNTHESIZE_ERROR_ITEM_GARADE = '0432';
+	const MESSAGE_SYNTHESIZE_ERROR_ITEM_GARADE = 'NG_ERROR_SYNTHESIZE_ERROR_ITEM_GARADE';
+	const STATUS_SYNTHESIZE_ITEM_FAIL = '0433';
+	const MESSAGE_SYNTHESIZE_ITEM_FAIL = 'NG_ERROR_SYNTHESIZE_ITEM_FAIL';
+
 	const STATUS_BY_CODE = "010";
 
 	const STATUS_NO_DATA = "0000";
@@ -341,9 +359,11 @@ EOF;
 	const TBL_REWARD = "reward";
 	const TBL_STAGE = "stage";
 	const TBL_ACHIEVEMENTS = "achievements";
+	const TBL_UPGRADEITEM = 'upgradeItem';
 	const TBL_UPGRADE = "upgrade";
 	const TBL_EXPREF = "exploration_ref_sect";
 	const TBL_LEVINFO = "levinfo";
+	const TBL_ITEMLEVINFO = 'itemlevinfo';
 	const TBL_ARTICLE = "article";
 	const TBL_TEXT = "text";
 	const TBL_RANKREWARD = "rank_reward";
@@ -444,7 +464,7 @@ EOF;
 	const LIMIT_MODES_PVB					= 999;	// 최대 PVB 에너지 제한
 	const LIMIT_MODES_DEFENCE				= 999;	// 최대 DEFENCE 에너지 제한
 	const LIMIT_MODES_SURVIVAL				= 999;	// 최대 생존 에너지 제한
-	const LIMIT_GAME_POINTS					= 9999999;	// 최대 골드 제한
+	const LIMIT_GAME_POINTS					= 100000000;	// 최대 골드 제한
 	const LIMIT_CASH_POINTS					= 99999;	// 최대 캐시포인트 제한
 	const LIMIT_FRIENDSHIP_POINTS			= 1000;	// 최대 우정포인트 제한
 
@@ -467,6 +487,9 @@ EOF;
 
 	//const for synthesize
 	const GATCHA_BY_GRADE					= "[\"GAC030000\", \"GAC030001\", \"GAC030002\", \"GAC030003\", \"GAC030004\"]";	//합성에 사용되는 가챠정보
+	const GATCHA_BY_WEPN_GRADE				= '["GAW070000", "GAW070001", "GAW070002", "GAW070003", "GAW070004"]';	//무기 합성에 사용되는 가챠정보
+	const GATCHA_BY_BCPC_GRADE				= '["GAG070000", "GAG070001", "GAG070002", "GAG070003", "GAG070004"]';	//백팩 합성에 사용되는 가챠정보
+	const GATCHA_BY_SKIL_GRADE				= '["GAT070000", "GAT070001", "GAT070002", "GAT070003", "GAT070004"]';	//스킬 합성에 사용되는 가챠정보
 
 	//const for character reach maxlevel
 	const CHARMAXLEV_REWARD_TYPE			= "EVENT_POINTS";
@@ -509,6 +532,8 @@ EOF;
 
 	//const for event
 	const UPGRADE_DIS_EVENT_PRODUCT			= "upgrade";
+	const UPGRADE_DIS_EVENT_CHAR_PRODUCT	= 'char';
+	const UPGRADE_DIS_EVENT_ITEM_PRODUCT	= 'item';
 
 	//const for achieve
 	const ACHIEVE_REPEATE_FOR_DAILY			= "DAILY";
@@ -519,11 +544,6 @@ EOF;
 	const LIMITED_PROVISION_PRODUCT_ID		= "NGP_LP_0001";
 	const HAPPYNEWYEAR_PROVISION_PRODUCT_ID	= "NGP_LP_0002";
 
-	//const for hot! time
-	const ARRAY_HOTTIME_GOLD = "[{\"day\":\"0\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"1\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"2\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"3\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"4\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"5\",\"hour\":[\"14\",\"15\"]}, {\"day\":\"6\",\"hour\":[\"20\",\"21\"]}]";
-	const ARRAY_HOTTIME_INCE = "[{\"day\":\"5\",\"hour\":[\"20\",\"21\"]}, {\"day\":\"4\",\"hour\":[\"16\",\"17\",\"18\",\"19\",\"20\",\"21\",\"22\",\"23\"]}]";
-	const ARRAY_HOTTIME_EXPR = "[{\"day\":\"0\",\"hour\":[\"14\",\"15\"]}, {\"day\":\"6\",\"hour\":[\"14\",\"15\"]}]";
-
 	//const for iap
 	const REASONCODE_IAP_NORMAL = "00";
 	const REASONCODE_RECEIPT_ALREADY_PROVISION = "01";
@@ -531,6 +551,13 @@ EOF;
 	const REASONCODE_CONSUME_FAILED = "03";
 	const REASONCODE_DOESNT_MATCH_RECEIPT = "04";
 	const REASONCODE_PACKAGE_STATUS = "05";
+
+	const ITEM_MAXLEV_BY_GRADE = '["0","10","10","10","10","10","10"]';
+	const ITEM_MAX_LEV = '10';
+	const GATCHA_BY_ITEM_GRADE_PAYMENT_TYPE = 'GAME_POINTS';
+	const GATCHA_BY_ITEM_GRADE_PAYMENT = '["0","4000","11000","19000","33000","45000"]';
+	const UNEQUIP_ASSET_TYPE = 'GAME_POINTS';
+	const UNEQUIP_ASSET_VALUE = '["0","1000","3000","4000","7000","9000","18000"]';
 
 	public $public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
 	public $private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
@@ -561,7 +588,7 @@ EOF;
 			$this->decoded = json_decode( stripslashes( $_POST["data"] ), TRUE );
 			if ( array_key_exists("pid", $this->decoded) == false )
 			{
-				$this->decoded["pid"] = "0";
+				$this->decoded["pid"] = '0';
 			}
 			$this->logw->sysLogWrite( LOG_NOTICE, $this->decoded["pid"], "requestData : ".$_POST["data"] );
 		}
@@ -736,8 +763,9 @@ EOF;
 		{
 			$cur_date = $cur_date[0]["curTime"];
 		}
+		$this->benchmark->mark('code_end');
 //		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'code_end'), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 
 //		$this->benchmark->mark('total_execution_time_endbf');
 //		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );

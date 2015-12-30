@@ -18,132 +18,18 @@ ob_start();
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-
-if (
-	//L4
-	$_SERVER['HTTP_HOST'] == '211.110.6.34'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocapi.tntgame.co.kr'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc1lb.tntgame.co.kr'
-	//web01
-	|| $_SERVER['HTTP_HOST'] == '175.119.227.180'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocapi1.tntgame.co.kr'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc1api1.tntgame.co.kr'
-	//web02
-	|| $_SERVER['HTTP_HOST'] == '211.110.6.124'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocapi2.tntgame.co.kr'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc1api2.tntgame.co.kr'
-	//web03
-	|| $_SERVER['HTTP_HOST'] == '1.234.7.75'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocapi3.tntgame.co.kr'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc1api3.tntgame.co.kr'
-	//web04
-	|| $_SERVER['HTTP_HOST'] == '211.110.154.227'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocapi4.tntgame.co.kr'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc1api4.tntgame.co.kr'
-)
+if ( array_key_exists( 'CI_ENV', $_SERVER ) )
 {
-	define('ENVIRONMENT', 'production');
-	define('SERVERGROUP', '1');
-	define('SUBFIX', '');
-}
-else if (
-	//L4
-	$_SERVER['HTTP_HOST'] == '1.234.45.38'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc2lb.tntgame.co.kr'
-	//web01
-	|| $_SERVER['HTTP_HOST'] == '1.234.45.250'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc2api1.tntgame.co.kr'
-	//web02
-	|| $_SERVER['HTTP_HOST'] == '175.126.103.73'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc2api2.tntgame.co.kr'
-	//web03
-	|| $_SERVER['HTTP_HOST'] == '1.234.89.167'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc2api3.tntgame.co.kr'
-	//web04
-	|| $_SERVER['HTTP_HOST'] == '1.234.6.60'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc2api4.tntgame.co.kr'
-)
-{
-	define('ENVIRONMENT', 'production');
-	define('SERVERGROUP', '2');
-	define('SUBFIX', '');
-}
-else if (
-	//L4
-	$_SERVER['HTTP_HOST'] == '1.234.6.33'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc3lb.tntgame.co.kr'
-	//web01
-	|| $_SERVER['HTTP_HOST'] == '1.234.89.245'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc3api1.tntgame.co.kr'
-	//web02
-	|| $_SERVER['HTTP_HOST'] == '211.110.154.217'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc3api2.tntgame.co.kr'
-	//web03
-	|| $_SERVER['HTTP_HOST'] == '1.234.69.161'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc3api3.tntgame.co.kr'
-	//web04
-	|| $_SERVER['HTTP_HOST'] == '1.234.69.83'
-	|| $_SERVER['HTTP_HOST'] == 'm.koc3api4.tntgame.co.kr'
-)
-{
-	define('ENVIRONMENT', 'production');
-	define('SERVERGROUP', '3');
-	define('SUBFIX', '');
-}
-else if (
-	//for exam
-	$_SERVER['HTTP_HOST'] == '101.79.109.242'
-	|| $_SERVER['HTTP_HOST'] == 'm.kocdev.tntgame.co.kr'
-)
-{
-	define('ENVIRONMENT', 'exam');
-	define('SERVERGROUP', '');
-	define('SUBFIX', '');
-}
-else if (
-	$_SERVER['HTTP_HOST'] == 'm.koclogin.tntgame.co.kr'
-)
-{
-	define('ENVIRONMENT', 'production');
-	define('SUBFIX', '');
-	if ( $_SERVER["LOCAL_ADDR"] == '175.119.227.180'
-			|| $_SERVER["LOCAL_ADDR"] == '211.110.6.124'
-			|| $_SERVER["LOCAL_ADDR"] == '1.234.7.75'
-			|| $_SERVER["LOCAL_ADDR"] == '211.110.154.227'
-	)
-	{
-		define('SERVERGROUP', '1');
-	}
-	else if ( $_SERVER["LOCAL_ADDR"] == '1.234.45.250'
-			|| $_SERVER["LOCAL_ADDR"] == '175.126.103.73'
-			|| $_SERVER["LOCAL_ADDR"] == '1.234.89.167'
-			|| $_SERVER["LOCAL_ADDR"] == '1.234.6.60'
-	)
-	{
-		define('SERVERGROUP', '2');
-	}
-	else if ( $_SERVER["LOCAL_ADDR"] == '1.234.89.245'
-			|| $_SERVER["LOCAL_ADDR"] == '211.110.154.217'
-			|| $_SERVER["LOCAL_ADDR"] == '1.234.69.161'
-			|| $_SERVER["LOCAL_ADDR"] == '1.234.69.83'
-	)
-	{
-		define('SERVERGROUP', '3');
-	}
-}
-else if ( $_SERVER['HTTP_HOST'] == '54.64.86.88' )
-{
-	define('ENVIRONMENT', 'staging');
-	define('SERVERGROUP', '');
-	define('SUBFIX', '');
+	define('ENVIRONMENT', $_SERVER['CI_ENV']);
+	define('SERVERGROUP', $_SERVER['SERVERGROUP']);
+	define('LOGROOT', $_SERVER['LOGROOT']);
 }
 else
 {
 	define('ENVIRONMENT', 'development');
-	define('SERVERGROUP', '');
-	define('SUBFIX', '');
+	define('SERVERGROUP', '1');
+	define('LOGROOT', '/tmp/');
 }
-
 
 /*
  *---------------------------------------------------------------
@@ -159,9 +45,6 @@ if ( defined('ENVIRONMENT') )
 	switch ( ENVIRONMENT )
 	{
 		case 'development':
-			error_reporting(E_ALL);
-		break;
-		case 'exam':
 			error_reporting(E_ALL);
 		break;
 		case 'staging':

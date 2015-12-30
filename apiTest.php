@@ -1,98 +1,18 @@
 <?php
-	if ( array_key_exists( "SERVER_ADDR", $_SERVER ) )
+	if ( $_SERVER['SERVER_NAME'] == 'ec2-52-193-77-169.ap-northeast-1.compute.amazonaws.com' )
 	{
-		$serverAddrKeyName = "SERVER_ADDR";
-	}
-	else if ( array_key_exists( "LOCAL_ADDR", $_SERVER ) )
-	{
-		$serverAddrKeyName = "LOCAL_ADDR";
-	}
-	if ( $_SERVER[$serverAddrKeyName] == "175.119.227.180" )
-	{
-		$serverAddr = "175.119.227.180";
-		$serverName = "api_1-1";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "211.110.6.124" )
-	{
-		$serverAddr = "211.110.6.124";
-		$serverName = "api_1-2";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.7.75" )
-	{
-		$serverAddr = "1.234.7.75";
-		$serverName = "api_1-3";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "211.110.154.227" )
-	{
-		$serverAddr = "211.110.154.227";
-		$serverName = "api_1-4";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.45.250" )
-	{
-		$serverAddr = "1.234.45.250";
-		$serverName = "api_2-1";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "175.126.103.73" )
-	{
-		$serverAddr = "175.126.103.73";
-		$serverName = "api_2-2";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.89.167" )
-	{
-		$serverAddr = "1.234.89.167";
-		$serverName = "api_2-3";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.6.60" )
-	{
-		$serverAddr = "1.234.6.60";
-		$serverName = "api_2-4";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.89.245" )
-	{
-		$serverAddr = "1.234.89.245";
-		$serverName = "api_3-1";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "211.110.154.217" )
-	{
-		$serverAddr = "211.110.154.217";
-		$serverName = "api_3-2";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.69.161" )
-	{
-		$serverAddr = "1.234.69.161";
-		$serverName = "api_3-3";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "1.234.69.83" )
-	{
-		$serverAddr = "1.234.69.83";
-		$serverName = "api_3-4";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "101.79.109.242" )
-	{
-		$serverAddr = "101.79.109.242";
-		$serverName = "exam";
-		$urlbase = "koc10300";
-	}
-	else if ( $_SERVER[$serverAddrKeyName] == "101.79.109.239" )
-	{
-		$serverAddr = "101.79.109.239";
-		$serverName = "dev";
+		$serverName = "stage 1";
 		$urlbase = "koc";
 	}
-	echo $serverAddr." ( ".$serverName." )<br />";
-	$strurl = "/".$urlbase."/index.php/request/api/requestLogin/";
+	echo $_SERVER['SERVER_NAME']." ( ".$serverName." )<br />";
+	if ( $urlbase == "" )
+	{
+		$strurl = "/index.php/request/api/requestLogin/";
+	}
+	else
+	{
+		$strurl = "/".$urlbase."/index.php/request/api/requestLogin/";
+	}
 ?>
 <script type="text/javascript">
 	var arrSampleData = [
@@ -157,6 +77,10 @@
 		"{\"pid\":\"13645\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"13645\", \"show_prof\":\"0\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"77\", \"targetIdx\":\"16643\", \"sourceIdx\":\"16657\", \"targetId\":\"RD0300014\", \"sourceId\":\"RD1200000\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"10\", \"itemType\":\"weapon\", \"targetIdx\":\"6252\", \"sourceIdx\":\"6919\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"24\", \"camount\":\"10\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"136\", \"itemType\":\"WEAPON\", \"targetIdx\":\"1148527\", \"sourceIdx\":\"1148529\", \"grade\":\"5\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"136\", \"itemType\":\"WEAPON\", \"sourceIdx\":\"1148656\", \"grade\":\"6\", \"cursession\":\"forAdmin\"}",
 		//테스트용
 		"{\"pid\":\"13645\",\"cid\":\"RS0100042\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"13645\",\"iid\":\"WCC1120001\", \"cursession\":\"forAdmin\"}",
@@ -174,7 +98,20 @@
 		actiondisp.innerText = "http://<?=$_SERVER['HTTP_HOST']?>/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
 		dataSam.innerText = arrSampleData[frmTest.apitype.selectedIndex];
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
+<?php
+	if ( $urlbase == "" )
+	{
+?>
+		frmTest.action = "/index.php/request/api/" + frmTest.apitype.value + "/";
+<?php
+	}
+	else
+	{
+?>
 		frmTest.action = "/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
+<?php
+	}
+?>
 	}
 
 	function sendact() {
@@ -192,10 +129,35 @@
 
 	window.onload = function () {
 		document.getElementById("samData").value = arrSampleData[frmTest.apitype.selectedIndex];
+<?php
+	if ( $urlbase == "" )
+	{
+?>
+		frmTest.action = "/index.php/request/api/" + frmTest.apitype.value + "/";
+<?php
+	}
+	else
+	{
+?>
 		frmTest.action = "/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
+<?php
+	}
+?>
 		document.getElementById("dataSample").innerText = arrSampleData[frmTest.apitype.selectedIndex];
+<?php
+	if ( $urlbase == "" )
+	{
+?>
+		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/index.php/request/api/" + frmTest.apitype.value + "/";
+<?php
+	}
+	else
+	{
+?>
 		document.getElementById("ActionURL").innerText = "http://<?=$_SERVER['HTTP_HOST']?>/<?=$urlbase?>/index.php/request/api/" + frmTest.apitype.value + "/";
-
+<?php
+	}
+?>
 	}
 </script>
 모든 데이터는 data 라는 이름의 파라미터에 json 형태의 value 로 전달 하시면 됩니다.<br /><br />
@@ -268,6 +230,10 @@ Action주소 : <br />
 		<option value="requestMailCount">requestMailCount</option>
 		<option value="requestUpdateShowProfile">requestUpdateShowProfile</option>
 		<option value="requestEvolution">requestEvolution</option>
+		<option value="requestUpgradeItem">requestUpgradeItem</option>
+		<option value="requestLoggingRetryStepForPVE">requestLoggingRetryStepForPVE</option>
+		<option value="requestSynthesizeItem">requestSynthesizeItem</option>
+		<option value="requestSynthesizeItemRetry">requestSynthesizeItemRetry</option>
 		<!-- 테스트용 -->
 		<option value="requestCharacterProvisioning">requestCharacterProvisioning</option>
 		<option value="requestItemProvisioning">requestItemProvisioning</option>

@@ -4,15 +4,13 @@
 		$serverName = "stage 1";
 		$urlbase = "koc";
 	}
-	echo $_SERVER['SERVER_NAME']." ( ".$serverName." )<br />";
-	if ( $urlbase == "" )
-	{
-		$strurl = "/index.php/request/api/requestLogin/";
-	}
 	else
 	{
-		$strurl = "/".$urlbase."/index.php/request/api/requestLogin/";
+		$serverName = "dev";
+		$urlbase = "koc";
 	}
+	echo $_SERVER['SERVER_NAME']." ( ".$serverName." )<br />";
+	$strurl = "/".$urlbase."/index.php/request/api/requestLogin/";
 ?>
 <script type="text/javascript">
 	var arrSampleData = [

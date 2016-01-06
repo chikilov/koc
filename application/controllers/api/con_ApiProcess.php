@@ -5908,6 +5908,7 @@ class Con_ApiProcess extends MY_Controller {
 	public function requestUpdateFile()
 	{
 		$device = $this->decoded['device'];
+		$lang = $this->decoded['lang'];
 		if ( $device == 'ANDROID' )
 		{
 			$device = 'AND';
@@ -5938,6 +5939,7 @@ class Con_ApiProcess extends MY_Controller {
 					$arrayResult['event_url'][] = 'http://'.$_SERVER['HTTP_HOST'].URLBASE.'index.php/pages/notice/imagenotice/view/'.$row['idx'].'/IOS';
 				}
 			}
+			$arrayResult['policy_url'] = 'http://'.$_SERVER['HTTP_HOST'].URLBASE.'/static/policy/policy_'.$lang.'.html';
 		}
 		else
 		{

@@ -1,0 +1,172 @@
+@import url('common.css');
+
+/**************   Mobile Game  **************/
+.mobile_top{position:relative;height:140px;background: url(http://image.pupugame.com/mobile/mobile_bg/df.jpg) no-repeat;background-size:cover;padding:15px 15px 0 15px;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;}
+.mobile_top .icon{position:relative;width:72px;height:72px;float:left;margin-right:15px;}
+.mobile_top .top_download ul{width:100%;height:35px;position:relative;margin-top:40px;}
+.mobile_top .top_download li{position:relative;width:30%;height:35px;float:right; padding:0 2% 0 1%;}
+.mobile_top .top_download li div{text-align:center;font-weight:bold;color:#fff;padding-top:3px;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;  text-shadow:  0 1px 0 #2e2e2e;}
+.mobile_top .top_download li .and_down{width:100%;height:100%;background: rgb(124,188,10); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(124,188,10,1) 0%, rgba(128,194,23,1) 62%, rgba(161,213,79,1) 62%, rgba(157,213,58,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,rgba(124,188,10,1)), color-stop(62%,rgba(128,194,23,1)), color-stop(62%,rgba(161,213,79,1)), color-stop(100%,rgba(157,213,58,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(45deg,  rgba(124,188,10,1) 0%,rgba(128,194,23,1) 62%,rgba(161,213,79,1) 62%,rgba(157,213,58,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(45deg,  rgba(124,188,10,1) 0%,rgba(128,194,23,1) 62%,rgba(161,213,79,1) 62%,rgba(157,213,58,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(45deg,  rgba(124,188,10,1) 0%,rgba(128,194,23,1) 62%,rgba(161,213,79,1) 62%,rgba(157,213,58,1) 100%); /* IE10+ */
+background: linear-gradient(45deg,  rgba(124,188,10,1) 0%,rgba(128,194,23,1) 62%,rgba(161,213,79,1) 62%,rgba(157,213,58,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7cbc0a', endColorstr='#9dd53a',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */}
+.mobile_top .top_download li .t_down{width:100%;height:100%;background: rgb(231,56,39); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(231,56,39,1) 0%, rgba(240,47,23,1) 29%, rgba(246,41,12,1) 61%, rgba(241,111,92,1) 61%, rgba(248,80,50,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left bottom, right top, color-stop(0%,rgba(231,56,39,1)), color-stop(29%,rgba(240,47,23,1)), color-stop(61%,rgba(246,41,12,1)), color-stop(61%,rgba(241,111,92,1)), color-stop(100%,rgba(248,80,50,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(45deg,  rgba(231,56,39,1) 0%,rgba(240,47,23,1) 29%,rgba(246,41,12,1) 61%,rgba(241,111,92,1) 61%,rgba(248,80,50,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(45deg,  rgba(231,56,39,1) 0%,rgba(240,47,23,1) 29%,rgba(246,41,12,1) 61%,rgba(241,111,92,1) 61%,rgba(248,80,50,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(45deg,  rgba(231,56,39,1) 0%,rgba(240,47,23,1) 29%,rgba(246,41,12,1) 61%,rgba(241,111,92,1) 61%,rgba(248,80,50,1) 100%); /* IE10+ */
+background: linear-gradient(45deg,  rgba(231,56,39,1) 0%,rgba(240,47,23,1) 29%,rgba(246,41,12,1) 61%,rgba(241,111,92,1) 61%,rgba(248,80,50,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e73827', endColorstr='#f85032',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */}
+.mobile_top .top_download li .ios_down{width:100%;height:100%;background: rgb(208,224,234); /* Old browsers */
+background: -moz-linear-gradient(45deg,  rgba(208,224,234,1) 1%, rgba(181,198,208,1) 63%, rgba(216,225,231,1) 63%, rgba(216,225,231,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left bottom, right top, color-stop(1%,rgba(208,224,234,1)), color-stop(63%,rgba(181,198,208,1)), color-stop(63%,rgba(216,225,231,1)), color-stop(100%,rgba(216,225,231,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(45deg,  rgba(208,224,234,1) 1%,rgba(181,198,208,1) 63%,rgba(216,225,231,1) 63%,rgba(216,225,231,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(45deg,  rgba(208,224,234,1) 1%,rgba(181,198,208,1) 63%,rgba(216,225,231,1) 63%,rgba(216,225,231,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(45deg,  rgba(208,224,234,1) 1%,rgba(181,198,208,1) 63%,rgba(216,225,231,1) 63%,rgba(216,225,231,1) 100%); /* IE10+ */
+background: linear-gradient(45deg,  rgba(208,224,234,1) 1%,rgba(181,198,208,1) 63%,rgba(216,225,231,1) 63%,rgba(216,225,231,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d0e0ea', endColorstr='#d8e1e7',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+}
+.mobile_top .simple_intro{line-height:1;color:#fff;padding-top:5px;  text-shadow: 0 1px 0 #2e2e2e;}
+.mobile_top .simple_intro .mobile_title{font-size:20px; font-weight:bold;}
+.mobile_top .simple_intro .mobile_info{font-size:11px; font-weight:bold; color:#fff;}
+.mobile_subtitle{font-size:16px; font-weight:bold;}
+
+.screenshots{width:100%;padding:15px 0;height:290px;position:relative;background: #f9f9f9; border-top:1px #f0f0f0 solid; border-bottom:1px #f0f0f0 solid;}
+.screenshots .device {height:250px;}
+.screenshots .gallery-container, .screenshots .gallery-wrapper {height:200px;}
+.screenshots .device .a-left {background: url(http://image.pupugame.com/mobile/arrows.png) no-repeat left top  ;position: absolute;top: 50%;margin-top: -15px;width: 17px;height: 30px;}
+.screenshots .device .arrow-left {margin-top: -125px;height: 250px;background: rgb(243,197,189); /* Old browsers */
+background: -moz-linear-gradient(left,  rgba(243,197,189,1) 0%, rgba(232,108,87,1) 35%, rgba(229,94,73,1) 49%, rgba(255,102,0,1) 75%, rgba(199,34,0,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(243,197,189,1)), color-stop(35%,rgba(232,108,87,1)), color-stop(49%,rgba(229,94,73,1)), color-stop(75%,rgba(255,102,0,1)), color-stop(100%,rgba(199,34,0,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  rgba(243,197,189,1) 0%,rgba(232,108,87,1) 35%,rgba(229,94,73,1) 49%,rgba(255,102,0,1) 75%,rgba(199,34,0,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  rgba(243,197,189,1) 0%,rgba(232,108,87,1) 35%,rgba(229,94,73,1) 49%,rgba(255,102,0,1) 75%,rgba(199,34,0,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  rgba(243,197,189,1) 0%,rgba(232,108,87,1) 35%,rgba(229,94,73,1) 49%,rgba(255,102,0,1) 75%,rgba(199,34,0,1) 100%); /* IE10+ */
+background: linear-gradient(to right,  rgba(243,197,189,1) 0%,rgba(232,108,87,1) 35%,rgba(229,94,73,1) 49%,rgba(255,102,0,1) 75%,rgba(199,34,0,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3c5bd', endColorstr='#c72200',GradientType=1 ); /* IE6-9 */
+}
+.screenshots .device .a-right {background: url(http://image.pupugame.com/mobile/arrows.png) no-repeat left bottom;position: absolute;top: 50%;margin-top: -15px;width: 17px;height: 30px;}
+.screenshots .device .arrow-right{margin-top: -125px;height: 250px;background: rgb(199,34,0); /* Old browsers */
+background: -moz-linear-gradient(left,  rgba(199,34,0,1) 0%, rgba(255,102,0,1) 25%, rgba(229,94,73,1) 51%, rgba(232,108,87,1) 65%, rgba(243,197,189,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(199,34,0,1)), color-stop(25%,rgba(255,102,0,1)), color-stop(51%,rgba(229,94,73,1)), color-stop(65%,rgba(232,108,87,1)), color-stop(100%,rgba(243,197,189,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  rgba(199,34,0,1) 0%,rgba(255,102,0,1) 25%,rgba(229,94,73,1) 51%,rgba(232,108,87,1) 65%,rgba(243,197,189,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  rgba(199,34,0,1) 0%,rgba(255,102,0,1) 25%,rgba(229,94,73,1) 51%,rgba(232,108,87,1) 65%,rgba(243,197,189,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  rgba(199,34,0,1) 0%,rgba(255,102,0,1) 25%,rgba(229,94,73,1) 51%,rgba(232,108,87,1) 65%,rgba(243,197,189,1) 100%); /* IE10+ */
+background: linear-gradient(to right,  rgba(199,34,0,1) 0%,rgba(255,102,0,1) 25%,rgba(229,94,73,1) 51%,rgba(232,108,87,1) 65%,rgba(243,197,189,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c72200', endColorstr='#f3c5bd',GradientType=1 ); /* IE6-9 */
+}
+.screenshots .device{height: 250px;padding: 10px 0;position: relative;}
+.screenshots .gallery-container  {position:absolute;height: 250px;width: 85%;margin: 0 7.5%;overflow:hidden;}
+.screenshots .gallery-wrapper {position:absolute;height: 250px;width: 90%;margin: 0 2.5%;}
+.screenshots .gallery-slide {float:left;}
+.screenshots .my-pagination {position: absolute;left: 0;text-align: center;bottom:20px;width: 100%;}
+.screenshots .gallery-switch {display: inline-block;width: 10px;height: 10px;border-radius: 10px;background: #999;box-shadow: 0px 1px 2px #555 inset;margin: 0 3px;cursor: pointer;}
+.screenshots .gallery-active-class {background: #fff;}
+
+.wrap_tab .tab li a{position:relative;display:block;font-size:16px;}
+
+.mobile_contents{position:relative;background:#f9f9f9;padding:15px 10px 0 10px;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;border-top:1px #f0f0f0 solid; border-bottom:1px #f0f0f0 solid;}
+.mobile_contents .introduce{display:block;font-size:14px; color:#555;overflow:hidden;}
+.mobile_contents .close{height:80px;}
+.mobile_contents .btn_more{display:block;height:20px;}
+.mobile_contents .btn_more a{display:block; float:right; text-align:right;width:45px; padding-right:15px; height:20px;font-size:12px; color:#555; background: url(http://image.pupugame.com/mobile/button/arrow-down.png) no-repeat; background-size:auto 15px;background-position:45px;}
+.mobile_contents .up a{background: url(http://image.pupugame.com/mobile/button/arrow-up.png) no-repeat;background-size:auto 15px;background-position:45px;}
+
+.recommend_game {position:relative;background:#f9f9f9;padding:10px 10px 0 10px;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;height:110px;border-top:1px #f0f0f0 solid; border-bottom:1px #f0f0f0 solid;line-height:1;font-size:14px;font-weight:bold;}
+.recommend_game ul{width:100%;height:68px;position:relative;margin-top:5px;}
+.recommend_game ul li{width:25%;height:68px;position:relative;float:left;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;line-height:1;text-align:center;}
+.recommend_game ul li .icon{width:48px; height:48px;}
+.recommend_game ul li .mobile_title{font-size:10px;line-height:1;font-weight:normal; color:#444;}
+/**************   Sub Common  **************/
+
+/*공용*/
+.web_top{position:relative;height:100px;background:#f9f9f9;padding:2.5%;border-bottom:2px solid #cecece;box-sizing : border-box;-webkit-box-sizing : border-box;-moz-box-sizing : border-box;}
+.web_top .icon{margin-right:5%;}
+.web_top .icon, .web_top .simple_intro{position:relative;width:45%;height:95%;float:left;text_align:center;font-size:12px;}
+.game_event{position:relative;width:100%;height:180px;background:#f9f9f9;float:clear;overflow:hidden;}
+.evt_thumb{width:300px;}
+
+.game_contents{background:#f9f9f9;margin-top:15px;}
+.game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:40px;padding:0;}
+.game_contents .wrap_tab .tab li{position:relative;border:1px solid #fff;float:left;width:32%;text-align:center;vertical-align:middle;background:#dadada;height:100%;}
+.game_contents .wrap_tab .tab .on{border-bottom:1px solid #dadada;}
+.game_contents .wrap_tab .tab li a{width:100%;height:100%;color:black;font-size:12px;}
+
+.intro{width:99%;background:#dadada;margin-bottom:10px;}
+.intro .intro_contents h4{font-size:20px;font-weight:bold;}
+.intro .intro_text{width:100%;padding:30px 0;}
+.intro .intro_contents .intro_text img{width:100%;}
+.intro .dh_gameBg .gameBg_txt{width:100%;padding:30px 0;}
+.intro .intro_contents , .intro .dh_gameBg , .intro .hn_intro_contents{margin: 2px 2.5% 0;width:95%;height:98%;}
+.gallery{width:100%;padding:30px 0;height:300px;position:relative;}
+
+
+
+
+/*대협전*/
+.dh_game_contents{background:#f9f9f9;margin-top:15px;}
+.dh_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;	height:100%;}
+.dh_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.dh_game_contents .wrap_tab .tab li{position:relative;border:1px solid #fff;float:left;width:49%;text-align:center;vertical-align:middle;background:#dadada;height:100%;	}
+.dh_game_contents .wrap_tab .tab .on{border-bottom:1px solid #dadada;}
+.dh_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:black;}
+
+/*몽환지성*/
+.mh_game_contents{background:#f9f9f9;margin-top:15px;}
+.mh_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.mh_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.mh_game_contents .wrap_tab .tab li{position:relative;border:1px solid #FBDB6A;float:left;width:24%;text-align:center;vertical-align:middle;background:#FFF9D8;height:100%;}
+.mh_game_contents .wrap_tab .tab .on{border-bottom:1px solid #FFF9D8;}
+.mh_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:brown;}
+
+/*진미인*/
+.jm_game_contents{margin-top:15px;background:#70455e;}
+.jm_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;	height:100%;}
+.jm_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.jm_game_contents .wrap_tab .tab li{position:relative;border:1px solid #70455e;float:left;width:32%;text-align:center;vertical-align:middle;background:#321c28;height:100%;}
+.jm_game_contents .wrap_tab .tab li a{color:pink;}
+.jm_game_contents .wrap_tab .tab .on{border-bottom:1px solid #321c28;}
+.jm_game_contents .wrap_tab .tab li a{width:100%;height:100%;}
+
+/*용투*/
+.yt_game_contents{background:#f9f9f9;margin-top:15px;}
+.yt_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.yt_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.yt_game_contents .wrap_tab .tab li{position:relative;border:1px solid #8C8C8C;float:left;width:32%;text-align:center;vertical-align:middle;background:#ffffff;height:100%;}
+.yt_game_contents .wrap_tab .tab .on{border-bottom:1px solid #ffffff;}
+.yt_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:black;}
+
+/*무장쟁패*/
+.mj_game_contents{background:#f9f9f9;margin-top:15px;}
+.mj_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.mj_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.mj_game_contents .wrap_tab .tab li{position:relative;border:1px solid #d9d8d6;float:left;width:32%;text-align:center;vertical-align:middle;background:#f9f9f9;height:100%;	}
+.mj_game_contents .wrap_tab .tab .on{border-bottom:1px solid #f9f9f9;}
+.mj_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:black;}
+
+/*천신전 (천신전 화보는 세로사진이 많아 크기 조절)*/
+.sj_game_contents{background:#f9f9f9;margin-top:15px;}
+.sj_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.sj_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.sj_game_contents .wrap_tab .tab li{position:relative;border:1px solid #8C8C8C;float:left;width:24%;text-align:center;vertical-align:middle;background:#ffffff;height:100%;}
+.sj_game_contents .wrap_tab .tab .on{border-bottom:1px solid #ffffff;}
+.sj_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:black;}
+.sj_game_contents .gallery, .sj_game_contents .gallery .device {height:300px;}
+.sj_game_contents .gallery .gallery-container, .sj_game_contents .gallery .gallery-wrapper {height:300px;}
+
+/*무장쟁패*/
+.zm_game_contents{background:#1E2E2D;margin-top:15px;}
+.zm_game_contents .wrap_tab{margin: 7px 2.5% 0;width:95%;display:block;height:100%;}
+.zm_game_contents .wrap_tab .tab{position:relative;margin: 0;width:100%;height:30px;padding:0;}
+.zm_game_contents .wrap_tab .tab li{position:relative;border:1px solid #1E2E2D;float:left;width:48%;text-align:center;vertical-align:middle;background:#101A17;height:100%;	}
+.zm_game_contents .wrap_tab .tab .on{border-bottom:1px solid #101A17;}
+.zm_game_contents .wrap_tab .tab li a{width:100%;height:100%;color:#a3b6b5;}
+
+
+

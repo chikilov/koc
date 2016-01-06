@@ -1727,15 +1727,15 @@ class Con_ApiProcess extends MY_Controller {
 						}
 						else
 						{
-							if ( ENVIRONMENT == 'production' || ENVIRONMENT == 'exam' )
+							if ( ENVIRONMENT == 'production' )
 							{
 								$kurl = 'http://m.koccommon.tntgame.co.kr/refresh.php';
 								$sFileName = 'http://m.koccommon.tntgame.co.kr/token.htm';
 							}
 							else
 							{
-								$kurl = 'http://'.$_SERVER['HTTP_HOST'].'/koc/static/upload/refresh.php';
-								$sFileName = 'http://'.$_SERVER['HTTP_HOST'].'/koc/static/upload/token.htm';
+								$kurl = 'http://'.$_SERVER['HTTP_HOST'].'/koc/refresh.php';
+								$sFileName = 'http://'.$_SERVER['HTTP_HOST'].'/koc/token.htm';
 							}
 							$kch = curl_init();
 							curl_setopt($kch, CURLOPT_URL, $kurl);

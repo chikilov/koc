@@ -40,7 +40,7 @@
 			<form id="frmCoupon" name="frmCoupon" method="post" action="<?php echo URLBASE; ?>index.php/pages/webview/couponview/result">
 			<p class="requestTxt">쿠폰 번호 혹은 이벤트 코드를 입력해 주세요</p>
 			<!--<p class="requestTxt"><img src="<?php echo URLBASE; ?>static/images/coupon_error_txt.png" alt="" /></p>-->
-			<div class="inputBox"><input type="text" id="coupon_id" name="coupon_id" value="" /><input type="hidden" id="pid" name="pid" value="<?php echo $pid ?>" /></div>
+			<div class="inputBox"><input type="text" id="coupon_id" name="coupon_id" value="" /><input type="hidden" id="pid" name="pid" value="<?php echo $pid; ?>" /></div>
 			<div class="submitBox"><a href="javascript:void(0);"><img src="<?php echo URLBASE; ?>static/images/Confirm_640.png" id="btnConfirm" vspace="16" border="0"></a></div>
 		</div>
 	</div>

@@ -3,7 +3,7 @@ class Con_CouponView extends MY_Controller {
 
 	function __construct(){
 		parent::__construct();
-		$this->load->model('admin/Model_Admin', "dbAdmin");
+		$this->load->model('api/Model_Login', "dbLogin");
 	}
 
 	function index()
@@ -26,8 +26,8 @@ class Con_CouponView extends MY_Controller {
 		{
 			$coupon_id = $_POST["coupon_id"];
 			$pid = $_POST["pid"];
-			$couponInfo1 = $this->dbAdmin->couponVerify1( $coupon_id, $pid )->result_array();
-			$couponInfo2 = $this->dbAdmin->couponVerify2( $coupon_id, $pid )->result_array();
+			$couponInfo1 = $this->dbLogin->couponVerify1( $coupon_id, $pid )->result_array();
+			$couponInfo2 = $this->dbLogin->couponVerify2( $coupon_id, $pid )->result_array();
 			// 쿠폰 정보가 올바르지 않은 경우
 			if ( empty( $couponInfo1 ) && empty( $couponInfo2 ) )
 			{
@@ -61,7 +61,7 @@ class Con_CouponView extends MY_Controller {
 						{
 							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::COUPON_SEND_TITLE, $row["reward_type"], $row["reward_value"], MY_Controller::NORMAL_EXPIRE_TERM );
 						}
-						$this->dbAdmin->requestCouponStatusUpdate( $pid, $couponInfo[0]["group_id"], $couponInfo[0]["coupon_type"], $coupon_id );
+						$this->dbLogin->requestCouponStatusUpdate( $pid, $couponInfo[0]["group_id"], $couponInfo[0]["coupon_type"], $coupon_id );
 						$result = "SUCCESS";
 					}
 				}

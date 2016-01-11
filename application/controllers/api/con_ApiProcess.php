@@ -505,6 +505,17 @@ class Con_ApiProcess extends MY_Controller {
 
 		if ( $pid )
 		{
+			//접속 이벤트 참여 (메일목록에 추가)
+			$this->load->model('admin/Model_Admin', 'dbAdmin');
+			$arrayEvent = $this->dbAdmin->requestValidAccEventList()->result_array();
+			foreach( $arrayEvent as $row )
+			{
+				if ( $this->dbAdmin->requestAccessEventApply( $pid, $row['idx'] ) == 1 )
+				{
+					$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::ACCESS_EVENT_REWARD_TITLE, $row['evt_target'], $row['evt_value'], MY_Controller::NORMAL_EXPIRE_TERM );
+				}
+			}
+
 			$resultCode = MY_Controller::STATUS_API_OK;
 			$resultText = MY_Controller::MESSAGE_API_OK;
 			$arrayResult['list'] = $this->dbMail->mailList( $pid/*, $category */)->result_array();

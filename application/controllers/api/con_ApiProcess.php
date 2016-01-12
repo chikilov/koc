@@ -1754,7 +1754,7 @@ class Con_ApiProcess extends MY_Controller {
 							curl_exec( $kch );
 
 							$sResult = json_decode(file_get_contents($sFileName),true);
-							$url = 'https://www.googleapis.com/androidpublisher/v1.1/applications/com.tntgame.koc.google/inapp/'.$arrayProduct[0]['iapcode'].'/purchases/'.$paymentSeq;
+							$url = 'https://www.googleapis.com/androidpublisher/v1.1/applications/com.ENP.robotheroes.global.googleplay/inapp/'.$arrayProduct[0]['iapcode'].'/purchases/'.$paymentSeq;
 							$url .= '?access_token='.$sResult['access_token'];
 
 							$ch = curl_init();

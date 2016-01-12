@@ -23,8 +23,8 @@
 	if ($_GET["code"]) {
 		$sParam = "";
 		$sParam .= "code=".$_GET["code"];
-		$sParam .= "&client_id=733902471656-2ls1292fc7lgfakgc2vk6e9n5dkn62g5.apps.googleusercontent.com";
-		$sParam .= "&client_secret=b7p7aAplK7wUj0HZXRoGPRZT";
+		$sParam .= "&client_id=861544031598-ejukh7ao7elqfv3bm9vlqqkq1vl8tca1.apps.googleusercontent.com";
+		$sParam .= "&client_secret=1wO8w4Js0FyVD-Gv3S4lJsm2";
 		$sParam .= "&redirect_uri=http://m.koccommon.tntgame.co.kr/return.php";
 		$sParam .= "&grant_type=authorization_code"; // authorization_code 는 OAuth 2 에서는 고정값입니다.
 		$rResult = getCurl("https://accounts.google.com/o/oauth2/token","post","$sParam");

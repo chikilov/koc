@@ -50,6 +50,7 @@ if ((time()-$regdate)>1800) {
 	$fp=fopen($sFileName,'w');
 	fwrite($fp,$rResult);
 	fclose($fp);
+	chown($sFileName, 'apache');
 
 	echo $rResult;
 }

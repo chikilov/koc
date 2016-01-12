@@ -277,7 +277,7 @@ class Model_Ref extends MY_Model {
 
 	public function getRewardIdFromStage( $pid, $stageid )
 	{
-		$query = "select reward from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
+		$query = "select reward, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

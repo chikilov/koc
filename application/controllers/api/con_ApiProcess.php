@@ -2483,7 +2483,9 @@ class Con_ApiProcess extends MY_Controller {
 			$is_clear = 0;
 		}
 
-		$rid = $this->dbRef->getRewardIdFromStage( $pid, $stageid )->result_array()[0]['reward'];
+		$stageInfo = $this->dbRef->getRewardIdFromStage( $pid, $stageid )->result_array()[0];
+		$rid = $stageInfo['reward'];
+		$platformPoints = $stageInfo['platform_points'];
 		if ( $cidArray[0]['idx'] > 0 )
 		{
 			$charInfo[0]['valid'] = 1;
@@ -2593,6 +2595,7 @@ class Con_ApiProcess extends MY_Controller {
 					//랜덤보상 지급
 					if ( $is_clear )
 					{
+						$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, 'achieve_points', $platformPoints, 'PVE보상' );
 						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, 'PVE보상 수령' );
 						$arrayResult['rewardobject'] = $arrayProduct[0];
 

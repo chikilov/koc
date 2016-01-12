@@ -2598,7 +2598,7 @@ class Model_Play extends MY_Model {
 
 	public function insertItem( $pid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERITEM." ( pid, energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, event_points, friendship_points ) values ('".$pid."', ".MY_Controller::MAX_ENERGY_POINTS.", ".MY_Controller::MAX_MODES_PVB.", ".MY_Controller::MAX_MODES_PVP.", ".MY_Controller::MAX_MODES_SURVIVAL.", 0, 0, 0, 0) ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERITEM." ( pid, energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, event_points, friendship_points, achieve_points ) values ('".$pid."', ".MY_Controller::MAX_ENERGY_POINTS.", ".MY_Controller::MAX_MODES_PVB.", ".MY_Controller::MAX_MODES_PVP.", ".MY_Controller::MAX_MODES_SURVIVAL.", 0, 0, 0, 0, 0) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

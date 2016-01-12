@@ -204,7 +204,7 @@ class Model_Play extends MY_Model {
 	public function requestItem( $pid )
 	{
 		$query = "select energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, ifnull(event_points, 0) as event_points, ";
-		$query .= "friendship_points, energy_uptime, pvb_uptime, pvp_uptime, survival_uptime ";
+		$query .= "friendship_points, achieve_points, energy_uptime, pvb_uptime, pvp_uptime, survival_uptime ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERITEM." ";
 		$query .= "where pid = '".$pid."'";
 

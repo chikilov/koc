@@ -2387,6 +2387,18 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
+	public function requestDailyPackageList( $pid )
+	{
+		$query = "select a.product_id ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERIAP." as a inner join koc_ref.".MY_Controller::TBL_PRODUCT." as b on a.product_id = b.id ";
+		$query .= "where b.product_type = '".MY_Controller::PRODUCTTYPE_PACKAGE_DAILY."' ";
+		$query .= "and a.is_provision = 1 and a.is_refund = 0 and buy_date between '".date('Y-m-d')." 00:00:00' and '".date('Y-m-d')." 23:59:59' and a.sid = '".$pid."' ";
+		$query .= "group by a.idx, a.product_id, a.paymentSeq, a.expire_date, b.type, b.value ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
 	public function requestLoggingEveryDayPackPayment( $pid, $mail_id, $idx, $paymentSeq, $product_id, $expire_date, $reward_type, $reward_value )
 	{
 		$query = "insert into koc_play.player_packagereward_log ";

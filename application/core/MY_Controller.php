@@ -457,6 +457,7 @@ EOF;
 	const PRODUCTTYPE_PACKAGE_FOREVER		= "PF";
 	const PRODUCTTYPE_PACKAGE_ENDPOINT		= "PE";
 	const PRODUCTTYPE_PACKAGE_MONTHLY		= "PM";
+	const PRODUCTTYPE_PACKAGE_DAILY			= "PD";
 
 	//const for points
 	const LIMIT_ENERGY_POINTS				= 999;	// 최대 행성전 에너지 제한

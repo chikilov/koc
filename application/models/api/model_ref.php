@@ -158,21 +158,20 @@ class Model_Ref extends MY_Model {
 
 	public function productVerify( $pid, $storeType, $product, $country_code )
 	{
-		$query = "select a.product_type, a.category, a.type, a.value as attach_value, c.payment_unit, c.payment_type, c.payment_value, ";
-		$query .= "a.bonus, b.article_type, b.article_value, a.vip_exp, a.".$storeType." as iapcode ";
+		$query = "select a.product_type, a.category, a.type, a.value as attach_value, a.payment_type, a.payment, ";
+		$query .= "a.bonus, b.article_type, b.article_value, a.vip_exp ";
 		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.type = b.article_id ";
-		$query .= "inner join koc_ref.product_price as c on a.id = c.product_id ";
 		$query .= "where a.enable = 1 and a.id = '".$product."' ";
-		if ( $country_code == "" || $country_code == null )
-		{
-			$query .= "and c.is_default = 1 ";
-		}
-		else
-		{
-			$query .= "and c.country_code = '".$country_code."' ";
-		}
 
-		$query .= "limit 1 ";
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function iapVerify( $pid, $storeType, $product )
+	{
+		$query = "select a.product_type, a.category, a.type, a.value as attach_value, a.bonus, b.article_type, b.article_value, a.vip_exp, a.".$storeType." as iapcode, 'IAP' as payment_type ";
+		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.type = b.article_id ";
+		$query .= "where a.enable = 1 and a.id = '".$product."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

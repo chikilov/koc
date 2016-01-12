@@ -894,6 +894,7 @@ class Con_ApiProcess extends MY_Controller {
 					*/
 					// 월간 패키지 첫구매 체크
 					$arrayResult['packinfo']['is_first'] = intval(!(bool)$this->dbPlay->requestPackageBuyHistory( $pid, '', MY_Controller::PRODUCTTYPE_PACKAGE_MONTHLY ));
+					$arrayResult['packinfo']['daily'] = $this->dbPlay->requestDailyPackageList( $pid )->result_array();
 
 					// 개척자 패키지
 					$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
@@ -1361,13 +1362,13 @@ class Con_ApiProcess extends MY_Controller {
 				$this->dbPlay->onBeginTransaction();
 				if ( empty( $arrDisInfo ) )
 				{
-					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment_value'], '상품 구매('.$product.')' );
+					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품 구매('.$product.')' );
 				}
 				else
 				{
 					if ( $arrDisInfo[0]['evt_paytype'] == 'DIS' )
 					{
-						$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrPayment[0]['payment_type'], floor( $arrPayment[0]['payment_value'] * (100 - $arrDisInfo[0]['evt_value']) / 100 ), '상품 구매('.$product.')' );
+						$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrPayment[0]['payment_type'], floor( $arrPayment[0]['payment'] * (100 - $arrDisInfo[0]['evt_value']) / 100 ), '상품 구매('.$product.')' );
 					}
 					else
 					{
@@ -1389,7 +1390,7 @@ class Con_ApiProcess extends MY_Controller {
 					{
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
-						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment'] );
 					}
 				}
 				else
@@ -1419,6 +1420,7 @@ class Con_ApiProcess extends MY_Controller {
 	{
 		$pid = $this->decoded['pid'];
 		$product = $this->decoded['product'];
+		$price = $this->decoded['price'];
 		$sid = $this->decoded['sid'];
 		$storeType = strtolower( $this->decoded['storetype'] );
 		$paymentSeq = $this->decoded['receipt'];
@@ -1439,7 +1441,7 @@ class Con_ApiProcess extends MY_Controller {
 		{
 			$country_code = '';
 		}
-		$country_code = 'kr';
+		$country_code = 'KRW';
 
 		if ( $pid && $storeType && $product && $sid )
 		{
@@ -1448,7 +1450,7 @@ class Con_ApiProcess extends MY_Controller {
 				$storeType = 'editor';
 			}
 
-			$arrayProduct = $this->dbRef->productVerify( $pid, $storeType, $product, $country_code )->result_array();
+			$arrayProduct = $this->dbRef->iapVerify( $pid, $storeType, $product )->result_array();
 			if ( count($arrayProduct) < 1 )
 			{
 				$resultCode = MY_Controller::STATUS_ABNORMALPRODUCT;
@@ -1462,6 +1464,7 @@ class Con_ApiProcess extends MY_Controller {
 					$arrayProduct[0]['product_type'] == MY_Controller::PRODUCTTYPE_PACKAGE_FOREVER
 					|| $arrayProduct[0]['product_type'] == MY_Controller::PRODUCTTYPE_PACKAGE_ENDPOINT
 					|| $arrayProduct[0]['product_type'] == MY_Controller::PRODUCTTYPE_PACKAGE_MONTHLY
+					|| $arrayProduct[0]['product_type'] == MY_Controller::PRODUCTTYPE_PACKAGE_DAILY
 				)
 				{
 					$product_status = !(bool)$this->dbPlay->requestPackageBuyHistory( $pid, $product, $arrayProduct[0]['product_type'] );
@@ -1474,7 +1477,10 @@ class Con_ApiProcess extends MY_Controller {
 						// 지급 처리
 						if ( $pid != $sid )
 						{
-							$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+							if ( $arrayProduct[0]['attach_value'] > 0 )
+							{
+								$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+							}
 							if ( $arrayProduct[0]['bonus'] > 0 )
 							{
 								$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, 'EVENT_POINTS', $arrayProduct[0]['bonus'], false );
@@ -1538,7 +1544,7 @@ class Con_ApiProcess extends MY_Controller {
 						$is_provision = 1;
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
-						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $price );
 
 						$receiptPaymentSeq = '';
 						$receiptApprovedPaymentNo = '';
@@ -1626,7 +1632,10 @@ class Con_ApiProcess extends MY_Controller {
 											// 지급 처리
 											if ( $pid != $sid )
 											{
-												$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+												if ( $arrayProduct[0]['attach_value'] > 0 )
+												{
+													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+												}
 												if ( $arrayProduct[0]['bonus'] > 0 )
 												{
 													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, 'EVENT_POINTS', $arrayProduct[0]['bonus'], false );
@@ -1807,7 +1816,10 @@ class Con_ApiProcess extends MY_Controller {
 												// 지급 처리
 												if ( $pid != $sid )
 												{
-													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+													if ( $arrayProduct[0]['attach_value'] > 0 )
+													{
+														$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+													}
 													if ( $arrayProduct[0]['bonus'] > 0 )
 													{
 														$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, 'EVENT_POINTS', $arrayProduct[0]['bonus'], false );
@@ -2005,7 +2017,10 @@ class Con_ApiProcess extends MY_Controller {
 											// 지급 처리
 											if ( $pid != $sid )
 											{
-												$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+												if ( $arrayProduct[0]['attach_value'] > 0 )
+												{
+													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+												}
 												if ( $arrayProduct[0]['bonus'] > 0 )
 												{
 													$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, 'EVENT_POINTS', $arrayProduct[0]['bonus'], false );
@@ -2167,7 +2182,10 @@ class Con_ApiProcess extends MY_Controller {
 									// 지급 처리
 									if ( $pid != $sid )
 									{
-										$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+										if ( $arrayProduct[0]['attach_value'] > 0 )
+										{
+											$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, $arrayProduct[0]['type'], $arrayProduct[0]['attach_value'], false );
+										}
 										if ( $arrayProduct[0]['bonus'] > 0 )
 										{
 											$this->dbMail->sendMail( $sid, $pid, MY_Controller::PACKAGE_SEND_TITLE, 'EVENT_POINTS', $arrayProduct[0]['bonus'], false );
@@ -2290,7 +2308,7 @@ class Con_ApiProcess extends MY_Controller {
 					$curcash['cash_points'] = 0;
 					$curcash['event_points'] = 0;
 				}
-				$this->dbPlay->requestLogIap( $is_provision, $pid, $sid, $storeType, $product, $arrayProduct[0]['payment_unit'], $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment_value'], $receiptPaymentSeq, $receiptApprovedPaymentNo, $receiptNaverId, $receiptPaymentTime, $curcash['cash_points'].','.$curcash['event_points'], $reasonCode );
+				$this->dbPlay->requestLogIap( $is_provision, $pid, $sid, $storeType, $product, $country_code, $arrayProduct[0]['payment_type'], $price, $receiptPaymentSeq, $receiptApprovedPaymentNo, $receiptNaverId, $receiptPaymentTime, $curcash['cash_points'].','.$curcash['event_points'], $reasonCode );
 			}
 		}
 		else

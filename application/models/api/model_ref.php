@@ -89,39 +89,12 @@ class Model_Ref extends MY_Model {
 
 	public function requestProductList( $pid, $storeType, $storeVersion, $country_code )
 	{
-		$query = "select a.id, a.alignment_index, a.category, a.retry_id, a.is_retry, a.type, a.value, ";
-		$query .= "max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_paytype, null), null)) as evt_paytype, ";
+		$query = "select a.id, a.alignment_index, a.category, a.retry_id, a.is_retry, a.type, a.value, max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_paytype, null), null)) as evt_paytype, ";
 		$query .= "ifnull( max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_value, null), null)), 0) as evt_value, ";
-		$query .= "b.payment_unit, b.payment_type, b.payment_value, ";
-		$query .= "a.bonus, a.expiration_time, a.target, a.enable, a.version, a.duration, a.".$storeType." as iapcode ";
-		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a inner join koc_ref.".MY_Controller::TBL_PRODUCTPRICE." as b on a.id = b.product_id ";
-		$query .= "left outer join ( select product_id from koc_ref.product_price where country_code = 'KR' ) as c on b.product_id = c.product_id ";
-		$query .= "left outer join koc_admin.event_discount as d on a.id = d.evt_target ";
+		$query .= "a.bonus, a.payment_type, a.payment as payment_value, a.expiration_time, a.target, a.enable, a.version, a.duration, a.".$storeType." as iapcode ";
+		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a left outer join koc_admin.event_discount as d on a.id = d.evt_target ";
 		$query .= "where ( a.version = 0 or a.version >= ".$storeVersion." ) and a.enable = 1 and a.expiration_time >= now() ";
-		if ( $storeType == "ios" )
-		{
-			$query .= "and target = 'SELF' ";
-		}
-		if ( $country_code == "" || $country_code == null )
-		{
-			$query .= "and b.is_default = 1 ";
-		}
-		else
-		{
-			$query .= "and ( b.country_code = '".$country_code."' or c.product_id is null ) ";
-		}
-
-		$query .= "group by a.id, a.category, a.retry_id, a.is_retry, a.type, a.value, b.payment_unit, b.payment_type, b.payment_value, ";
-		$query .= "a.bonus, a.expiration_time, a.target, a.enable, a.version, a.ios, a.android ";
-		$query .= "order by category asc, id asc, ";
-		if ( $country_code == "" || $country_code == null )
-		{
-			$query .= "b.is_default desc ";
-		}
-		else
-		{
-			$query .= "b.is_default asc ";
-		}
+		$query .= "group by a.id, a.category, a.retry_id, a.is_retry, a.type, a.value, a.bonus, a.expiration_time, a.target, a.enable, a.version, a.ios, a.android order by category asc, id asc ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

@@ -1700,7 +1700,7 @@ class Con_ApiProcess extends MY_Controller {
 											$is_provision = 1;
 											$resultCode = MY_Controller::STATUS_API_OK;
 											$resultText = MY_Controller::MESSAGE_API_OK;
-											$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+											$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $price );
 											$reasonCode = MY_Controller::REASONCODE_IAP_NORMAL;
 										}
 										else
@@ -1883,7 +1883,7 @@ class Con_ApiProcess extends MY_Controller {
 												$is_provision = 1;
 												$resultCode = MY_Controller::STATUS_API_OK;
 												$resultText = MY_Controller::MESSAGE_API_OK;
-												$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+												$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $price );
 
 												$receiptPaymentSeq = '';
 												$receiptApprovedPaymentNo = '';
@@ -2085,7 +2085,7 @@ class Con_ApiProcess extends MY_Controller {
 											$is_provision = 1;
 											$resultCode = MY_Controller::STATUS_API_OK;
 											$resultText = MY_Controller::MESSAGE_API_OK;
-											$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+											$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $price );
 
 											$receiptPaymentSeq = '';
 											$receiptApprovedPaymentNo = '';
@@ -2250,7 +2250,7 @@ class Con_ApiProcess extends MY_Controller {
 									$is_provision = 1;
 									$resultCode = MY_Controller::STATUS_API_OK;
 									$resultText = MY_Controller::MESSAGE_API_OK;
-									$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment_value'] );
+									$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $price );
 
 									$receiptPaymentSeq = '';
 									$receiptApprovedPaymentNo = '';

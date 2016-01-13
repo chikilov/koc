@@ -2452,6 +2452,10 @@ class Model_Play extends MY_Model {
 			$query .= "and left(buy_date, 7) = left(now(), 7) and product_id in ( ";
 			$query .= "select id from koc_ref.".MY_Controller::TBL_PRODUCT." where product_type = 'PM' and enable = 1 ) ";
 		}
+		else if ( $product_type == MY_Controller::PRODUCTTYPE_PACKAGE_DAILY )
+		{
+			$query .= "and left(buy_date, 10) = left(now(), 10) and product_id = '".$product_id."' ";
+		}
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_SEL->query($query);

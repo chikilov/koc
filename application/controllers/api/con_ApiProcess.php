@@ -190,6 +190,7 @@ class Con_ApiProcess extends MY_Controller {
 		$affiliateEmail = $this->decoded['affiliateemail'];
 		$affiliateProfImg = $this->decoded['affiliateprofimg'];
 		$pushkey = $this->decoded['pushkey'];
+		$country = $this->decoded['country'];
 		if ( array_key_exists('platform', $this->decoded) )
 		{
 			$platform = $this->decoded['platform'];
@@ -215,7 +216,7 @@ class Con_ApiProcess extends MY_Controller {
 				else
 				{
 					//회원 가입처리
-					$arrayResult['pid'] = $this->dbLogin->requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg );
+					$arrayResult['pid'] = $this->dbLogin->requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg, $country );
 					if ( count($arrayResult) < 1 )
 					{
 						$resultCode = MY_Controller::STATUS_JOIN_PARTNERSHIP;

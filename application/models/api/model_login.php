@@ -86,11 +86,11 @@ class Model_Login extends MY_Model {
 		return $this->DB_LOGIN->query($query);
 	}
 
-	public function requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg )
+	public function requestAffiliateJoin( $macaddr, $uuid, $affiliateType, $affiliateId, $affiliateName, $affiliateEmail, $affiliateProfImg, $country )
 	{
 		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ( ";
-		$query .= "macaddr, uuid, affiliate_type, affiliate_id, affiliate_name, email, prof_Img, reg_date ) ";
-		$query .= "values ( '".$macaddr."', '".$uuid."', '".$affiliateType."', '".$affiliateId."', '".$affiliateName."', ";
+		$query .= "macaddr, uuid, country, affiliate_type, affiliate_id, affiliate_name, email, prof_Img, reg_date ) ";
+		$query .= "values ( '".$macaddr."', '".$uuid."', '".$country."', '".$affiliateType."', '".$affiliateId."', '".$affiliateName."', ";
 		$query .= "'".$affiliateEmail."', '".$affiliateProfImg."', now() )";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );

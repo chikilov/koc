@@ -153,7 +153,7 @@ else if ( ENVIRONMENT == 'production' && SERVERGROUP == "3" )
 }
 else
 */
-if ( ENVIRONMENT == 'staging' )
+if ( ENVIRONMENT == 'production' )
 {
 	//log single
 	$db['log']['hostname'] = 'logdb-master.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';

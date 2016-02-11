@@ -2538,6 +2538,7 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				if ( $basic_reward_type != 'GAME_POINTS' || $basic_reward_value > $stageReward[0]['max_gold'] )
 				{
+					$basic_reward_type = 'GAME_POINTS';
 					$basic_reward_value = $stageReward[0]['max_gold'];
 				}
 
@@ -2583,7 +2584,7 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbPlay->onBeginTransaction();
 
 					//기본보상 추가 (포인트)
-					$arrayProduct[count($arrayProduct)] = array( 'article_type' => 'ASST', 'article_value' => $basic_reward_type, 'attach_value' => $basic_reward_value );
+					$arrayBasicProduct = array( 'article_type' => 'ASST', 'article_value' => $basic_reward_type, 'attach_value' => $basic_reward_value );
 					//기본보상 추가 (기체 경험치)
 					$txtCarray = '';
 					$mlRewardList = array();
@@ -2615,6 +2616,7 @@ class Con_ApiProcess extends MY_Controller {
 					if ( $is_clear )
 					{
 						$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, 'achieve_points', $platformPoints, 'PVE보상' );
+						$this->commonUserResourceProvisioning( array($arrayBasicProduct), $pid, $pid, 'PVE보상 수령' );
 						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, 'PVE보상 수령' );
 						$arrayResult['rewardobject'] = $arrayProduct[0];
 

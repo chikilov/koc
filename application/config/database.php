@@ -156,6 +156,40 @@ else
 if ( ENVIRONMENT == 'staging' )
 {
 	//log single
+	$db['log']['hostname'] = 'logdb-master.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';
+	$db['log']['username'] = 'webuser';
+	$db['log']['password'] = 'dudrud0612';
+	//login single
+	$db['login']['hostname'] = 'gatedb-master.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';
+	$db['login']['username'] = 'webuser';
+	$db['login']['password'] = 'dudrud0612';
+
+	$db['default']['hostname'] = 'gamedb-master.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';
+	$db['default']['username'] = 'webuser';
+	$db['default']['password'] = 'dudrud0612';
+	//replication slave
+	$db['default_sel']['hostname'] = 'gamedb-slave.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';
+	$db['default_sel']['username'] = 'webuser';
+	$db['default_sel']['password'] = 'dudrud0612';
+	//replication master
+	$db['default_ins']['hostname'] = 'gamedb-master.c4gglueqjphd.ap-northeast-1.rds.amazonaws.com';
+	$db['default_ins']['username'] = 'webuser';
+	$db['default_ins']['password'] = 'dudrud0612';
+
+	$db['login']['dbdriver'] = 'mysqli';
+	$db['login']['pconnect'] = FALSE;
+	$db['log']['dbdriver'] = 'mysqli';
+	$db['log']['pconnect'] = FALSE;
+	$db['default']['dbdriver'] = 'mysqli';
+	$db['default']['pconnect'] = FALSE;
+	$db['default_sel']['dbdriver'] = 'mysqli';
+	$db['default_sel']['pconnect'] = FALSE;
+	$db['default_ins']['dbdriver'] = 'mysqli';
+	$db['default_ins']['pconnect'] = FALSE;
+}
+else if ( ENVIRONMENT == 'staging' )
+{
+	//log single
 	$db['log']['hostname'] = 'rh-log-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
 	$db['log']['username'] = 'webuser';
 	$db['log']['password'] = 'dudrud78';

@@ -1,7 +1,25 @@
 <?php
-	if ( $_SERVER['SERVER_NAME'] == 'ec2-52-193-77-169.ap-northeast-1.compute.amazonaws.com' )
+	if ( array_key_exists( 'CI_ENV', $_SERVER ) )
 	{
-		$serverName = "stage 1";
+		define('ENVIRONMENT', $_SERVER['CI_ENV']);
+		define('SERVERGROUP', $_SERVER['SERVERGROUP']);
+		define('LOGROOT', $_SERVER['LOGROOT']);
+	}
+	else
+	{
+		define('ENVIRONMENT', 'development');
+		define('SERVERGROUP', '1');
+		define('LOGROOT', '/tmp/');
+	}
+
+	if ( ENVIRONMENT == 'production' )
+	{
+		$serverName = "live ".SERVERGROUP;
+		$urlbase = "koc";
+	}
+	else if ( ENVIRONMENT == 'staging' )
+	{
+		$serverName = "stage ".SERVERGROUP;
 		$urlbase = "koc";
 	}
 	else

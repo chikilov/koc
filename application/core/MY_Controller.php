@@ -585,8 +585,8 @@ EOF;
 		}
 		if ( array_key_exists( "data", $_POST ) )
 		{
-			$_POST["data"] = $this->NG_DECRYPT( $_POST["data"] );
-			$this->decoded = json_decode( stripslashes( $_POST["data"] ), TRUE );
+			$dataString = $this->NG_DECRYPT( $_POST["data"] );
+			$this->decoded = json_decode( stripslashes( $dataString ), TRUE );
 			if ( array_key_exists("pid", $this->decoded) == false )
 			{
 				$this->decoded["pid"] = '0';
@@ -684,16 +684,16 @@ EOF;
 				$is_enc = false;
 			}
 		}
-		else if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 		{
 			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
 			{
 				$is_enc = false;
 			}
 		}
-		else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
 		{
-			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" )
 			{
 				$is_enc = false;
 			}
@@ -719,16 +719,16 @@ EOF;
 				$is_enc = false;
 			}
 		}
-		else if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
 		{
 			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
 			{
 				$is_enc = false;
 			}
 		}
-		else if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
 		{
-			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" )
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" )
 			{
 				$is_enc = false;
 			}

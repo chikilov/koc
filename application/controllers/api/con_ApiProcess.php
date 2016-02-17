@@ -4202,22 +4202,31 @@ class Con_ApiProcess extends MY_Controller {
 					unset($arrayResult);
 					// 합성은 비용 없음 추후 생길 경우 아래 주석 해제
 					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $gatchaPayment_type, $gatchaPayment, '아이템 합성하기' );
-					$refid = $this->dbRef->randomizeInventoryListPick( $pid, $gatchaValue )->result_array()[0]['id'];
-					if ( $refid )
+					if ( $result )
 					{
-						$arrayResult['objectarray'] = array( 'value' => $refid );
+						$refid = $this->dbRef->randomizeInventoryListPick( $pid, $gatchaValue )->result_array()[0]['id'];
+						if ( $refid )
+						{
+							$arrayResult['objectarray'] = array( 'value' => $refid );
 
-						// 아이템 정보 업데이트
-						$result2 = $this->dbPlay->inventoryProvision( $pid, $arrayResult['objectarray']['value'] );
-						$result = (bool)$result2;
-						$arrayResult['objectarray']['idx'] = $result2;
+							// 아이템 정보 업데이트
+							$result2 = $this->dbPlay->inventoryProvision( $pid, $arrayResult['objectarray']['value'] );
+							$result = (bool)$result2;
+							$arrayResult['objectarray']['idx'] = $result2;
 
-						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
-						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $targetIdx );
+							$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
+							$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $targetIdx );
+						}
+						else
+						{
+							$result = (bool)0;
+						}
 					}
 					else
 					{
-						$result = (bool)0;
+						$resultCode = MY_Controller::STATUS_SYNTHESIZE_ITEM_RACK_COST;
+						$resultText = MY_Controller::MESSAGE_SYNTHESIZE_ITEM_RACK_COST;
+						$arrayResult = null;
 					}
 					$this->dbPlay->onEndTransaction( $result );
 					if ( $result )
@@ -4230,8 +4239,8 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else
 					{
-						$resultCode = MY_Controller::STATUS_SYNTHESIZE_FAIL;
-						$resultText = MY_Controller::MESSAGE_SYNTHESIZE_FAIL;
+						$resultCode = MY_Controller::STATUS_SYNTHESIZE_ITEM_FAIL;
+						$resultText = MY_Controller::MESSAGE_SYNTHESIZE_ITEM_FAIL;
 						$arrayResult = null;
 					}
 				}

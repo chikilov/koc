@@ -1437,6 +1437,11 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					else
 					{
+						if ( $arrayProduct[0]['article_type'] == 'ASST' )
+						{
+							unset($arrayResult['objectarray']);
+						}
+
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
 						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment'] );
@@ -2651,13 +2656,14 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbRank->onBeginTransaction();
 					$this->dbPlay->onBeginTransaction();
 
+					//기본보상 추가 (포인트)
+					$arrayBasicProduct = array( array( 'article_type' => 'ASST', 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) ) );
 					//2배 아이템 적용(골드)
 					if ( in_array(MY_Controller::PRODUCT_ID_GOLD_BONUS, $instant_item) )
 					{
-						$basic_reward_value += $basic_reward_value;
+						$arrayBasicProduct[] = $arrayBasicProduct[0];
 					}
-					//기본보상 추가 (포인트)
-					$arrayBasicProduct = array( 'article_type' => 'ASST', 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) );
+
 					//기본보상 추가 (기체 경험치)
 					$txtCarray = '';
 					$mlRewardList = array();
@@ -2727,7 +2733,7 @@ class Con_ApiProcess extends MY_Controller {
 					if ( $is_clear )
 					{
 						$this->updatePoint( $pid, MY_Controller::COMMON_SAVE_CODE, 'achieve_points', $platformPoints, 'PVE보상' );
-						$this->commonUserResourceProvisioning( array($arrayBasicProduct), $pid, $pid, 'PVE보상 수령' );
+						$this->commonUserResourceProvisioning( $arrayBasicProduct, $pid, $pid, 'PVE보상 수령' );
 						$randomProduct[] = array( 'reward_type' => $arrayProduct['reward_1_type'], 'attach_value' => $arrayProduct['attach_1_value'], 'article_type' => $arrayProduct['article_1_type'], 'article_value' => $arrayProduct['article_1_value'] );
 						if ( $grade > 1 )
 						{
@@ -2743,11 +2749,11 @@ class Con_ApiProcess extends MY_Controller {
 							//2배 아이템 적용(골드)
 							if ( in_array(MY_Controller::PRODUCT_ID_GOLD_BONUS, $instant_item) && $row['article_type'] == MY_Controller::COMMON_PVE_REWARD_TYPE )
 							{
-								$randomProduct[$key]['article_value'] += $randomProduct[$key]['article_value'];
+								$addProduct[] = $row;
 							}
 
 							//2배 아이템 적용(아이템)
-							if ( in_array(MY_Controller::PRODUCT_ID_ITEM_BONUS, $instant_item) && in_array($row["article_type"], json_decode(MY_Controller::ITEM_TYPE, true)) )
+							if ( in_array(MY_Controller::PRODUCT_ID_ITEM_BONUS, $instant_item) && ( in_array( $row["article_type"], json_decode(MY_Controller::ITEM_TYPE, true ) ) || $row["article_type"] == 'CHAR' ) )
 							{
 								$addProduct[] = $row;
 							}
@@ -2757,6 +2763,7 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$randomProduct = array_merge($randomProduct, $addProduct);
 						}
+
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
@@ -2790,12 +2797,16 @@ class Con_ApiProcess extends MY_Controller {
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
 						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-
 						$arrayResult = $this->commonUserResourceProvisioning( $randomProduct, $pid, $pid, 'PVE보상 수령' );
 						$arrayResult['playerinfo'] = $playerInfo;
 						$arrayResult['rewardobject'] = $randomProduct;
 						$arrayResult['basicreward'] = array( array( 'article_value' => 'achieve_points', 'attach_value' => intval($platformPoints) ) );
 						$arrayResult['basicreward'][] = array( 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) );
+
+						if ( in_array(MY_Controller::PRODUCT_ID_GOLD_BONUS, $instant_item) && $basic_reward_type == MY_Controller::COMMON_PVE_REWARD_TYPE )
+						{
+							$arrayResult['basicreward'][] = array( 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) );
+						}
 
 						if ( array_key_exists('rewardobject', $arrayResult) )
 						{
@@ -2830,11 +2841,11 @@ class Con_ApiProcess extends MY_Controller {
 								{
 									if ( array_key_exists('assets', $arrayResult) )
 									{
-										$arrayResult['assets'][] = $arrayResult['objectarray'][$key][0];
+										$arrayResult['assets'][] = $arrayResult['objectarray'][$key];
 									}
 									else
 									{
-										$arrayResult['assets'] = $arrayResult['objectarray'][$key];
+										$arrayResult['assets'] = array( $arrayResult['objectarray'][$key] );
 									}
 								}
 							}
@@ -3001,111 +3012,6 @@ class Con_ApiProcess extends MY_Controller {
 			{
 				$resultCode = MY_Controller::STATUS_PVE_REWARD_FAIL;
 				$resultText = MY_Controller::MESSAGE_PVE_REWARD_FAIL;
-				$arrayResult = null;
-			}
-		}
-		else
-		{
-			$resultCode = MY_Controller::STATUS_NO_MATCHING_PARAMETER;
-			$resultText = MY_Controller::MESSAGE_NO_MATCHING_PARAMETER;
-			$arrayResult = null;
-		}
-
-		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $pid, $_POST['data'] );
-	}
-
-	public function requestLoggingRetryRewardStepForPVE()
-	{
-		$pid = $this->decoded['pid'];
-		$logid = $this->decoded['logid'];
-		$stageid = $this->decoded['stageid'];
-		$rid = $this->decoded['rid'];
-		$rpattern = $this->decoded['rpattern'];
-		$rseq = $this->decoded['rseq'];
-
-		if ( $pid )
-		{
-			$arrayRewardInfo = $this->dbRecord->requestLogRetryRewardInfo( $pid, $logid )->result_array();
-			if ( !( empty( $arrayRewardInfo ) ) )
-			{
-				$this->dbRecord->onBeginTransaction();
-				$this->dbPlay->onBeginTransaction();
-				$arrayRetry = $this->dbRef->requestRetryInfo( $pid, $stageid )->result_array();
-				if ( empty( $arrayRetry ) )
-				{
-					$resultCode = MY_Controller::STATUS_PVE_RETRY_STAGE;
-					$resultText = MY_Controller::MESSAGE_PVE_RETRY_STAGE;
-					$arrayResult = null;
-				}
-				else
-				{
-					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayRetry[0]['retry_type'], $arrayRetry[0]['retry_value'], 'PVE보상 다시 뽑기' );
-					if ( $result )
-					{
-						$arrayProduct = $this->dbRef->randomizeRewardValuePickWithException( $pid, $rid, $rpattern, $rseq )->result_array();
-
-						//랜덤보상 지급
-						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, 'PVE보상 수령' );
-						$arrayResult['rewardobject'] = $arrayProduct[0];
-						if ( array_key_exists('objectarray', $arrayResult) )
-						{
-							if ( $arrayResult['rewardobject']['article_type'] == 'CHAR' || $arrayResult['rewardobject']['article_type'] == 'ITEM' || $arrayResult['rewardobject']['article_type'] == 'WEPN' || $arrayResult['rewardobject']['article_type'] == 'BCPC' || $arrayResult['rewardobject']['article_type'] == 'SKIL' )
-							{
-								$arrayResult['rewardobject']['idx'] = $arrayResult['objectarray'][0]['idx'];
-							}
-							unset($arrayResult['objectArray']);
-
-							// 로그 추가 완료
-							if ( array_key_exists('idx', $arrayResult['rewardobject']) )
-							{
-								$idx = $arrayResult['rewardobject']['idx'];
-							}
-							else
-							{
-								$idx = null;
-							}
-							$txtRandReward = $arrayResult['rewardobject']['reward_type'];
-							$txtRandReward .= ' => '.$arrayResult['rewardobject']['attach_value'];
-						}
-						else
-						{
-							$idx = null;
-							$txtRandReward = $arrayResult['rewardobject']['reward_type'];
-							$txtRandReward .= ' => '.$arrayResult['rewardobject']['attach_value'];
-						}
-
-						$result = (bool)$this->dbRecord->updateLoggingRetryRewardStepForPVE( $pid, $logid, $arrayResult['rewardobject']['seq'], $arrayResult['rewardobject']['reward_type'], $arrayResult['rewardobject']['attach_value'], $idx );
-					}
-					else
-					{
-						$resultCode = MY_Controller::STATUS_RETRY_LACK_CASH;
-						$resultText = MY_Controller::MESSAGE_RETRY_LACK_CASH;
-						$arrayResult = null;
-					}
-
-					$this->dbPlay->onEndTransaction( $result );
-					$this->dbRecord->onEndTransaction( $result );
-
-					if ( $arrayResult )
-					{
-						$this->calcurateEnergy( $pid );
-						$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
-						$resultCode = MY_Controller::STATUS_API_OK;
-						$resultText = MY_Controller::MESSAGE_API_OK;
-						$this->onSysLogWriteDb( $pid, '행성전 추가보상\n'.$txtRandReward );
-					}
-					else
-					{
-						$resultCode = MY_Controller::STATUS_RETRY_FAIL;
-						$resultText = MY_Controller::MESSAGE_RETRY_FAIL;
-						$arrayResult = null;
-					}
-				}
-			}
-			else
-			{
-				$resultCode = MY_Controller::STATUS_RETRY_ALREADY;
-				$resultText = MY_Controller::MESSAGE_RETRY_ALREADY;
 				$arrayResult = null;
 			}
 		}

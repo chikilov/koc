@@ -1163,7 +1163,7 @@ EOF;
 						}
 					}
 				}
-				$arrayResult['objectarray'][] = array( array( 'article_value' => $arrayProduct['article_value'], 'attach_value' => $arrayProduct['attach_value'] ) );
+				$arrayResult['objectarray'][] = array( 'article_value' => $arrayProduct['article_value'], 'attach_value' => $arrayProduct['attach_value'] );
 			}
 			// 캐릭터 가챠인 경우 도감, 캐릭터 정보 업데이트
 			else

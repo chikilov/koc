@@ -96,7 +96,7 @@ class Model_Record extends MY_Model {
 		return $this->DB_INS->insert_id();
 	}
 
-	public function updateLoggingRewardStepForPVE( $pid, $logid, $cidArray, $basic_reward_type, $basic_reward_value, $random_reward_id, $random_reward_pattern, $random_reward_seq, $random_reward_type, $random_reward_value, $random_reward_idx, $duration, $is_clear )
+	public function updateLoggingRewardStepForPVE( $pid, $logid, $cidArray, $basic_reward_type, $basic_reward_value, $arrayProduct, $random_reward, $duration, $grade, $is_clear )
 	{
 		$query = "update koc_record.".MY_Controller::TBL_PVE." set ";
 		$query .= "character_0 = '".$cidArray[0]["idx"]."', ";
@@ -110,44 +110,37 @@ class Model_Record extends MY_Model {
 		$query .= "exp_2 = '".$cidArray[2]["exp"]."', ";
 		$query .= "basic_reward_type = '".$basic_reward_type."', ";
 		$query .= "basic_reward_value = '".$basic_reward_value."', ";
-		$query .= "random_reward_id = '".$random_reward_id."', ";
-		if ( $random_reward_pattern == "" || $random_reward_pattern == null )
+
+		$query .= "random_reward_id = '".$arrayProduct['id']."', ";
+		$query .= "random_reward_pattern = '".$arrayProduct['pattern']."', ";
+		if ( count($random_reward) > 0 )
 		{
-			$query .= "random_reward_pattern = null, ";
-		}
-		else
-		{
-			$query .= "random_reward_pattern = '".$random_reward_pattern."', ";
-		}
-		if ( $random_reward_seq == "" || $random_reward_seq == null )
-		{
-			$query .= "random_reward_seq = null, ";
-		}
-		else
-		{
-			$query .= "random_reward_seq = '".$random_reward_seq."', ";
-		}
-		if ( $random_reward_type == "" || $random_reward_type == null )
-		{
-			$query .= "random_reward_type = null, ";
-		}
-		else
-		{
-			$query .= "random_reward_type = '".$random_reward_type."', ";
-		}
-		if ( $random_reward_value == "" || $random_reward_value == null )
-		{
-			$query .= "random_reward_value = null, ";
-		}
-		else
-		{
-			$query .= "random_reward_value = '".$random_reward_value."', ";
-		}
-		if ( $random_reward_idx )
-		{
-			$query .= "random_reward_idx = '".$random_reward_idx."', ";
+			foreach ( $random_reward as $key => $val )
+			{
+				if ( array_key_exists('reward_type', $val) )
+				{
+					$query .= "random".$key."_reward_type = '".$val['reward_type']."', ";
+				}
+				else
+				{
+					$query .= "random".$key."_reward_type = null, ";
+				}
+				if ( array_key_exists('attach_value', $val) )
+				{
+					$query .= "random".$key."_reward_value = '".$val['attach_value']."', ";
+				}
+				else
+				{
+					$query .= "random".$key."_reward_value = null, ";
+				}
+				if ( array_key_exists('idx', $val) )
+				{
+					$query .= "random".$key."_reward_idx = '".$val['idx']."', ";
+				}
+			}
 		}
 		$query .= "duration = '".$duration."', ";
+		$query .= "grade = '".$grade."', ";
 		$query .= "is_clear = ".$is_clear.", ";
 		$query .= "result_datetime = now() ";
 		$query .= "where pid = '".$pid."' and idx = '".$logid."' ";
@@ -317,6 +310,7 @@ class Model_Record extends MY_Model {
 		$query .= "select idx, case ";
 		$sumSubKey = 0;
 		$prevSumSubKey = 0;
+		$tempKey = array_keys($arrayGrade[$key]["arrPlanet"]);
 		for ( $subkey = 0; $subkey < count($arrayGrade[$key]["arrPlanet"]); $subkey++ )
 		{
 			if ( $subkey == 0 )
@@ -324,7 +318,7 @@ class Model_Record extends MY_Model {
 				$query .= "when idx between 1 and ".($arrayGrade[$key]["arrPlanet"][$subkey]["pcount"] + $sumSubKey)." ";
 				$query .= "then '".$arrayGrade[$key]["arrPlanet"][$subkey]["grade"]."' ";
 			}
-			else if ( $subkey == end(array_keys($arrayGrade[$key]["arrPlanet"])) )
+			else if ( $subkey == end($tempKey) )
 			{
 				$query .= "when idx between ".$sumSubKey." and ".$expCount." ";
 				$query .= "then '".$arrayGrade[$key]["arrPlanet"][$subkey]["grade"]."' ";
@@ -426,8 +420,8 @@ class Model_Record extends MY_Model {
 
 	public function requestLogRewardInfo( $pid, $logid )
 	{
-		$query = "select idx from koc_record.".MY_Controller::TBL_PVE." where ";
-		$query .= "random_reward_type is null and random_reward_value is null and random_reward_idx is null and pid = '".$pid."' and idx = '".$logid."' ";
+		$query = "select idx, instant_item1, instant_item2, instant_item3, instant_item4 from koc_record.".MY_Controller::TBL_PVE." where ";
+		$query .= "result_datetime is null and pid = '".$pid."' and idx = '".$logid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -476,10 +470,9 @@ class Model_Record extends MY_Model {
 	public function requestLoggingStartPVP( $pid, $enemyPid, $use_cash, $instant_item1, $instant_item2, $instant_item3, $instant_item4 )
 	{
 		$query = "insert into koc_record.".MY_Controller::TBL_PVP." ";
-		$query .= "( pid, weekseq, enemy_id, use_cash, instant_item1, instant_item2, instant_item3, instant_item4, start_datetime ) values ( ";
+		$query .= "( pid, dateseq, enemy_id, use_cash, instant_item1, instant_item2, instant_item3, instant_item4, start_datetime ) values ( ";
 		$query .= "'".$pid."', ";
-		$query .= "case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end, ";
+		$query .= "date_format(now(), '%Y%m%d'), ";
 		$query .= "'".$enemyPid."', ";
 		$query .= "".$use_cash.", ";
 		$query .= "'".$instant_item1."', ";
@@ -519,11 +512,7 @@ class Model_Record extends MY_Model {
 	{
 		$query = "select count(idx) as win_count, ifnull(sum( if( result_datetime > ";
 		$query .= "( select ifnull(max( result_datetime ), '1900-01-01') from koc_record.".MY_Controller::TBL_PVP." where is_clear = -1 and pid = '".$pid."' ";
-		$query .= "and weekseq = ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ) ), 1, 0 ) ), 0) as serial_win from koc_record.".MY_Controller::TBL_PVP." where pid = '".$pid."' and weekseq = ";
-		$query .= "( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ) ";
-		$query .= "and is_clear = 1 ";
+		$query .= "and dateseq = date_format(now(), '%Y%m%d') ), 1, 0 ) ), 0) as serial_win from koc_record.".MY_Controller::TBL_PVP." where pid = '".$pid."' and dateseq = date_format(now(), '%Y%m%d') and is_clear = 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

@@ -97,6 +97,9 @@
 		"{\"pid\":\"24\", \"camount\":\"10\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"136\", \"itemType\":\"WEAPON\", \"targetIdx\":\"1148527\", \"sourceIdx\":\"1148529\", \"grade\":\"5\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"136\", \"itemType\":\"WEAPON\", \"sourceIdx\":\"1148656\", \"grade\":\"6\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"102870\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"3\", \"cid\":\"354077\", \"gtype_0\":\"0\", \"gtype_1\":\"1\", \"gtype_2\":\"0\", \"cursession\":\"forAdmin\"}",
+		"{\"pid\":\"3\", \"cid\":\"354077\", \"gtype_0\":\"0\", \"gtype_1\":\"1\", \"gtype_2\":\"0\", \"cursession\":\"forAdmin\"}",
 		//테스트용
 		"{\"pid\":\"13645\",\"cid\":\"RS0100042\", \"cursession\":\"forAdmin\"}",
 		"{\"pid\":\"13645\",\"iid\":\"WCC1120001\", \"cursession\":\"forAdmin\"}",
@@ -250,6 +253,9 @@ Action주소 : <br />
 		<option value="requestLoggingRetryStepForPVE">requestLoggingRetryStepForPVE</option>
 		<option value="requestSynthesizeItem">requestSynthesizeItem</option>
 		<option value="requestSynthesizeItemRetry">requestSynthesizeItemRetry</option>
+		<option value="requestInitDelayForPVP">requestInitDelayForPVP</option>
+		<option value="requestResetGearSlot">requestResetGearSlot</option>
+		<option value="requestSynthesizeGear">requestSynthesizeGear</option>
 		<!-- 테스트용 -->
 		<option value="requestCharacterProvisioning">requestCharacterProvisioning</option>
 		<option value="requestItemProvisioning">requestItemProvisioning</option>

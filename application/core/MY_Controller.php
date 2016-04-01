@@ -112,6 +112,10 @@ EOF;
 	const MESSAGE_EQUIP_ITEM = "NG_ERROR_EQUIP_ITEM";
 	const STATUS_EQUIP_CLASS_ERROR_ITEM = "0104";
 	const MESSAGE_EQUIP_CLASS_ERROR_ITEM = "NG_ERROR_EQUIP_CLASS_ERROR_ITEM";
+	const STATUS_EQUIP_SLOT_ERROR_ITEM = "0105";
+	const MESSAGE_EQUIP_SLOT_ERROR_ITEM = "NG_ERROR_EQUIP_SLOT_ERROR_ITEM";
+	const STATUS_EQUIP_TYPE_ERROR_ITEM = "0106";
+	const MESSAGE_EQUIP_TYPE_ERROR_ITEM = "NG_ERROR_EQUIP_TYPE_ERROR_ITEM";
 
 	const STATUS_BUYITEM_ERROR_ITEM = "0111";
 	const MESSAGE_BUYITEM_ERROR_ITEM = "NG_ERROR_BUYITEM_ERROR_ITEM";
@@ -306,6 +310,16 @@ EOF;
 	const STATUS_SYNTHESIZE_ITEM_FAIL = '0434';
 	const MESSAGE_SYNTHESIZE_ITEM_FAIL = 'NG_ERROR_SYNTHESIZE_FAIL';
 
+	const STATUS_ENERGY_BONUS_TIME_ERROR = '0441';
+	const MESSAGE_ENERGY_BONUS_TIME_ERROR = 'NG_ERROR_ENERGY_BONUS_TIME_ERROR';
+	const STATUS_ENERGY_NOT_BONUS_TIME = '0442';
+	const MESSAGE_ENERGY_NOT_BONUS_TIME = 'NG_ERROR_ENERGY_NOT_BONUS_TIME';
+
+	const STATUS_RESET_LACK_CASH = "0451";
+	const MESSAGE_RESET_LACK_CASH = "NG_ERROR_RESET_LACK_CASH";
+	const STATUS_RESET_NO_CHARACTER = "0452";
+	const MESSAGE_RESET_NO_CHARACTER = "NG_ERROR_RESET_NO_CHARACTER";
+
 	const STATUS_BY_CODE = "010";
 
 	const STATUS_NO_DATA = "0000";
@@ -342,8 +356,10 @@ EOF;
 	const TBL_PLAYERERRLOG = "player_errlog";
 	const TBL_PLAYERASSETLOG = "player_asset_logging";
 	const TBL_PLAYERVIP = "player_vip";
+	const TBL_PLAYERLEV = "player_level";
 	const TBL_PLAYEREXTRAATTEND = "player_extraattend";
 	const TBL_PLAYERIAP = "player_iap";
+	const TBL_PLAYERENREQ = "player_enreq";
 
 		//table in koc_ref database
 	const TBL_DATAFILES = "datafiles";
@@ -371,9 +387,12 @@ EOF;
 	const TBL_RANKREWARD = "rank_reward";
 	const TBL_VIP = "vip";
 	const TBL_SUPPLIES = "supplies";
+	const TBL_PLAYERLEVINFO = "player_levinfo";
+	const TBL_PLAYERREWARD = "player_reward";
 	const TBL_VIPLEVINFO = "vip_levinfo";
 	const TBL_VIPREWARD = "vip_reward";
 	const TBL_EVENTATTEND = "event_attend";
+	const TBL_ITEMUPREF = "item_upgrade_reference";
 
 		//table in koc_mail database
 	const TBL_MAIL = "mail";
@@ -416,6 +435,7 @@ EOF;
 	//const for player
 	const MAX_CHAR_CAPACITY					= 50;	// 기본 캐릭터 보유량
 	const MAX_WEPN_CAPACITY					= 60;	// 기본 무기 보유량
+	const MAX_GEAR_CAPACITY					= 150;	// 기본 기어 보유량
 
 	const MAX_TEAM							= 3;	// 기본 팀 수
 	const MAX_CHARACTER_SLOT				= 3;	// 기본 캐릭터슬롯 수
@@ -426,8 +446,9 @@ EOF;
 	const MAX_LEVEL							= 30;	// 기본 최대 강화수치
 	const MAX_INC_LIMIT_CHAR				= 100;	// 최대 캐릭터 증가 슬롯
 	const MAX_INC_LIMIT_ITEM				= 90;	// 최대 아이템 증가 슬롯
+	const MAX_INC_LIMIT_GEAR				= 100;	// 최대 아이템 증가 슬롯
 
-	const MAX_ENERGY_POINTS					= 10;	// 기본 행성전 에너지
+	const MAX_ENERGY_POINTS					= 50;	// 기본 행성전 에너지
 	const MAX_MODES_PVB						= 10;	// 기본 PVB 에너지
 	const MAX_MODES_PVP						= 10;	// 기본 PVP 에너지
 	const MAX_MODES_DEFENCE					= 10;	// 기본 DEFENCE 에너지
@@ -438,9 +459,11 @@ EOF;
 
 	const ENERGY_RECHARGE_INTERVAL			= 600;	// 에너지(행성전) 충전 시간
 	const MODE_PVB_RECHARGE_INTERVAL		= 1800;	// 에너지(보스) 충전 시간
-	const MODE_PVP_RECHARGE_INTERVAL		= 1800;	// 에너지(대전) 충전 시간
+	const MODE_PVP_RECHARGE_INTERVAL		= 30;	// 에너지(대전) 충전 시간
 	const MODE_DEFENSE_RECHARGE_INTERVAL	= 1800;	// 에너지(디펜스) 충전 시간
 	const MODE_SURVIVAL_RECHARGE_INTERVAL	= 1800;	// 에너지(생존) 충전 시간
+	const PVP_DELAY_INIT_ASSET_TYPE			= 'CASH_POINTS';
+	const PVP_DELAY_INIT_ASSET_VALUE		= 50;
 
 	const MAX_ATTEND						= 20;	// 최대 출석 일 수
 	const MAX_EXTRAATTEND					= 7;	// 최대 이벤트출석 일 수
@@ -450,16 +473,16 @@ EOF;
 	const RANDOMIZE_TYPE					= "[\"SINGLE\", \"PACKAGE\", \"CHARACTER\", \"WEAPON\", \"BACKPACK\", \"TECHNIQUE\"]";
 	const CHARACTER_TYPE					= "[\"SINGLE\", \"PACKAGE\", \"CHARACTER\"]";
 	const INVENTORY_TYPE					= "[\"WEAPON\", \"BACKPACK\", \"TECHNIQUE\"]";
-	const ITEM_TYPE							= "[\"WTIK\", \"BTIK\", \"STIK\", \"WEPN\", \"BCPC\", \"SKIL\"]";
+	const ITEM_TYPE							= '["WTIK", "BTIK", "STIK", "WEPN", "BCPC", "SKIL"]';
 
-	const GAMEPOINTS_PER_CHARACTER_GRADE	= "[0,100,200,400,600,800,1200]";
-	const GAMEPOINTS_PER_ITEM_GRADE			= "[0,100,200,400,600,800,1200]";
+	const GAMEPOINTS_PER_CHARACTER_GRADE	= '[0,100,200,400,600,800,1200]';
+	const GAMEPOINTS_PER_ITEM_GRADE			= '[0,100,200,400,600,800,1200]';
 
-	const PRODUCTTYPE_NORMAL				= "NM";
-	const PRODUCTTYPE_PACKAGE_FOREVER		= "PF";
-	const PRODUCTTYPE_PACKAGE_ENDPOINT		= "PE";
-	const PRODUCTTYPE_PACKAGE_MONTHLY		= "PM";
-	const PRODUCTTYPE_PACKAGE_DAILY			= "PD";
+	const PRODUCTTYPE_NORMAL				= 'NM';
+	const PRODUCTTYPE_PACKAGE_FOREVER		= 'PF';
+	const PRODUCTTYPE_PACKAGE_ENDPOINT		= 'PE';
+	const PRODUCTTYPE_PACKAGE_MONTHLY		= 'PM';
+	const PRODUCTTYPE_PACKAGE_DAILY			= 'PD';
 
 	//const for points
 	const LIMIT_ENERGY_POINTS				= 999;	// 최대 행성전 에너지 제한
@@ -471,14 +494,17 @@ EOF;
 	const LIMIT_CASH_POINTS					= 99999;	// 최대 캐시포인트 제한
 	const LIMIT_FRIENDSHIP_POINTS			= 1000;	// 최대 우정포인트 제한
 
-	const COMMON_USE_CODE					= "use";
-	const COMMON_SAVE_CODE					= "save";
+	const COMMON_USE_CODE					= 'use';
+	const COMMON_SAVE_CODE					= 'save';
 
 	//const for pve
 	const DEFENCE_UP_ITEM_PRICE				= 400;
 	const ATTACK_UP_ITEM_PRICE				= 400;
 	const AUTO_SKILL_ITEM_PRICE				= 600;
 	const FRIEND_TIME_EXTENT_ITEM_PRICE		= 600;
+	const PRODUCT_ID_GOLD_BONUS				= 'NGP_BT_00001';
+	const PRODUCT_ID_EXP_BONUS				= 'NGP_BT_00002';
+	const PRODUCT_ID_ITEM_BONUS				= 'NGP_BT_00003';
 
 	//const for ranking
 	const PVP_YEARWEEK_STANDARD				= 3;	//pvp는 매주 화요일 갱신
@@ -489,39 +515,40 @@ EOF;
 	const PVP_SCORE_LAST_GROUP				= 18000; // pvp 그룹 마지막 그룹시작점수
 
 	//const for synthesize
-	const GATCHA_BY_GRADE					= "[\"GAC030000\", \"GAC030001\", \"GAC030002\", \"GAC030003\", \"GAC030004\"]";	//합성에 사용되는 가챠정보
+	const GATCHA_BY_GRADE					= '["GAC030000", "GAC030001", "GAC030002", "GAC030003", "GAC030004"]';	//합성에 사용되는 가챠정보
 	const GATCHA_BY_WEPN_GRADE				= '["GAW070000", "GAW070001", "GAW070002", "GAW070003", "GAW070004"]';	//무기 합성에 사용되는 가챠정보
 	const GATCHA_BY_BCPC_GRADE				= '["GAG070000", "GAG070001", "GAG070002", "GAG070003", "GAG070004"]';	//백팩 합성에 사용되는 가챠정보
 	const GATCHA_BY_SKIL_GRADE				= '["GAT070000", "GAT070001", "GAT070002", "GAT070003", "GAT070004"]';	//스킬 합성에 사용되는 가챠정보
+	const GATCHA_BY_GEAR_GRADE				= '{"KRYPT":{"HD":["MGKR01001","MGKR02001","MGKR03001","MGKR04001","MGKR05001","MGKR06001"],"BD":["MGKR01002","MGKR02002","MGKR03002","MGKR04002","MGKR05002","MGKR06002"],"RA":["MGKR01003","MGKR02003","MGKR03003","MGKR04003","MGKR05003","MGKR06003"],"LA":["MGKR01004","MGKR02004","MGKR03004","MGKR04004","MGKR05004","MGKR06004"],"RL":["MGKR01005","MGKR02005","MGKR03005","MGKR04005","MGKR05005","MGKR06005"],"LL":["MGKR01006","MGKR02006","MGKR03006","MGKR04006","MGKR05006","MGKR06006"]},"KAIRON":{"HD":["MGKA01001","MGKA02001","MGKA03001","MGKA04001","MGKA05001","MGKA06001"],"BD":["MGKA01002","MGKA02002","MGKA03002","MGKA04002","MGKA05002","MGKA06002"],"RA":["MGKA01003","MGKA02003","MGKA03003","MGKA04003","MGKA05003","MGKA06003"],"LA":["MGKA01004","MGKA02004","MGKA03004","MGKA04004","MGKA05004","MGKA06004"],"RL":["MGKA01005","MGKA02005","MGKA03005","MGKA04005","MGKA05005","MGKA06005"],"LL":["MGKA01006","MGKA02006","MGKA03006","MGKA04006","MGKA05006","MGKA06006"]},"PADANIUM":{"HD":["MGPA01001","MGPA02001","MGPA03001","MGPA04001","MGPA05001","MGPA06001"],"BD":["MGPA01002","MGPA02002","MGPA03002","MGPA04002","MGPA05002","MGPA06002"],"RA":["MGPA01003","MGPA02003","MGPA03003","MGPA04003","MGPA05003","MGPA06003"],"LA":["MGPA01004","MGPA02004","MGPA03004","MGPA04004","MGPA05004","MGPA06004"],"RL":["MGPA01005","MGPA02005","MGPA03005","MGPA04005","MGPA05005","MGPA06005"],"LL":["MGPA01006","MGPA02006","MGPA03006","MGPA04006","MGPA05006","MGPA06006"]},"PRODIA":{"HD":["MGPR01001","MGPR02001","MGPR03001","MGPR04001","MGPR05001","MGPR06001"],"BD":["MGPR01002","MGPR02002","MGPR03002","MGPR04002","MGPR05002","MGPR06002"],"RA":["MGPR01003","MGPR02003","MGPR03003","MGPR04003","MGPR05003","MGPR06003"],"LA":["MGPR01004","MGPR02004","MGPR03004","MGPR04004","MGPR05004","MGPR06004"],"RL":["MGPR01005","MGPR02005","MGPR03005","MGPR04005","MGPR05005","MGPR06005"],"LL":["MGPR01006","MGPR02006","MGPR03006","MGPR04006","MGPR05006","MGPR06006"]},"TASTEN":{"HD":["MGTA01001","MGTA02001","MGTA03001","MGTA04001","MGTA05001","MGTA06001"],"BD":["MGTA01002","MGTA02002","MGTA03002","MGTA04002","MGTA05002","MGTA06002"],"RA":["MGTA01003","MGTA02003","MGTA03003","MGTA04003","MGTA05003","MGTA06003"],"LA":["MGTA01004","MGTA02004","MGTA03004","MGTA04004","MGTA05004","MGTA06004"],"RL":["MGTA01005","MGTA02005","MGTA03005","MGTA04005","MGTA05005","MGTA06005"],"LL":["MGTA01006","MGTA02006","MGTA03006","MGTA04006","MGTA05006","MGTA06006"]}}';	//스킬 합성에 사용되는 가챠정보
 
 	//const for character reach maxlevel
-	const CHARMAXLEV_REWARD_TYPE			= "EVENT_POINTS";
-	const CHARMAXLEV_REWARD_VALUE			= "10";
+	const CHARMAXLEV_REWARD_TYPE			= 'EVENT_POINTS';
+	const CHARMAXLEV_REWARD_VALUE			= 10;
 
 	const CHAR_EXP_FOR_MAXLEV				= 209700;
 
 	//const for exploration
-	const ARRAY_GRADE_COUNT					= "[{\"count\":\"20\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"2\"},{\"grade\":\"2\",\"pcount\":\"6\"},{\"grade\":\"3\",\"pcount\":\"6\"},{\"grade\":\"4\",\"pcount\":\"4\"},{\"grade\":\"5\",\"pcount\":\"2\"}]},{\"count\":\"21\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"2\"},{\"grade\":\"2\",\"pcount\":\"6\"},{\"grade\":\"3\",\"pcount\":\"7\"},{\"grade\":\"4\",\"pcount\":\"4\"},{\"grade\":\"5\",\"pcount\":\"2\"}]},{\"count\":\"22\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"2\"},{\"grade\":\"2\",\"pcount\":\"7\"},{\"grade\":\"3\",\"pcount\":\"7\"},{\"grade\":\"4\",\"pcount\":\"4\"},{\"grade\":\"5\",\"pcount\":\"2\"}]},{\"count\":\"23\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"2\"},{\"grade\":\"2\",\"pcount\":\"7\"},{\"grade\":\"3\",\"pcount\":\"7\"},{\"grade\":\"4\",\"pcount\":\"5\"},{\"grade\":\"5\",\"pcount\":\"2\"}]},{\"count\":\"24\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"7\"},{\"grade\":\"3\",\"pcount\":\"7\"},{\"grade\":\"4\",\"pcount\":\"5\"},{\"grade\":\"5\",\"pcount\":\"2\"}]},{\"count\":\"25\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"7\"},{\"grade\":\"3\",\"pcount\":\"7\"},{\"grade\":\"4\",\"pcount\":\"5\"},{\"grade\":\"5\",\"pcount\":\"3\"}]},{\"count\":\"26\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"7\"},{\"grade\":\"3\",\"pcount\":\"8\"},{\"grade\":\"4\",\"pcount\":\"5\"},{\"grade\":\"5\",\"pcount\":\"3\"}]},{\"count\":\"27\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"8\"},{\"grade\":\"3\",\"pcount\":\"8\"},{\"grade\":\"4\",\"pcount\":\"5\"},{\"grade\":\"5\",\"pcount\":\"3\"}]},{\"count\":\"28\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"8\"},{\"grade\":\"3\",\"pcount\":\"8\"},{\"grade\":\"4\",\"pcount\":\"6\"},{\"grade\":\"5\",\"pcount\":\"3\"}]},{\"count\":\"29\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"8\"},{\"grade\":\"3\",\"pcount\":\"9\"},{\"grade\":\"4\",\"pcount\":\"6\"},{\"grade\":\"5\",\"pcount\":\"3\"}]},{\"count\":\"30\",\"arrPlanet\":[{\"grade\":\"1\",\"pcount\":\"3\"},{\"grade\":\"2\",\"pcount\":\"9\"},{\"grade\":\"3\",\"pcount\":\"9\"},{\"grade\":\"4\",\"pcount\":\"6\"},{\"grade\":\"5\",\"pcount\":\"3\"}]}]";	// 탐색 행성 수 별 등급별 행성 수
+	const ARRAY_GRADE_COUNT					= '[{"count":"20","arrPlanet":[{"grade":"1","pcount":"2"},{"grade":"2","pcount":"6"},{"grade":"3","pcount":"6"},{"grade":"4","pcount":"4"},{"grade":"5","pcount":"2"}]},{"count":"21","arrPlanet":[{"grade":"1","pcount":"2"},{"grade":"2","pcount":"6"},{"grade":"3","pcount":"7"},{"grade":"4","pcount":"4"},{"grade":"5","pcount":"2"}]},{"count":"22","arrPlanet":[{"grade":"1","pcount":"2"},{"grade":"2","pcount":"7"},{"grade":"3","pcount":"7"},{"grade":"4","pcount":"4"},{"grade":"5","pcount":"2"}]},{"count":"23","arrPlanet":[{"grade":"1","pcount":"2"},{"grade":"2","pcount":"7"},{"grade":"3","pcount":"7"},{"grade":"4","pcount":"5"},{"grade":"5","pcount":"2"}]},{"count":"24","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"7"},{"grade":"3","pcount":"7"},{"grade":"4","pcount":"5"},{"grade":"5","pcount":"2"}]},{"count":"25","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"7"},{"grade":"3","pcount":"7"},{"grade":"4","pcount":"5"},{"grade":"5","pcount":"3"}]},{"count":"26","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"7"},{"grade":"3","pcount":"8"},{"grade":"4","pcount":"5"},{"grade":"5","pcount":"3"}]},{"count":"27","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"8"},{"grade":"3","pcount":"8"},{"grade":"4","pcount":"5"},{"grade":"5","pcount":"3"}]},{"count":"28","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"8"},{"grade":"3","pcount":"8"},{"grade":"4","pcount":"6"},{"grade":"5","pcount":"3"}]},{"count":"29","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"8"},{"grade":"3","pcount":"9"},{"grade":"4","pcount":"6"},{"grade":"5","pcount":"3"}]},{"count":"30","arrPlanet":[{"grade":"1","pcount":"3"},{"grade":"2","pcount":"9"},{"grade":"3","pcount":"9"},{"grade":"4","pcount":"6"},{"grade":"5","pcount":"3"}]}]';	// 탐색 행성 수 별 등급별 행성 수
 	const MIN_EXP_PLANET_COUNT				= 20;	// 탐색 행성 최소 수량
 	const MAX_EXP_PLANET_COUNT				= 30;	// 탐색 행성 최대 수량
 
-	const EXP_TIME_FOR_CHAR					= "[\"0.00\",\"0.00\",\"0.04\",\"0.08\",\"0.12\",\"0.16\",\"0.20\"]";	// 기체 등급별 탐색시간 비율
+	const EXP_TIME_FOR_CHAR					= '["0.00","0.00","0.04","0.08","0.12","0.16","0.20"]';	// 기체 등급별 탐색시간 비율
 
 	const EXP_COST_BASIC_MULTIPLE			= 200;	// 탐색 비용 고정 배수 (등급 * 고정배수 = 탐색비용)
-	const COMMON_EXP_REWARD_TYPE			= "EVENT_POINTS";
-	const COMMON_EXP_REWARD_VALUE			= "5";
-	const COMMON_PVE_REWARD_TYPE			= "GAME_POINTS";
-	const COMMON_SURVIVAL_REWARD_TYPE		= "GAME_POINTS";
+	const COMMON_EXP_REWARD_TYPE			= 'EVENT_POINTS';
+	const COMMON_EXP_REWARD_VALUE			= 5;
+	const COMMON_PVE_REWARD_TYPE			= 'GAME_POINTS';
+	const COMMON_SURVIVAL_REWARD_TYPE		= 'GAME_POINTS';
 
-	const COMMON_RANKING_PAGE_SIZE			= "200";
-	const RECOMMENDED_FRIEND_LIST_COUNT		= "10";
-	const FRIEND_STATUS_REQUEST				= "0";
-	const FRIEND_STATUS_ACCEPTED			= "1";
-	const FRIEND_STATUS_REJECTED			= "2";
-	const FRIEND_STATUS_DELETED				= "3";
+	const COMMON_RANKING_PAGE_SIZE			= '200';
+	const RECOMMENDED_FRIEND_LIST_COUNT		= '10';
+	const FRIEND_STATUS_REQUEST				= '0';
+	const FRIEND_STATUS_ACCEPTED			= '1';
+	const FRIEND_STATUS_REJECTED			= '2';
+	const FRIEND_STATUS_DELETED				= '3';
 	const FRIEND_HELP_BASIC_POINT			= 10;
 	const FRIEND_PRESENT_TIME				= 86400;
-	const COMMON_LANGUAGE_COLUMN			= "kr";
+	const COMMON_LANGUAGE_COLUMN			= 'kr';
 
 	//const for pvp
 	const PVP_POINT_USER_MULTIPLE			= 2;
@@ -532,6 +559,7 @@ EOF;
 	const COMMON_SLOT_PAYMENT_TYPE			= "CASH_POINTS";
 	const COMMON_CHASLOT_PAYMENT_VALUE		= 30;
 	const COMMON_INVSLOT_PAYMENT_VALUE		= 20;
+	const COMMON_GERSLOT_PAYMENT_VALUE		= 20;
 
 	//const for event
 	const UPGRADE_DIS_EVENT_PRODUCT			= "upgrade";
@@ -558,9 +586,26 @@ EOF;
 	const ITEM_MAXLEV_BY_GRADE = '["0","10","10","10","10","10","10"]';
 	const ITEM_MAX_LEV = '10';
 	const GATCHA_BY_ITEM_GRADE_PAYMENT_TYPE = 'GAME_POINTS';
-	const GATCHA_BY_ITEM_GRADE_PAYMENT = '["0","4000","11000","19000","33000","45000"]';
+	const GATCHA_BY_ITEM_GRADE_PAYMENT = '["0","1000","2000","4000","7000","45000"]';
 	const UNEQUIP_ASSET_TYPE = 'GAME_POINTS';
 	const UNEQUIP_ASSET_VALUE = '["0","1000","3000","4000","7000","9000","18000"]';
+
+	//const for energy bonus
+	const ENBONUS_A = '[12, 13]';
+	const ENBONUS_B = '[20, 21]';
+	const ENBONUS_TERM_A = '50400';
+	const ENBONUS_TERM_B = '28800';
+	const ENERGY_BONUS_TYPE = 'ENERGY_POINTS';
+	const ENERGY_BONUS_VALUE = '20';
+	const ENERGY_BONUS_LOG_TEXT = '지정시간 이벤트 에너지 지급';
+
+	//const for gearslot
+	const ARRAY_GEAR_TYPE = '[{"type":"KRYPT", "probability":"1"}, {"type":"PRODIA", "probability":"1"}, {"type":"KAIRON", "probability":"1"}, {"type":"TASTEN", "probability":"1"}, {"type":"PADANIUM", "probability":"1"}]';
+	const GEAR_RESET_BASIC_TYPE = 'GAME_POINTS';
+	const GEAR_RESET_BASIC_VALUE = 7500;
+	const GEAR_RESET_LOCK_TYPE = 'CASH_POINTS';
+	const GEAR_RESET_LOCK_VALUE = 25;
+	const ARRAY_GEAR_PARTS_SLOTSEQ = '["HD", "BD", "RA", "LA", "RL", "LL"]';
 
 	public $public_key = MY_Controller::INIT_ENCRYPTION_SERVER_PUBLICKEY;
 	public $private_key = MY_Controller::INIT_ENCRYPTION_SERVER_PRIVATEKEY;
@@ -605,16 +650,16 @@ EOF;
 		$this->load->model("api/Model_Login", "dbLogin");
 		$this->load->model("api/Model_Log", "dbLog");
 
-		date_default_timezone_set('Asia/Seoul');
+		date_default_timezone_set('Etc/UTC');
 
 		$uriAddress = $_SERVER['REQUEST_URI'];
 
-		if(strpos($uriAddress, "/pages/admin/") !== false)
+		if ( strpos($uriAddress, "/pages/admin/") !== false )
 		{
 			$this->load->library('session');
 			$userId = $this->session->userdata('userId_session');
 
-			if( $userId == null )
+			if ( $userId == null )
 			{
 				$this->load->helper('url');
 
@@ -695,11 +740,17 @@ EOF;
 		}
 		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
 		{
-			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" )
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" || $_SERVER["HTTP_USER_AGENT"] == "curl/7.43.0")
 			{
 				$is_enc = false;
 			}
 		}
+
+		if ( array_key_exists("HTTP_POSTMAN_TOKEN", $_SERVER) )
+		{
+			$is_enc = false;
+		}
+
 		if ( $is_enc )
 		{
 			$key = $key == NULL ? DEFAULTKEY : $key;
@@ -730,11 +781,17 @@ EOF;
 		}
 		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
 		{
-			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" )
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" || $_SERVER["HTTP_USER_AGENT"] == "curl/7.43.0" )
 			{
 				$is_enc = false;
 			}
 		}
+
+		if ( array_key_exists("HTTP_POSTMAN_TOKEN", $_SERVER) )
+		{
+			$is_enc = false;
+		}
+
 		if ( $is_enc )
 		{
 			$key = $key == NULL ? DEFAULTKEY : $key;
@@ -766,12 +823,9 @@ EOF;
 		{
 			$cur_date = $cur_date[0]["curTime"];
 		}
-		$this->benchmark->mark('code_end');
-//		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
-		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'code_end'), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
+		$this->benchmark->mark('total_execution_time_endbf');
+		$strReturn = json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(double)((int)((((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024) * 1000) / 1000), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE);
 
-//		$this->benchmark->mark('total_execution_time_endbf');
-//		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".json_encode( array( 'resultCd'=>$status, 'resultMsg'=>$message, 'loadingTime'=>$this->benchmark->elapsed_time('total_execution_time_start', 'total_execution_time_endbf'), 'memusage'=>(string)(((double)memory_get_usage(true) - (double)MEMUSECHK) / (double)1024 / (double)1024), 'cur_date' => $cur_date, 'arrResult'=>$arrayResult ), JSON_UNESCAPED_UNICODE) );
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "responseData : ".$strReturn, $status );
 
 		$strReturn = $this->NG_ENCRYPT( $strReturn );
@@ -1046,32 +1100,6 @@ EOF;
 				}
 			}
 
-		    //에너지가 MY_Controller::MAX_MODES_PVP(10)개 이상이면 충전이 진행되지 않음
-			//다음 에너지 충전이 존재하지 않음 null
-			if ( $curDataArray["pvp_points"] >= ( MY_Controller::MAX_MODES_PVP + $incInfo["inc_pvp"] ) )
-			{
-				$curDataArray["pvp_uptime"] = -1;
-			}
-			else
-			{
-				$lastEnergyTime = $curDataArray["pvp_uptime"];
-				$lastEnergyTime = strtotime((string)$lastEnergyTime);
-				$diffInSec = (int)$currentTime - (int)$lastEnergyTime;
-
-				//지나간 시간만큼 하트를 더함 (MY_Controller::HEART_REFILL_SECONDS(1200초))
-				$curDataArray["pvp_points"] = intval($curDataArray["pvp_points"]) + floor($diffInSec / MY_Controller::MODE_PVP_RECHARGE_INTERVAL);
-
-				if ( intval($curDataArray["pvp_points"]) >= ( intval(MY_Controller::MAX_MODES_PVP) + intval($incInfo["inc_pvp"]) ) )
-				{
-					$curDataArray["pvp_points"] = ( intval(MY_Controller::MAX_MODES_PVP) + intval($incInfo["inc_pvp"]) );
-					$curDataArray["pvp_uptime"] = -1;
-				}
-				else
-				{
-					$curDataArray["pvp_uptime"] = intval($diffInSec) % intval(MY_Controller::MODE_PVP_RECHARGE_INTERVAL);
-				}
-			}
-
 			//에너지가 MY_Controller::MAX_MODES_SURVIVAL(10)개 이상이면 충전이 진행되지 않음
 			//다음 에너지 충전이 존재하지 않음 null
 			if ( $curDataArray["survival_points"] >= ( MY_Controller::MAX_MODES_SURVIVAL + $incInfo["inc_survival"] ) )
@@ -1110,237 +1138,232 @@ EOF;
     function commonUserResourceProvisioning( $arrayProd, $pid, $sid, $loggingText )
     {
 		// 인벤토리 내에 빈공간 체크
-		$charCount = 0;
-		$wepnCount = 0;
+		$charCount = $this->dbPlay->IsEmptySpace( $sid, "CHARACTER" )->result_array()[0]["is_empty"];
+		$wepnCount = $this->dbPlay->IsEmptySpace( $sid, "WEAPON" )->result_array()[0]["is_empty"];
+		$gearCount = $this->dbPlay->IsEmptySpace( $sid, "GEAR" )->result_array()[0]["is_empty"];
 
+		//빈공간이 존재할 경우(추가되는 아이템의 수량 이상으로)
 		foreach ( $arrayProd as $key => $arrayProduct )
 		{
-			if ( $arrayProduct["article_type"] == "CTIK" || $arrayProduct["article_type"] == "CHAR" )
+		    if ( $arrayProduct['article_type'] == 'ASST' )
 			{
-				$charCount = $charCount + 1;
-			}
-			else if ( in_array($arrayProduct["article_type"], json_decode(MY_Controller::ITEM_TYPE, true)) )
-			{
-				if ( $arrayProduct["article_type"] == "WEPN" || $arrayProduct["article_type"] == "BCPC" || $arrayProduct["article_type"] == "SKIL" || $arrayProduct["article_type"] == "STIK" || $arrayProduct["article_type"] == "BTIK" || $arrayProduct["article_type"] == "WTIK" )
+				$this->calcurateEnergy( $sid );
+				$result = (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, $arrayProduct['article_value'], $arrayProduct['attach_value'], $loggingText );
+				if ( array_key_exists('bonus', $arrayProduct) )
 				{
-					$wepnCount = $wepnCount + 1;
-				}
-			}
-		}
-
-		if ( $charCount > 0 )
-		{
-			$result = (bool)$this->dbPlay->IsEmptySpace( $sid, "CHARACTER", $charCount )->result_array()[0]["is_empty"];
-		}
-		else
-		{
-			$result = (bool)1;
-		}
-
-		if ( $wepnCount > 0 )
-		{
-			$result = $result & (bool)$this->dbPlay->IsEmptySpace( $sid, "WEAPON", $wepnCount )->result_array()[0]["is_empty"];
-		}
-		//빈공간이 존재할 경우(추가되는 아이템의 수량 이상으로)
-		if ( $result )
-		{
-			foreach ( $arrayProd as $key => $arrayProduct )
-			{
-			    if ( $arrayProduct["article_type"] == "ASST" )
-				{
-					$this->calcurateEnergy( $sid );
-					$result = (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, $arrayProduct["article_value"], $arrayProduct["attach_value"], $loggingText );
-					if ( array_key_exists("bonus", $arrayProduct) )
+					if ( $arrayProduct['bonus'] > 0 )
 					{
-						if ( $arrayProduct["bonus"] > 0 )
+						if ( $arrayProduct['article_value'] == 'CASH_POINTS' )
 						{
-							if ( $arrayProduct["article_value"] == "CASH_POINTS" )
-							{
-								$result = $result & (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, "EVENT_POINTS", $arrayProduct["bonus"], $loggingText );
-							}
-							else
-							{
-								$result = $result & (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, $arrayProduct["article_value"], $arrayProduct["bonus"], $loggingText );
-							}
+							$result = $result & (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, 'EVENT_POINTS', $arrayProduct['bonus'], $loggingText );
+						}
+						else
+						{
+							$result = $result & (bool)$this->updatePoint( $sid, MY_Controller::COMMON_SAVE_CODE, $arrayProduct['article_value'], $arrayProduct['bonus'], $loggingText );
 						}
 					}
-
-					$arrayResult["remain_item"] = null;
 				}
-				// 캐릭터 가챠인 경우 도감, 캐릭터 정보 업데이트
-				else
+				$arrayResult['objectarray'][] = array( array( 'article_value' => $arrayProduct['article_value'], 'attach_value' => $arrayProduct['attach_value'] ) );
+			}
+			// 캐릭터 가챠인 경우 도감, 캐릭터 정보 업데이트
+			else
+			{
+				//for ( $i = 0; $i < $arrayProduct['attach_value'] )
+				if ( $arrayProduct['article_type'] == 'CTIK' )
 				{
-					//for ( $i = 0; $i < $arrayProduct["attach_value"] )
-					if ( $arrayProduct["article_type"] == "CTIK" )
+					$result = (bool)1;
+					if ( $charCount > 0 )
 					{
-						$result = (bool)1;
-
-						for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 						{
-							$refid = $this->requestGatcha( $sid, $arrayProduct["article_value"] );
+							$refid = $this->requestGatcha( $sid, $arrayProduct['article_value'] );
 							// 캐릭터 정보 업데이트
 							$idx = $this->dbPlay->characterProvision( $sid, $refid );
-							$arrayResult["objectarray"][$i]["type"] = "CHARACTER";
-							$arrayResult["objectarray"][$i]["idx"] = $idx;
-							$arrayResult["objectarray"][$i]["value"] = $refid;
+							$arrayResult['objectarray'][] = array_merge( $this->dbPlay->requestCharacterIns( $pid, $idx )->result_array()[0], array( 'type' => 'CHARACTER', 'value' => $refid ) );
 							$result = $result & (bool)$idx;
 
 							// 도감 업데이트
 							$this->dbPlay->collectionProvision( $sid, $refid );
 						}
-					}
-					// 아이템 가챠인 경우 인벤토리 정보 업데이트
-					else if ( $arrayProduct["article_type"] == "BTIK" || $arrayProduct["article_type"] == "STIK" || $arrayProduct["article_type"] == "WTIK" )
-					{
-						$result = (bool)1;
 
-						for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
+						$charCount = $charCount - 1;
+					}
+					else
+					{
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
+					}
+				}
+				// 아이템 가챠인 경우 인벤토리 정보 업데이트
+				else if ( $arrayProduct['article_type'] == 'BTIK' || $arrayProduct['article_type'] == 'STIK' || $arrayProduct['article_type'] == 'WTIK' )
+				{
+					$result = (bool)1;
+					if ( $wepnCount > 0 )
+					{
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 						{
-							$refid = $this->requestGatcha( $sid, $arrayProduct["article_value"] );
+							$refid = $this->requestGatcha( $sid, $arrayProduct['article_value'] );
 							// 인벤토리 정보 업데이트
 							$idx = $this->dbPlay->inventoryProvision( $sid, $refid );
-							$arrayResult["objectarray"][$i]["type"] = "ITEM";
-							$arrayResult["objectarray"][$i]["idx"] = $idx;
-							$arrayResult["objectarray"][$i]["value"] = $refid;
+							$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $refid );
 							$result = $result & (bool)$idx;
 						}
-					}
-					else if ( $arrayProduct["article_type"] == "CHAR" )
-					{
-						$result = (bool)1;
 
-						for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
+						$wepnCount = $wepnCount - 1;
+					}
+					else
+					{
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
+					}
+				}
+				else if ( $arrayProduct['article_type'] == 'CHAR' )
+				{
+					$result = (bool)1;
+					if ( $charCount > 0 )
+					{
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 						{
 							// 캐릭터 정보 업데이트
-							$idx = $this->dbPlay->characterProvision( $sid, $arrayProduct["article_value"] );
-							$arrayResult["objectarray"][$i]["type"] = "CHARACTER";
-							$arrayResult["objectarray"][$i]["idx"] = $idx;
-							$arrayResult["objectarray"][$i]["value"] = $arrayProduct["article_value"];
+							$idx = $this->dbPlay->characterProvision( $sid, $arrayProduct['article_value'] );
+							$arrayResult['objectarray'][] = array_merge($this->dbPlay->requestCharacterIns( $pid, $idx )->result_array()[0], array( 'type' => 'CHARACTER', 'idx' => $idx, 'value' => $arrayProduct['article_value'] ) );
 							$result = $result & (bool)$idx;
 
 							// 도감 업데이트
-							$this->dbPlay->collectionProvision( $sid, $arrayProduct["article_value"] );
+							$this->dbPlay->collectionProvision( $sid, $arrayProduct['article_value'] );
 						}
-					}
-					else if ( $arrayProduct["article_type"] == "ITEM" || $arrayProduct["article_type"] == "PILT" || $arrayProduct["article_type"] == "BCPC" || $arrayProduct["article_type"] == "SKIL" || $arrayProduct["article_type"] == "WEPN" )
-					{
-						$result = (bool)1;
 
-						for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
+						$charCount = $charCount - 1;
+					}
+					else
+					{
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
+					}
+				}
+				else if ( $arrayProduct['article_type'] == 'PILT' )
+				{
+					$result = (bool)1;
+
+					for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
+					{
+						// 인벤토리 정보 업데이트
+						$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct['article_value'] );
+						$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $arrayProduct['article_value'], 'expire' => $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]['expire'] );
+						$result = $result & (bool)$idx;
+					}
+				}
+				else if ( $arrayProduct['article_type'] == 'BCPC' || $arrayProduct['article_type'] == 'SKIL' || $arrayProduct['article_type'] == 'WEPN' )
+				{
+					$result = (bool)1;
+					if ( $wepnCount > 0 )
+					{
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 						{
 							// 인벤토리 정보 업데이트
-							$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct["article_value"] );
-							$arrayResult["objectarray"][$i]["type"] = "ITEM";
-							$arrayResult["objectarray"][$i]["idx"] = $idx;
-							$arrayResult["objectarray"][$i]["value"] = $arrayProduct["article_value"];
-							$arrayResult["objectarray"][$i]["expire"] = $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]["expire"];
+							$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct['article_value'] );
+							$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $arrayProduct['article_value'], 'expire' => $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]['expire'] );
 							$result = $result & (bool)$idx;
 						}
+
+						$wepnCount = $wepnCount - 1;
 					}
-					else if ( $arrayProduct["article_type"] == "OPRT" )
+					else
 					{
-						$result = (bool)1;
-						//오퍼레이터의 경우 중복체크하여 지급
-						if ( !( (bool)$this->dbPlay->requestItemExistsWithRef( $sid, $arrayProduct["article_value"], "count" ) ) )
-						{
-							for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
-							{
-								// 인벤토리 정보 업데이트
-								$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct["article_value"] );
-								$arrayResult["objectarray"][$i]["type"] = "ITEM";
-								$arrayResult["objectarray"][$i]["idx"] = $idx;
-								$arrayResult["objectarray"][$i]["value"] = $arrayProduct["article_value"];
-								$arrayResult["objectarray"][$i]["expire"] = $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]["expire"];
-								$result = $result & (bool)$idx;
-							}
-						}
-						else
-						{
-							$arrayResult = null;
-						}
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
 					}
-					else if ( $arrayProduct["article_type"] == "EXTD" )
+				}
+				else if ( $arrayProduct['article_type'] == 'OPRT' )
+				{
+					$result = (bool)1;
+					//오퍼레이터의 경우 중복체크하여 지급
+					if ( !( (bool)$this->dbPlay->requestItemExistsWithRef( $sid, $arrayProduct['article_value'], 'count' ) ) )
 					{
-						for ( $i = 0; $i < $arrayProduct["attach_value"]; $i++ )
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 						{
-							$idx = $this->dbPlay->requestItemExistsWithRef( $sid, $arrayProduct["article_value"], "value" )->result_array();
-							if ( !empty($idx) )
-							{
-								$idx = $idx[0]["idx"];
-								$result = (bool)$this->dbPlay->requestExtendItemExpire( $sid, $idx, $arrayProduct["article_value"] );
-								if ( $result )
-								{
-									$arrayResult["objectarray"][$i]["type"] = "ITEM";
-									$arrayResult["objectarray"][$i]["idx"] = $idx;
-									$arrayResult["objectarray"][$i]["value"] = $arrayProduct["article_value"];
-									$arrayResult["objectarray"][$i]["expire"] = $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]["expire"];
-								}
-								else
-								{
-									$arrayResult = null;
-								}
-							}
-							else
-							{
-								$arrayResult = null;
-							}
+							// 인벤토리 정보 업데이트
+							$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct['article_value'] );
+							$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $arrayProduct['article_value'], 'expire' => $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]['expire'] );
+							$result = $result & (bool)$idx;
 						}
 					}
 					else
 					{
-						$arrayResult = null;
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
 					}
 				}
-
-				if ( array_key_exists( "vip_exp", $arrayProduct ) )
+				else if ( $arrayProduct['article_type'] == 'EXTD' )
 				{
-					if ( $arrayProduct["vip_exp"] > 0 )
+					for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
 					{
-						$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct["vip_exp"] )->result_array();
-						if ( !( empty( $vipInfo ) ) )
+						$idx = $this->dbPlay->requestItemExistsWithRef( $sid, $arrayProduct['article_value'], 'value' )->result_array();
+						if ( !empty($idx) )
 						{
-							$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]["vip_level"], $vipInfo[0]["vip_exp"] );
-							if ( $vipInfo[0]["prev_level"] != $vipInfo[0]["vip_level"] )
+							$idx = $idx[0]['idx'];
+							$result = (bool)$this->dbPlay->requestExtendItemExpire( $sid, $idx, $arrayProduct['article_value'] );
+							if ( $result )
 							{
-								$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]["prev_level"], $vipInfo[0]["vip_level"] )->result_array();
-								if ( !( empty($vipReward) ) )
-								{
-									foreach( $vipReward as $row )
-									{
-										if ( $row["reward_div"] == "PERM" )
-										{
-											$this->dbPlay->updatePlayerBasic( $pid, $row["reward_type"], $row["reward_value"] );
-										}
-										else
-										{
-											$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row["reward_type"], $row["reward_value"], MY_Controller::NORMAL_EXPIRE_TERM );
-											$this->dbPlay->updateVipRewardDate( $pid, $row["reward_type"], $row["reward_value"] );
-										}
-									}
-									$incInfo = $this->dbPlay->requestPlayerIns( $pid )->result_array()[0];
-									// 현재 디비값 불러오기
-									// vip 레벨업으로 인한 에너지 추가 처리
-									$this->dbPlay->revisionItemTime( $pid, $incInfo["inc_eng"], $incInfo["inc_pvb"], $incInfo["inc_pvp"], $incInfo["inc_survival"] );
-								}
+								$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $arrayProduct['article_value'], 'expire' => $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]['expire'] );
 							}
-							$arrayResult["vipinfo"] = $vipInfo[0];
+							else
+							{
+								$arrayResult = array( 'idx' => 0 );
+							}
 						}
 						else
 						{
-							$arrayResult["vipinfo"] = null;
+							$arrayResult = array( 'idx' => 0 );
 						}
 					}
-
-					if ( !$result )
-					{
-						$arrayResult = null;
-					}
+				}
+				else
+				{
+					$arrayResult = array( 'idx' => 0 );
 				}
 			}
-		}
-		else
-		{
-			$arrayResult = null;
+			/*
+			if ( array_key_exists( 'vip_exp', $arrayProduct ) )
+			{
+				if ( $arrayProduct['vip_exp'] > 0 )
+				{
+					$vipInfo = $this->dbPlay->requestVipInfo( $pid, $arrayProduct['vip_exp'] )->result_array();
+					if ( !( empty( $vipInfo ) ) )
+					{
+						$this->dbPlay->requestUpdateVipInfo( $pid, $vipInfo[0]['vip_level'], $vipInfo[0]['vip_exp'] );
+						if ( $vipInfo[0]['prev_level'] != $vipInfo[0]['vip_level'] )
+						{
+							$vipReward = $this->dbRef->requestVipReward( $pid, $vipInfo[0]['prev_level'], $vipInfo[0]['vip_level'] )->result_array();
+							if ( !( empty($vipReward) ) )
+							{
+								foreach( $vipReward as $row )
+								{
+									if ( $row['reward_div'] == 'PERM' )
+									{
+										$this->dbPlay->updatePlayerBasic( $pid, $row['reward_type'], $row['reward_value'] );
+									}
+									else
+									{
+										$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::VIPREWARD_SEND_TITLE, $row['reward_type'], $row['reward_value'], MY_Controller::NORMAL_EXPIRE_TERM );
+										$this->dbPlay->updateVipRewardDate( $pid, $row['reward_type'], $row['reward_value'] );
+									}
+								}
+								$incInfo = $this->dbPlay->requestPlayerIns( $pid )->result_array()[0];
+								// 현재 디비값 불러오기
+								// vip 레벨업으로 인한 에너지 추가 처리
+								$this->dbPlay->revisionItemTime( $pid, $incInfo['inc_eng'], $incInfo['inc_pvb'], $incInfo['inc_pvp'], $incInfo['inc_survival'] );
+							}
+						}
+						$arrayResult['vipinfo'] = $vipInfo[0];
+					}
+					else
+					{
+						$arrayResult['vipinfo'] = null;
+					}
+				}
+
+				if ( !$result )
+				{
+					$arrayResult = null;
+				}
+			}
+			*/
 		}
 
 		return $arrayResult;

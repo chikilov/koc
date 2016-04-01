@@ -190,23 +190,23 @@ if ( ENVIRONMENT == 'production' )
 else if ( ENVIRONMENT == 'staging' )
 {
 	//log single
-	$db['log']['hostname'] = 'rh-log-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
+	$db['log']['hostname'] = '211.237.12.214';
 	$db['log']['username'] = 'webuser';
 	$db['log']['password'] = 'dudrud78';
 	//login single
-	$db['login']['hostname'] = 'rh-login-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
+	$db['login']['hostname'] = '211.237.12.214';
 	$db['login']['username'] = 'webuser';
 	$db['login']['password'] = 'dudrud78';
 
-	$db['default']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
+	$db['default']['hostname'] = '211.237.12.214';
 	$db['default']['username'] = 'webuser';
 	$db['default']['password'] = 'dudrud78';
 	//replication slave
-	$db['default_sel']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
+	$db['default_sel']['hostname'] = '211.237.12.214';
 	$db['default_sel']['username'] = 'webuser';
 	$db['default_sel']['password'] = 'dudrud78';
 	//replication master
-	$db['default_ins']['hostname'] = 'rh-master-stage-rds.csd7atpmn088.ap-northeast-1.rds.amazonaws.com';
+	$db['default_ins']['hostname'] = '211.237.12.214';
 	$db['default_ins']['username'] = 'webuser';
 	$db['default_ins']['password'] = 'dudrud78';
 
@@ -227,28 +227,28 @@ else if ( ENVIRONMENT == 'development' )
 	// setsebool httpd_can_network_connect_db=on 설정해야함.
 	$db['login']['hostname'] = '101.79.109.239';
 	$db['login']['username'] = 'root';
-	$db['login']['password'] = 'dudrud';
+	$db['login']['password'] = 'dudrud2140';
 	//log single
 	$db['log']['hostname'] = '101.79.109.239';
 	$db['log']['username'] = 'root';
-	$db['log']['password'] = 'dudrud';
+	$db['log']['password'] = 'dudrud2140';
 
 	$db['default']['hostname'] = '101.79.109.239';
 	$db['default']['username'] = 'root';
-	$db['default']['password'] = 'dudrud';
+	$db['default']['password'] = 'dudrud2140';
 	//replication slave
 	$db['default_sel']['hostname'] = '101.79.109.239';
 	$db['default_sel']['username'] = 'root';
-	$db['default_sel']['password'] = 'dudrud';
+	$db['default_sel']['password'] = 'dudrud2140';
 	//replication master
 	$db['default_ins']['hostname'] = '101.79.109.239';
 	$db['default_ins']['username'] = 'root';
-	$db['default_ins']['password'] = 'dudrud';
+	$db['default_ins']['password'] = 'dudrud2140';
 
 	$db['login']['dbdriver'] = 'mysqli';
-	$db['login']['pconnect'] = TRUE;
+	$db['login']['pconnect'] = FALSE;
 	$db['log']['dbdriver'] = 'mysqli';
-	$db['log']['pconnect'] = TRUE;
+	$db['log']['pconnect'] = FALSE;
 	$db['default']['dbdriver'] = 'mysqli';
 	$db['default']['pconnect'] = FALSE;
 	$db['default_sel']['dbdriver'] = 'mysqli';

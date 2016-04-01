@@ -187,12 +187,17 @@ class Model_Ref extends MY_Model {
 
 	public function randomizeValuePick( $pid, $rid )
 	{
-		$query = "select id, pattern, ( min(min_prob) + ceil( rand() * (max(max_prob) - min(min_prob)) ) ) as rand_prob ";
-		$query .= "from ( select d.id, d.pattern, d.seq, d.reward_type, d.reward_value, d.reward_probability, (@min_prob) as min_prob, ";
-		$query .= "(@min_prob:= @min_prob + d.reward_probability) as max_prob from koc_ref.".MY_Controller::TBL_REWARD." as d ";
-		$query .= "inner join ( select id, ( min(min_prob) + ceil( rand() * (max(max_prob) - min(min_prob)) ) ) as rand_prob from koc_ref.".MY_Controller::TBL_REWARD." ";
-		$query .= "where id = '".$rid."' ) as e on d.id = e.id and e.rand_prob between d.min_prob and d.max_prob, (select @min_prob:= 0) as f ";
-		$query .= "where d.id = '".$rid."' ) as g ";
+		$query = "select d.id, d.pattern, reward_1_type, reward_1_value as attach_1_value, max(if(e.reward_1_type = f.article_id, article_type, null)) as article_1_type, ";
+		$query = "select d.id, 14 as pattern, reward_1_type, reward_1_value as attach_1_value, max(if(e.reward_1_type = f.article_id, article_type, null)) as article_1_type, ";
+		$query .= "max(if(e.reward_1_type = f.article_id, article_value, null)) as article_1_value, reward_2_type, reward_2_value as attach_2_value, ";
+		$query .= "max(if(e.reward_2_type = f.article_id, article_type, null)) as article_2_type, max(if(e.reward_2_type = f.article_id, article_value, null)) as article_2_value, ";
+		$query .= "reward_3_type, reward_3_value as attach_3_value, max(if(e.reward_3_type = f.article_id, article_type, null)) as article_3_type, ";
+		$query .= "max(if(e.reward_3_type = f.article_id, article_value, null)) as article_3_value ";
+		$query .= "from ( select a.id, a.pattern, b.rand_prob, (if(@min_prob = 0, @min_prob, @min_prob + 1)) as min_prob, (@min_prob := @min_prob + a.probability) as max_prob ";
+		$query .= "from koc_ref.reward as a inner join ( select id, ceil( rand() * sum(probability) ) as rand_prob from koc_ref.reward where id = '".$rid."' ) as b on a.id = b.id, ";
+		$query .= "(select @min_prob:= 0) as c where a.id = '".$rid."' group by a.id, a.pattern ) as d inner join koc_ref.reward as e on d.id = e.id and d.pattern = e.pattern ";
+		$query .= "left outer join koc_ref.article as f on e.reward_1_type = f.article_id or e.reward_2_type = f.article_id or e.reward_3_type = f.article_id ";
+		$query .= "where d.rand_prob between d.min_prob and d.max_prob group by reward_1_type, reward_1_value, reward_2_type, reward_2_value, reward_3_type, reward_3_value ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -249,7 +254,7 @@ class Model_Ref extends MY_Model {
 
 	public function getRewardIdFromStage( $pid, $stageid )
 	{
-		$query = "select reward, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
+		$query = "select reward, reward_pexp, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -307,10 +312,10 @@ class Model_Ref extends MY_Model {
 
 	public function requestAchieveRewardSum( $pid, $aid )
 	{
-		$query = "select reward_type, sum(reward_value) as attach_value, article_type, article_value from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." as a ";
+		$query = "select reward_type, sum(reward_value) as attach_value, article_type, article_value, reward_exp from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." as a ";
 		$query .= "inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.reward_type = b.article_id ";
 		$query .= "where id in ('".join("', '", $aid)."') and reward_type is not null and reward_type != '' and article_type = 'ASST' group by article_value ";
-		$query .= "union select reward_type, reward_value as attach_value, article_type, article_value from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." as c ";
+		$query .= "union select reward_type, reward_value as attach_value, article_type, article_value, reward_exp from koc_ref.".MY_Controller::TBL_ACHIEVEMENTS." as c ";
 		$query .= "inner join koc_ref.".MY_Controller::TBL_ARTICLE." as d on c.reward_type = d.article_id ";
 		$query .= "where id in ('".join("', '", $aid)."') and reward_type is not null and reward_type != '' and article_type != 'ASST' ";
 
@@ -402,10 +407,10 @@ class Model_Ref extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function requestExpInfo( $pid, $itemType, $grade, $exp )
+	public function requestExpInfo( $pid, $category, $itemType, $grade, $exp )
 	{
-		$query = "select current_step as level, reference from koc_ref.".MY_Controller::TBL_ITEMLEVINFO." ";
-		$query .= "where category = '".$itemType."' and grade = '".$grade."' and '".$exp."' between min_exp and max_exp ";
+		$query = "select current_step as level, ".$itemType." as reference from koc_ref.".MY_Controller::TBL_ITEMLEVINFO." ";
+		$query .= "where category = '".$category."' and grade = '".$grade."' and '".$exp."' between min_exp and max_exp ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -437,11 +442,38 @@ class Model_Ref extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
+	public function requestPlayerReward( $pid, $prev_level, $player_level )
+	{
+		$query = "select reward_div, reward_type, reward_value from koc_ref.".MY_Controller::TBL_PLAYERREWARD." ";
+		$query .= "where player_lev > ".$prev_level." and player_lev <= ".$player_level." ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
 	public function requestDailyVipReward( $pid, $vip_level )
 	{
 		$query = "select reward_div, reward_type, reward_value from koc_ref.".MY_Controller::TBL_VIPREWARD." ";
 		$query .= "where vip_lev = ".$vip_level." and reward_div = 'DAILY' and not exists ( select pid from koc_play.".MY_Controller::TBL_PLAYERVIP." ";
 		$query .= "where pid = '".$pid."' and left(vipreward_datetime, 10) = left(now(), 10) ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestDailyPlayerReward( $pid, $player_level )
+	{
+		$query = "select reward_div, reward_type, reward_value from koc_ref.".MY_Controller::TBL_PLAYERREWARD." ";
+		$query .= "where player_lev = ".$player_level." and reward_div = 'DAILY' and not exists ( select pid from koc_play.".MY_Controller::TBL_PLAYERLEV." ";
+		$query .= "where pid = '".$pid."' and left(reward_datetime, 10) = left(now(), 10) ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestStageEnergy( $pid, $stageid )
+	{
+		$query = "select energy from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -611,28 +643,6 @@ class Model_Ref extends MY_Model {
 	public function requestInitGatcha( $id )
 	{
 		$query = "insert into koc_ref.".MY_Controller::TBL_GATCHA_SIM." (id, refid) select id, refid from gatcha where id = '".$id."' ";
-
-		$this->DB_INS->query($query);
-		return $this->DB_INS->affected_rows();
-	}
-
-	public function requestRewardTest1()
-	{
-		$query = "select id, pattern, ( min(min_prob) + ceil( rand() * (max(max_prob) - min(min_prob)) ) ) as rand_prob from ( select d.id, d.pattern, d.seq, d.reward_type, d.reward_value, d.reward_probability, (@min_prob) as min_prob, (@min_prob:= @min_prob + d.reward_probability) as max_prob from koc_ref.reward as d inner join ( select id, ( min(min_prob) + ceil( rand() * (max(max_prob) - min(min_prob)) ) ) as rand_prob from koc_ref.reward where id = 'RWPVE05215' ) as e on d.id = e.id and e.rand_prob between d.min_prob and d.max_prob, (select @min_prob:= 0) as f where d.id = 'RWPVE05215' ) as g";
-
-		return $this->DB_SEL->query($query);
-	}
-
-	public function requestRewardTest2( $rid, $rpattern, $rvalue )
-	{
-		$query = "select id, pattern, seq, reward_type, reward_value as attach_value, d.article_type, d.article_value,reward_probability from ( select a.id, a.pattern, a.seq, a.reward_type, a.reward_value, a.reward_probability, (@rowsum) + 1 as min_prob, (@rowsum := @rowsum + a.reward_probability) as max_prob from koc_ref.reward as a , (select @rowsum := 0) as b  where a.id = '".$rid."' and a.pattern = '".$rpattern."' order by a.seq ) as c inner join koc_ref.article as d on c.reward_type = d.article_id  where ".$rvalue." between min_prob and max_prob";
-
-		return $this->DB_SEL->query($query);
-	}
-
-	public function rewardTestInsert( $rid, $rpattern, $rseq )
-	{
-		$query = "insert into koc_ref.reward_test select * from reward where id = '".$rid."' and pattern = '".$rpattern."' and seq = '".$rseq."' ";
 
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();

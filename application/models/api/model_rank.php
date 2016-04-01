@@ -77,13 +77,13 @@ class Model_Rank extends MY_Model {
 		}
 	}
 
-	public function requestUpdatePVERank( $pid, $stageid, $duration )
+	public function requestUpdatePVERank( $pid, $stageid, $duration, $grade )
 	{
-		$query = "insert into koc_rank.".MY_Controller::TBL_PVE." ( pid, stageid, min_duration, rank_datetime ) ";
-		$query .= "select '".$pid."', '".$stageid."', '".$duration."', now() from dual ";
+		$query = "insert into koc_rank.".MY_Controller::TBL_PVE." ( pid, stageid, grade, min_duration, rank_datetime ) ";
+		$query .= "select '".$pid."', '".$stageid."', '".$grade."', '".$duration."', now() from dual ";
 		$query .= "where not exists ( select pid from koc_rank.".MY_Controller::TBL_PVE." where pid = '".$pid."' and stageid = '".$stageid."' ";
-		$query .= "and ifnull(if(min_duration = 0, 99999, min_duration), 99999) <= '".$duration."' ) ";
-		$query .= "on duplicate key update min_duration = '".$duration."'";
+		$query .= "and ( ifnull(if(min_duration = 0, 99999, min_duration), 99999) <= '".$duration."' and ifnull(if(grade = 0, 3, grade), 3) >= '".$grade."' ) ) ";
+		$query .= "on duplicate key update min_duration = '".$duration."', grade = '".$grade."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -125,10 +125,8 @@ class Model_Rank extends MY_Model {
 
 	public function requestUpdatePVPRank( $pid, $score )
 	{
-		$query = "insert into koc_rank.".MY_Controller::TBL_PVPSTORE." ( pid, weekseq, name, affiliate_name, prof_img, rank, score, rank_datetime ) ";
-		$query .= "select '".$pid."', ";
-		$query .= "case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end, ";
+		$query = "insert into koc_rank.".MY_Controller::TBL_PVPSTORE." ( pid, dateseq, name, affiliate_name, prof_img, rank, score, rank_datetime ) ";
+		$query .= "select '".$pid."', date_format(now(), '%Y%m%d'), ";
 		$query .= "( select name from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "( select if(show_name, affiliate_name, '') from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
 		$query .= "( select if(show_prof, prof_img, '') as prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid = '".$pid."' ), ";
@@ -143,16 +141,18 @@ class Model_Rank extends MY_Model {
 	public function requestPVPScore( $pid )
 	{
 		$query = "select rank, score from koc_rank.".MY_Controller::TBL_PVPSTORE." where pid = '".$pid."' ";
+		$query .= "and dateseq = date_format(now(), '%Y%m%d') ";
+		/* 20160314 랭킹 일일로 변경
 		$query .= "and weekseq = ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
 		$query .= "else yearweek(now(), 2) end ) ";
-
+		*/
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
 	}
 
 	public function requestPVERank( $pid )
 	{
-		$query = "select stageid, min_duration from koc_rank.".MY_Controller::TBL_PVE." where pid = '".$pid."' ";
+		$query = "select stageid, grade, min_duration from koc_rank.".MY_Controller::TBL_PVE." where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -183,8 +183,7 @@ class Model_Rank extends MY_Model {
 		$query .= "a.prof_img, c.refid, a.rank, a.score from koc_rank.".MY_Controller::TBL_PVP." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid and b.team_seq = 0 ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on b.memb_0 = c.idx where ";
-		$query .= "a.weekseq = ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ) order by a.rank asc ";
+		$query .= "a.dateseq = date_format(now(), '%Y%m%d') order by a.rank asc ";
 		$query .= "limit ".$page.", ".MY_Controller::COMMON_RANKING_PAGE_SIZE." ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -195,10 +194,8 @@ class Model_Rank extends MY_Model {
 	{
 		$query = "select rank, score, rank_score from ( select ifnull(a.rank, 0) as rank, ifnull(a.score, 0) as score, ifnull(b.score, 0) as rank_score ";
 		$query .= "from koc_rank.".MY_Controller::TBL_PVPSTORE." as a left outer join koc_rank.".MY_Controller::TBL_PVP." as b ";
-		$query .= "on a.pid = b.pid and a.weekseq = b.weekseq ";
-		$query .= "where a.pid = '".$pid."' and a.weekseq = ( case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." ";
-		$query .= "then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ) union select 0, 0, 0 from dual ) as a order by rank desc limit 1 ";
+		$query .= "on a.pid = b.pid and a.dateseq = b.dateseq ";
+		$query .= "where a.pid = '".$pid."' and a.dateseq = date_format(now(), '%Y%m%d') union select 0, 0, 0 from dual ) as a order by rank desc limit 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -212,9 +209,7 @@ class Model_Rank extends MY_Model {
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERFRIEND." as b on (a.pid = b.fid or a.pid = b.pid) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as c on a.pid = c.pid and c.team_seq = 0 ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d on c.memb_0 = d.idx ";
-		$query .= "where b.pid = '".$pid."' and b.friend_status = 1 and a.weekseq = ( ";
-		$query .= "case when dayofweek(now()) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then yearweek(date_add(now(), interval -7 day), 2) ";
-		$query .= "else yearweek(now(), 2) end ) group by a.pid, a.name, a.rank, a.score ) as a order by rank asc";
+		$query .= "where b.pid = '".$pid."' and b.friend_status = 1 and a.dateseq = date_format(now(), '%Y%m%d') group by a.pid, a.name, a.rank, a.score ) as a order by rank asc ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -312,19 +307,20 @@ class Model_Rank extends MY_Model {
 	public function requestLastWeekRankInfo( $pid, $rewardtype )
 	{
 		$query = "select max(if(pid = '".$pid."', rank, null)) as rank, max(if(pid = '".$pid."', is_reward, null)) as is_reward, ";
-		$query .= "count(pid) as tot from koc_rank.".$rewardtype."_lastweek where weekseq = ( ";
+		$query .= "count(pid) as tot ";
 		if ( $rewardtype == "pvp" )
 		{
-			$query .= "case when dayofweek(date_add(now(), interval -7 day)) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then ";
-			$query .= "yearweek(date_add(now(), interval -14 day), 2) else yearweek(date_add(now(), interval -7 day), 2) end ) ";
+			$query .= "from koc_rank.".$rewardtype."_lastday where dateseq = date_format(date_add(now(), interval -1 day), '%Y%m%d') ";
 		}
 		else if ( $rewardtype == "pvb" )
 		{
+			$query .= "from koc_rank.".$rewardtype."_lastweek where weekseq = ( ";
 			$query .= "case when dayofweek(date_add(now(), interval -7 day)) < ".MY_Controller::PVB_YEARWEEK_STANDARD." then ";
 			$query .= "yearweek(date_add(now(), interval -14 day), 2) else yearweek(date_add(now(), interval -7 day), 2) end ) ";
 		}
 		else if ( $rewardtype == "survival" )
 		{
+			$query .= "from koc_rank.".$rewardtype."_lastweek where weekseq = ( ";
 			$query .= "case when dayofweek(date_add(now(), interval -7 day)) < ".MY_Controller::SURVIVAL_YEARWEEK_STANDARD." then ";
 			$query .= "yearweek(date_add(now(), interval -14 day), 2) else yearweek(date_add(now(), interval -7 day), 2) end ) ";
 		}

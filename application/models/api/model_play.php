@@ -62,9 +62,9 @@ class Model_Play extends MY_Model {
 
 	public function requestJoinStep2( $pid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERBASIC." ( pid, name, affiliate_name, show_prof, prof_img, vip_level, vip_exp, ";
-		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, show_name ) ";
-		$query .= "select '".$pid."', null, null, 1, null, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERBASIC." ( pid, name, affiliate_name, show_prof, prof_img, vip_level, vip_exp, player_level, player_exp, ";
+		$query .= "inc_cha, inc_wea, inc_ger, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, show_name ) ";
+		$query .= "select '".$pid."', null, null, 1, null, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -123,8 +123,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerSel( $pid )
 	{
-		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, ";
-		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, player_level, player_exp, ";
+		$query .= "inc_cha, inc_wea, inc_ger, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -134,8 +134,8 @@ class Model_Play extends MY_Model {
 
 	public function requestPlayerIns( $pid )
 	{
-		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, ";
-		$query .= "inc_cha, inc_wea, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
+		$query = "select name, show_prof, show_name, if(show_prof, prof_img, '') as prof_img, vip_level, vip_exp, player_level, player_exp, ";
+		$query .= "inc_cha, inc_wea, inc_ger, inc_bck, inc_skl, inc_exp, inc_eng, inc_fri, inc_pvp, inc_pvb, inc_survival, operator, show_prof ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -159,10 +159,10 @@ class Model_Play extends MY_Model {
 		$query .= "c.refid as op, d.refid as pilot_0, e.refid as pilot_1, f.refid as pilot_2 ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as c on a.operator = c.idx ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as d on b.pilot_0 = d.idx ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as e on b.pilot_1 = e.idx ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as f on b.pilot_2 = f.idx ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as c on a.operator = c.idx and c.pid = '".$pid."' ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as d on b.pilot_0 = d.idx and d.pid = '".$pid."' ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as e on b.pilot_1 = e.idx and e.pid = '".$pid."' ";
+		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as f on b.pilot_2 = f.idx and f.pid = '".$pid."' ";
 		$query .= "where a.pid = '".$pid."' and b.team_seq = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -181,7 +181,7 @@ class Model_Play extends MY_Model {
 
 	public function requestCharacters( $pid )
 	{
-		$query = "select idx, refid, level, exp, weapon, backpack, skill_0, skill_1, skill_2, ";
+		$query = "select idx, refid, level, exp, weapon, backpack, skill_0, skill_1, skill_2, gtype_0, gtype_1, gtype_2, gear_0, gear_1, gear_2, gear_3, gear_4, gear_5, ";
 		$query .= "up_grade, up_refid, up_incentive, exp_group_idx, exp_idx, exp_time ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and is_del = 0 ";
@@ -192,7 +192,7 @@ class Model_Play extends MY_Model {
 
 	public function requestCharacter( $pid, $cid )
 	{
-		$query = "select idx, refid, level, exp, weapon, backpack, skill_0, skill_1, skill_2, ";
+		$query = "select idx, refid, level, exp, weapon, backpack, skill_0, skill_1, skill_2, gtype_0, gtype_1, gtype_2, gear_0, gear_1, gear_2, gear_3, gear_4, gear_5, ";
 		$query .= "up_grade, up_refid, up_incentive, exp_group_idx, exp_idx, exp_time ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
@@ -201,10 +201,25 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
+	public function requestCharacterIns( $pid, $cid )
+	{
+		$query = "select idx, refid, level, exp, weapon, backpack, skill_0, skill_1, skill_2, gtype_0, gtype_1, gtype_2, gear_0, gear_1, gear_2, gear_3, gear_4, gear_5, ";
+		$query .= "up_grade, up_refid, up_incentive, exp_group_idx, exp_idx, exp_time ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
+		$query .= "where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
 	public function requestItem( $pid )
 	{
 		$query = "select energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, ifnull(event_points, 0) as event_points, ";
-		$query .= "friendship_points, achieve_points, energy_uptime, pvb_uptime, pvp_uptime, survival_uptime ";
+		$query .= "friendship_points, achieve_points, energy_uptime, pvb_uptime, pvp_uptime, survival_uptime, ";
+		$query .= "ifnull(item_bonus, 0) as item_bonus, ifnull(exp_bonus, 0) as exp_bonus, ifnull(gold_bonus, 0) as gold_bonus, ";
+		$query .= "ifnull(def_3, 0) as def_3, ifnull(def_4, 0) as def_4, ifnull(def_5, 0) as def_5, ";
+		$query .= "ifnull(inf_3, 0) as inf_3, ifnull(inf_4, 0) as inf_4, ifnull(inf_5, 0) as inf_5, ";
+		$query .= "ifnull(sht_3, 0) as sht_3, ifnull(sht_4, 0) as sht_4, ifnull(sht_5, 0) as sht_5 ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERITEM." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -214,8 +229,8 @@ class Model_Play extends MY_Model {
 
 	public function requestItemWithTime( $pid )
 	{
-		$query = "select energy_points, pvb_points, pvp_points, survival_points, ";
-		$query .= "energy_uptime, pvb_uptime, pvp_uptime, survival_uptime ";
+		$query = "select energy_points, pvb_points, survival_points, ";
+		$query .= "energy_uptime, pvb_uptime, survival_uptime ";
 		$query .= "from koc_play.".MY_Controller::TBL_PLAYERITEM." ";
 		$query .= "where pid = '".$pid."'";
 
@@ -585,12 +600,16 @@ class Model_Play extends MY_Model {
 		{
 			$query .= "= backpack ";
 		}
-		else
+		else if ( strcasecmp($slotseq, "SKILL_0") == 0 || strcasecmp($slotseq, "SKILL_1") == 0 || strcasecmp($slotseq, "SKILL_2") == 0 )
 		{
 			$query .= "in ( skill_0, skill_1, skill_2 )";
 		}
+		else if ( strcasecmp($slotseq, "GEAR_0") == 0 || strcasecmp($slotseq, "GEAR_1") == 0 || strcasecmp($slotseq, "GEAR_2") == 0 || strcasecmp($slotseq, "GEAR_3") == 0 || strcasecmp($slotseq, "GEAR_4") == 0 || strcasecmp($slotseq, "GEAR_5") == 0 )
+		{
+			$query .= "in ( gear_0, gear_1, gear_2, gear_3, gear_4, gear_5 )";
+		}
 		$query .= ") and idx = '".$cid."' and ";
-		$query .= "exists(select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where idx = '".$iid."' and is_del = 0)";
+		$query .= "exists(select idx from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx = '".$iid."' and is_del = 0)";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -599,7 +618,7 @@ class Model_Play extends MY_Model {
 	public function requestUnequipAvailableCheck( $pid, $cid, $slotseq, $iid )
 	{
 		$query = "select a.idx, b.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
-		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b on a.".$slotseq." = b.idx ";
+		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b on a.".$slotseq." = b.idx and b.pid = '".$pid."' ";
 		$query .= "where a.pid = '".$pid."' and a.idx = '".$cid."' and b.idx = '".$iid."' and b.is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -676,11 +695,66 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
+	public function requestResetGearSlot( $pid, $cid, $gtype_0, $gtype_1, $gtype_2 )
+	{
+		$arrGear = json_decode(MY_Controller::ARRAY_GEAR_TYPE, true);
+		$sum = 0;
+		$presum = array();
+		foreach ( $arrGear as $val )
+		{
+			$presum[] = $sum + 1;
+			$sum += $val['probability'];
+		}
+
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERCHARACTER." set ";
+		if ( boolval($gtype_0) == false )
+		{
+			$query .= "gtype_0 = case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end, ";
+			$query .= "gear_0 = null, gear_1 = null, ";
+		}
+		if ( boolval($gtype_1) == false )
+		{
+			$query .= "gtype_1 = case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end, ";
+			$query .= "gear_2 = null, gear_3 = null, ";
+		}
+		if ( boolval($gtype_2) == false )
+		{
+			$query .= "gtype_2 = case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+			$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end, ";
+			$query .= "gear_4 = null, gear_5 = null, ";
+		}
+		$query .= "mod_date = now() where pid = '".$pid."' and idx = '".$cid."' and is_del = 0 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
 	public function characterProvision( $pid, $cid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ( pid, refid, grade, level, exp, up_grade, up_incentive, is_del, reg_date) ";
-		$query .= "select '".$pid."' as pid, '".$cid."' as refid, grade as grade, '1' as level, '0' as exp, '0' as up_grade, '0.00' as up_incentive, ";
-		$query .= "0 as is_del, now() as reg_date ";
+		$arrGear = json_decode(MY_Controller::ARRAY_GEAR_TYPE, true);
+		$sum = 0;
+		$presum = array();
+		foreach ( $arrGear as $val )
+		{
+			$presum[] = $sum + 1;
+			$sum += $val['probability'];
+		}
+
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ( pid, refid, grade, level, exp, gtype_0, gtype_1, gtype_2, up_grade, up_incentive, is_del, reg_date) ";
+		$query .= "select '".$pid."' as pid, '".$cid."' as refid, grade as grade, '1' as level, '0' as exp, ";
+		$query .= "case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+		$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end as gtype_0, ";
+		$query .= "case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+		$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end as gtype_1, ";
+		$query .= "case when ( rand() * ".$sum." ) < ".$presum[0]." then '".$arrGear[0]['type']."' when ( rand() * ".$sum." ) < ".$presum[1]." then '".$arrGear[1]['type']."' when ( rand() * ".$sum." ) < ".$presum[2]." then '".$arrGear[2]['type']."' ";
+		$query .= "when ( rand() * ".$sum." ) < ".$presum[3]." then '".$arrGear[3]['type']."' when ( rand() * ".$sum." ) < ".$presum[4]." then '".$arrGear[4]['type']."' end as gtype_2, ";
+		$query .= "'0' as up_grade, '0.00' as up_incentive, 0 as is_del, now() as reg_date ";
 		$query .= "from koc_ref.".MY_Controller::TBL_REFCHARACTER." where id = '".$cid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -701,16 +775,26 @@ class Model_Play extends MY_Model {
 
 	public function inventoryProvision( $pid, $iid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ( pid, refid, grade, up_grade, up_refid, up_exp, expire, is_del, reg_date) ";
-		$query .= "select '".$pid."' as pid, '".$iid."' as refid, grade, ";
-		if ( $iid == "OP01000008" )
+		$query = "select a.category, cast(sum(ifnull(b.probability, 0)) * rand() as unsigned) as probability ";
+		$query .= "from koc_ref.".MY_Controller::TBL_ITEM." as a left outer join koc_ref.".MY_Controller::TBL_ITEMUPREF." as b on a.id = b.refid where a.id = '".$iid."' ";
+		$arrTemp = $this->DB_INS->query($query)->result_array()[0];
+
+		if ( strtolower($arrTemp['category']) == 'gear' )
 		{
-			$query .= "0 as up_grade, null as up_refid, 0 as up_exp, '2015-02-28 23:59:59' as expire, 0 as is_del, now() as reg_date ";
+			$query = "select id from koc_ref.item_upgrade_reference as a, (select @rowsum := 0) as b where refid = '".$iid."' ";
+			$query .= "and (@rowsum := @rowsum + ifnull(probability, 0)) >= ".$arrTemp['probability']." order by (@rowsum := @rowsum + ifnull(probability, 0)) asc limit 1 ";
+
+			$up_refid = $this->DB_INS->query($query)->result_array()[0]['id'];
 		}
 		else
 		{
-			$query .= "0 as up_grade, null as up_refid, 0 as up_exp, if(duration = '0', null, date_add(now(), interval duration hour)) as expire, 0 as is_del, now() as reg_date ";
+			$up_refid = null;
 		}
+
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ( pid, refid, grade, up_grade, up_refid, up_exp, expire, is_del, reg_date) ";
+		$query .= "select '".$pid."' as pid, id as refid, grade, 0 as up_grade, ";
+		$query .= ( $up_refid != null ? "'".$up_refid."'" : "null" )." as up_refid, ";
+		$query .= "0 as up_exp, if(duration = '0', null, date_add(now(), interval duration hour)) as expire, 0 as is_del, now() as reg_date ";
 		$query .= "from koc_ref.".MY_Controller::TBL_ITEM." where id = '".$iid."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -721,6 +805,14 @@ class Model_Play extends MY_Model {
 	public function requestInventoryExpire( $pid, $iid )
 	{
 		$query = "select expire from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx = '".$iid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_INS->query($query);
+	}
+
+	public function requestItemInfo( $pid, $iid )
+	{
+		$query = "select idx, refid, grade, up_grade, up_refid, expire from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." where pid = '".$pid."' and idx = '".$iid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
@@ -741,8 +833,7 @@ class Model_Play extends MY_Model {
 		}
 		else if ( strtoupper($payment_type) == "PVP_POINTS" )
 		{
-			$query .= "PVP_UPTIME = if( ".$payment_type." - ".$payment." < ".( MY_Controller::MAX_MODES_PVP + $inc_pvp ).", ";
-			$query .= "if( pvp_uptime is null, now(), pvp_uptime), null), ";
+			$query .= "PVP_UPTIME = now(), ";
 		}
 		else if ( strtoupper($payment_type) == "SURVIVAL_POINTS" )
 		{
@@ -752,6 +843,10 @@ class Model_Play extends MY_Model {
 
 		$query .= "".$payment_type." = ".$payment_type." - ".$payment." ";
 		$query .= "where pid = '".$pid."' and ".$payment_type." >= ".$payment." ";
+		if ( strtoupper($payment_type) == "PVP_POINTS" )
+		{
+			$query .= "and date_add(ifnull(PVP_UPTIME, '1900-01-01 00:00:00'), interval ((10 - PVP_POINTS) * ".MY_Controller::MODE_PVP_RECHARGE_INTERVAL.") second) < now() ";
+		}
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -921,7 +1016,6 @@ class Model_Play extends MY_Model {
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERITEM." set ";
 		$query .= "energy_points = '".$curDataArray["energy_points"]."', ";
 		$query .= "pvb_points = '".$curDataArray["pvb_points"]."', ";
-		$query .= "pvp_points = '".$curDataArray["pvp_points"]."', ";
 		$query .= "survival_points = '".$curDataArray["survival_points"]."'";
 		if ( $curDataArray["energy_uptime"] < 0 )
 		{
@@ -938,14 +1032,6 @@ class Model_Play extends MY_Model {
 		else
 		{
 			$query .= ", pvb_uptime = date_add(now(), interval -".$curDataArray["pvb_uptime"]." second)";
-		}
-		if ( $curDataArray["pvp_uptime"] < 0 )
-		{
-			$query .= ", pvp_uptime = null";
-		}
-		else
-		{
-			$query .= ", pvp_uptime = date_add(now(), interval -".$curDataArray["pvp_uptime"]." second)";
 		}
 		if ( $curDataArray["survival_uptime"] < 0 )
 		{
@@ -1043,24 +1129,35 @@ class Model_Play extends MY_Model {
 		return $this->DB_INS->query($query);
 	}
 
-	public function IsEmptySpace( $pid, $IsEmptySpace, $count )
+	public function IsEmptySpace( $pid, $IsEmptySpace )
 	{
 		if ( $IsEmptySpace == "CHARACTER" )
 		{
-			$query = "select a.inc_cha + ".MY_Controller::MAX_CHAR_CAPACITY." >= ifnull( count(b.idx), 0 ) + ".$count." as is_empty ";
+			$query = "select a.inc_cha + ".MY_Controller::MAX_CHAR_CAPACITY." - ifnull( count(b.idx), 0 ) as is_empty ";
 			$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
 			$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as b on a.pid = b.pid and b.is_del = 0 ";
 			$query .= "where a.pid = '".$pid."' group by a.inc_cha, a.pid ";
 		}
 		else if ( $IsEmptySpace == "WEAPON" )
 		{
-			$query = "select a.inc_wea + ".MY_Controller::MAX_WEPN_CAPACITY." >= ifnull( sum(if( d.idx is null, 1, 0 )), 0 ) + ".$count." as is_empty ";
+			$query = "select a.inc_wea + ".MY_Controller::MAX_WEPN_CAPACITY." - ifnull( sum(if( d.idx is null, 1, 0 )), 0 ) as is_empty ";
 			$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a left outer join ( select c.pid, c.idx ";
 			$query .= "from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as c ";
 			$query .= "inner join koc_ref.".MY_Controller::TBL_ITEM." as d on c.refid = d.id where d.category IN ( 'WEAPON', 'BACKPACK', 'TECHNIQUE' ) ";
 			$query .= "and c.is_del = 0 and c.pid = '".$pid."' ";
 			$query .= ") as b on a.pid = b.pid left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d ";
 			$query .= "on a.pid = d.pid and ( b.idx = d.weapon or b.idx = d.backpack or b.idx = d.skill_0 or b.idx = d.skill_1 or b.idx = d.skill_2 ) ";
+			$query .= "where a.pid = '".$pid."' group by a.pid ";
+		}
+		else if ( $IsEmptySpace == "GEAR" )
+		{
+			$query = "select a.inc_ger + ".MY_Controller::MAX_GEAR_CAPACITY." - ifnull( sum(if( d.idx is null, 1, 0 )), 0 ) as is_empty ";
+			$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a left outer join ( select c.pid, c.idx ";
+			$query .= "from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as c ";
+			$query .= "inner join koc_ref.".MY_Controller::TBL_ITEM." as d on c.refid = d.id where d.category = 'GEAR' ";
+			$query .= "and c.is_del = 0 and c.pid = '".$pid."' ";
+			$query .= ") as b on a.pid = b.pid left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as d ";
+			$query .= "on a.pid = d.pid and ( b.idx = d.gear_0 or b.idx = d.gear_1 or b.idx = d.gear_2 or b.idx = d.gear_3 or b.idx = d.gear_4 or b.idx = d.gear_5 ) ";
 			$query .= "where a.pid = '".$pid."' group by a.pid ";
 		}
 		else
@@ -1074,20 +1171,9 @@ class Model_Play extends MY_Model {
 
 	public function requestCharactersSynthesize( $pid, $arrIdx )
 	{
-/* 튜닝 및 간단히 확인된 쿼리이나 확신이 서지 않음
-		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
-		$query .= "where a.pid = '".$pid."' and a.idx in ('".join("', '", $arrIdx)."') ";
-		$query .= "and a.up_grade = ".MY_Controller::MAX_UPGRADE." and a.level = ".MY_Controller::MAX_LEVEL." and a.is_del = 0 and (a.exp_idx is null or a.exp_idx < 1) ";
-		$query .= "and a.idx != ifnull(b.memb_0, 0) and a.idx != ifnull(b.memb_1, 0) and a.idx != ifnull(b.memb_2, 0) ";
-		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
-*/
 		$query = "select idx, grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and idx in ('".join("', '", $arrIdx)."') ";
 		$query .= "and up_grade = ".MY_Controller::MAX_UPGRADE." and level = ".MY_Controller::MAX_LEVEL." and is_del = 0 and (exp_idx is null or exp_idx < 1) ";
-		$query .= "and idx not in ( select ifnull(memb_0, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
-		$query .= "select ifnull(memb_1, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
-		$query .= "select ifnull(memb_2, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -1095,14 +1181,6 @@ class Model_Play extends MY_Model {
 
 	public function requestItemsSynthesize( $pid, $arrIdx, $itemType, $maxLev )
 	{
-/* 튜닝 및 간단히 확인된 쿼리이나 확신이 서지 않음
-		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
-		$query .= "where a.pid = '".$pid."' and a.idx in ('".join("', '", $arrIdx)."') ";
-		$query .= "and a.up_grade = ".MY_Controller::MAX_UPGRADE." and a.level = ".MY_Controller::MAX_LEVEL." and a.is_del = 0 and (a.exp_idx is null or a.exp_idx < 1) ";
-		$query .= "and a.idx != ifnull(b.memb_0, 0) and a.idx != ifnull(b.memb_1, 0) and a.idx != ifnull(b.memb_2, 0) ";
-		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
-*/
 		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as a ";
 		if ( $itemType == 'technique' )
 		{
@@ -1129,20 +1207,9 @@ class Model_Play extends MY_Model {
 
 	public function requestCharactersEvolution( $pid, $arrIdx )
 	{
-/* 튜닝 및 간단히 확인된 쿼리이나 확신이 서지 않음
-		$query = "select a.idx, a.grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as a ";
-		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.pid = b.pid ";
-		$query .= "where a.pid = '".$pid."' and a.idx in ('".join("', '", $arrIdx)."') ";
-		$query .= "and a.up_grade = ".MY_Controller::MAX_UPGRADE." and a.level = ".MY_Controller::MAX_LEVEL." and a.is_del = 0 and (a.exp_idx is null or a.exp_idx < 1) ";
-		$query .= "and a.idx != ifnull(b.memb_0, 0) and a.idx != ifnull(b.memb_1, 0) and a.idx != ifnull(b.memb_2, 0) ";
-		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
-*/
 		$query = "select idx, grade from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and idx in ('".join("', '", $arrIdx)."') ";
 		$query .= "and up_grade = ".MY_Controller::MAX_UPGRADE." and level = ".MY_Controller::MAX_LEVEL." and is_del = 0 and (exp_idx is null or exp_idx < 1) ";
-		$query .= "and idx not in ( select ifnull(memb_0, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
-		$query .= "select ifnull(memb_1, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
-		$query .= "select ifnull(memb_2, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -1411,7 +1478,7 @@ class Model_Play extends MY_Model {
 	public function requestEquipmentFriend( $pid )
 	{
 		$query = "select max(if(a.operator = b.idx, b.refid, null)) as op ";
-		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b on a.operator = b.idx ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a left outer join koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as b on a.operator = b.idx and b.pid = '".$pid."' ";
 		$query .= "where a.pid = '".$pid."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -1451,7 +1518,7 @@ class Model_Play extends MY_Model {
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERTEAM." as b on a.fid = b.pid and b.team_seq = 0 ";
 		$query .= "left outer join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on ( b.memb_0 = c.idx or b.memb_1 = c.idx or b.memb_2 = c.idx ) and c.is_del = 0 ";
 		$query .= "left outer join (select pid, idx, refid from koc_play.".MY_Controller::TBL_PLAYERINVENTORY." ";
-		$query .= "where is_del = 0 and cast(ifnull(expire, '9999-12-31 23:59:59') as datetime) > now() ) as d ";
+		$query .= "where is_del = 0 and cast(ifnull(expire, '9999-12-31 23:59:59') as datetime) > now() and pid = '".$fid."' ) as d ";
 		$query .= "on a.fid = d.pid and ( c.weapon = d.idx or c.backpack = d.idx or c.skill_0 = d.idx or c.skill_1 = d.idx or c.skill_2 = d.idx ) ";
 		$query .= "where a.pid = '".$pid."' and a.fid = '".$fid."' and a.friend_status = ".MY_Controller::FRIEND_STATUS_ACCEPTED." ";
 		$query .= "group by a.fid, a.fname, a.affiliate_name, a.login_datetime, c.refid, c.level, c.up_grade, c.up_refid order by slot asc ";
@@ -1668,6 +1735,23 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->affected_rows();
 	}
 
+	public function requestBeforeRequestData( $pid )
+	{
+		$query = "select rstime, rltime from koc_play.".MY_Controller::TBL_PLAYERENREQ." where pid = '".$pid."' order by idx desc limit 1 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestEnBonus( $pid, $rstime, $rltime )
+	{
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERENREQ." ( pid, rstime, rltime ) values ( '".$pid."', '".$rstime."', '".$rltime."' ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_SEL->query($query);
+		return $this->DB_SEL->affected_rows();
+	}
+
 //삭제 예정
 	public function requestEquipment( $pid )
 	{
@@ -1713,6 +1797,15 @@ class Model_Play extends MY_Model {
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERINVENTORY." as a inner join koc_ref.".MY_Controller::TBL_ITEM." as b on a.refid = b.id ";
 		$query .= "set a.expire = date_add( a.expire, interval b.duration hour ), ext_date = now() ";
 		$query .= "where a.idx = '".$idx."' and a.pid = '".$pid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function requestInitDelayForPVP( $pid )
+	{
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERITEM." set pvp_uptime = null where pid = '".$pid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);
@@ -2255,6 +2348,10 @@ class Model_Play extends MY_Model {
 		{
 			$query .= "inc_".$slottype." = if( inc_".$slottype." + ".$incquantity." > ".MY_Controller::MAX_INC_LIMIT_ITEM.", ";
 		}
+		else if ( $slottype == "ger" )
+		{
+			$query .= "inc_".$slottype." = if( inc_".$slottype." + ".$incquantity." > ".MY_Controller::MAX_INC_LIMIT_GEAR.", ";
+		}
 		$query .= "inc_".$slottype.", inc_".$slottype." + ".$incquantity." ) ";
 		$query .= "where pid = '".$pid."' ";
 
@@ -2270,6 +2367,27 @@ class Model_Play extends MY_Model {
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_INS->query($query);
+	}
+
+	public function requestPlayerInfo( $pid, $player_exp )
+	{
+		$query = "select player_level as prev_level, ifnull(max(b.lev), 0) as player_level, ( player_exp + ".$player_exp." ) as player_exp ";
+		$query .= "from koc_play.".MY_Controller::TBL_PLAYERBASIC." as a ";
+		$query .= "left outer join koc_ref.".MY_Controller::TBL_PLAYERLEVINFO." as b on a.player_exp + ".$player_exp." >= b.exp ";
+		$query .= "where a.pid = '".$pid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestUpdatePlayerInfo( $pid, $player_level, $player_exp )
+	{
+		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set player_level = '".$player_level."', player_exp = '".$player_exp."' ";
+		$query .= "where pid = '".$pid."' ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
 	}
 
 	public function requestVipInfo( $pid, $vip_exp )
@@ -2296,6 +2414,16 @@ class Model_Play extends MY_Model {
 	public function updateVipRewardDate( $pid, $reward_type, $reward_value )
 	{
 		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERVIP." ( pid, vipreward_datetime, reward_type, reward_value ) values ";
+		$query .= "( '".$pid."', now(), '".$reward_type."', '".$reward_value."' ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
+	}
+
+	public function updatePlayerRewardDate( $pid, $reward_type, $reward_value )
+	{
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERLEV." ( pid, reward_datetime, reward_type, reward_value ) values ";
 		$query .= "( '".$pid."', now(), '".$reward_type."', '".$reward_value."' ) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -2462,9 +2590,9 @@ class Model_Play extends MY_Model {
 		return $this->DB_SEL->affected_rows();
 	}
 
-	public function requestCharacterClassCheck( $pid, $cid )
+	public function requestCharacterClassCheck( $pid, $cid, $gseq )
 	{
-		$query = "select b.vocation from player_character as a inner join koc_ref.ref_character as b on a.refid = b.id ";
+		$query = "select b.vocation, gtype_".$gseq." from player_character as a inner join koc_ref.ref_character as b on a.refid = b.id ";
 		$query .= "where a.idx = '".$cid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -2473,7 +2601,7 @@ class Model_Play extends MY_Model {
 
 	public function requestItemClassCheck( $pid, $iid )
 	{
-		$query = "select b.vocation from player_inventory as a inner join koc_ref.item as b on a.refid = b.id ";
+		$query = "select b.vocation, b.type, b.parts from player_inventory as a inner join koc_ref.item as b on a.refid = b.id ";
 		$query .= "where a.idx = '".$iid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -2501,7 +2629,7 @@ class Model_Play extends MY_Model {
 	public function resetPlayerBasic( $pid )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERBASIC." set vip_level = 0, vip_exp = 0, ";
-		$query .= "inc_cha = 0, inc_wea = 0, inc_bck = 0, inc_skl = 0, inc_exp = 0, inc_eng = 0, inc_fri = 0, inc_pvp = 0, inc_pvb = 0, inc_survival = 0 ";
+		$query .= "inc_cha = 0, inc_wea = 0, inc_ger = 0, inc_bck = 0, inc_skl = 0, inc_exp = 0, inc_eng = 0, inc_fri = 0, inc_pvp = 0, inc_pvb = 0, inc_survival = 0 ";
 		$query .= "where pid = '".$pid."'";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -2614,7 +2742,7 @@ class Model_Play extends MY_Model {
 
 	public function insertItem( $pid )
 	{
-		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERITEM." ( pid, energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, event_points, friendship_points, achieve_points ) values ('".$pid."', ".MY_Controller::MAX_ENERGY_POINTS.", ".MY_Controller::MAX_MODES_PVB.", ".MY_Controller::MAX_MODES_PVP.", ".MY_Controller::MAX_MODES_SURVIVAL.", 0, 0, 0, 0, 0) ";
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERITEM." ( pid, energy_points, pvb_points, pvp_points, survival_points, game_points, cash_points, event_points, friendship_points, achieve_points, def_3, def_4, def_5, inf_3, inf_4, inf_5, sht_3, sht_4, sht_5 ) values ('".$pid."', ".MY_Controller::MAX_ENERGY_POINTS.", ".MY_Controller::MAX_MODES_PVB.", ".MY_Controller::MAX_MODES_PVP.", ".MY_Controller::MAX_MODES_SURVIVAL.", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_INS->query($query);

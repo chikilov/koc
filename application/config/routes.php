@@ -39,11 +39,11 @@
 */
 
 /*API 시작*/
-$route['request/api/(:any)'] = 'api/con_ApiProcess/$1';
+$route['request/api/(:any)'] = 'api/Con_ApiProcess/$1';
 $route['request/api/'] = 'api/con_ApiProcess';
 
-$route['request/apiProcessor/(:any)'] = 'api/con_ApiProcessor/$1';
-$route['request/apiProcessor/'] = 'api/con_ApiProcessor';
+$route['request/apiProcessor/(:any)'] = 'api/Con_ApiProcessor/$1';
+$route['request/apiProcessor/'] = 'api/Con_ApiProcessor';
 
 $route['request/apiUpdate/(:any)'] = 'api/con_ApiUpdate/$1';
 $route['request/apiUpdate/'] = 'api/con_ApiUpdate';

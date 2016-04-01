@@ -191,23 +191,23 @@ else if ( ENVIRONMENT == 'staging' )
 {
 	//log single
 	$db['log']['hostname'] = '211.237.12.214';
-	$db['log']['username'] = 'webuser';
+	$db['log']['username'] = 'root';
 	$db['log']['password'] = 'dudrud2140';
 	//login single
 	$db['login']['hostname'] = '211.237.12.214';
-	$db['login']['username'] = 'webuser';
+	$db['login']['username'] = 'root';
 	$db['login']['password'] = 'dudrud2140';
 
 	$db['default']['hostname'] = '211.237.12.214';
-	$db['default']['username'] = 'webuser';
+	$db['default']['username'] = 'root';
 	$db['default']['password'] = 'dudrud2140';
 	//replication slave
 	$db['default_sel']['hostname'] = '211.237.12.214';
-	$db['default_sel']['username'] = 'webuser';
+	$db['default_sel']['username'] = 'root';
 	$db['default_sel']['password'] = 'dudrud2140';
 	//replication master
 	$db['default_ins']['hostname'] = '211.237.12.214';
-	$db['default_ins']['username'] = 'webuser';
+	$db['default_ins']['username'] = 'root';
 	$db['default_ins']['password'] = 'dudrud2140';
 
 	$db['login']['dbdriver'] = 'mysqli';

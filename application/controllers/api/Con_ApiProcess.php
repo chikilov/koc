@@ -2764,39 +2764,6 @@ class Con_ApiProcess extends MY_Controller {
 							$randomProduct = array_merge($randomProduct, $addProduct);
 						}
 
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						$tempArray = array(
-							array( 'article_type' => 'ASST', 'reward_type' => 'CASH_POINTS', 'article_value' => 'CASH_POINTS', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'FRIENDSHIP_POINTS', 'article_value' => 'FRIENDSHIP_POINTS', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'INF_3', 'article_value' => 'INF_3', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'INF_4', 'article_value' => 'INF_4', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'INF_5', 'article_value' => 'INF_5', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'DEF_3', 'article_value' => 'DEF_3', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'DEF_4', 'article_value' => 'DEF_4', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'DEF_5', 'article_value' => 'DEF_5', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'SHT_3', 'article_value' => 'SHT_3', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'SHT_4', 'article_value' => 'SHT_4', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'SHT_5', 'article_value' => 'SHT_5', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'ITEM_BONUS', 'article_value' => 'ITEM_BONUS', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'EXP_BONUS', 'article_value' => 'EXP_BONUS', 'attach_value' => intval(rand(1, 10)) ),
-							array( 'article_type' => 'ASST', 'reward_type' => 'GOLD_BONUS', 'article_value' => 'GOLD_BONUS', 'attach_value' => intval(rand(1, 10)) )
-						);
-
-						$rand[0] = rand(1, 14) - 1;
-						$rand[1] = rand(1, 14) - 1;
-						$rand[2] = rand(1, 14) - 1;
-						$randomProduct[] = $tempArray[$rand[0]];
-						$randomProduct[] = $tempArray[$rand[1]];
-						$randomProduct[] = $tempArray[$rand[2]];
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
 						$arrayResult = $this->commonUserResourceProvisioning( $randomProduct, $pid, $pid, 'PVE보상 수령' );
 						$arrayResult['playerinfo'] = $playerInfo;
 						$arrayResult['rewardobject'] = $randomProduct;

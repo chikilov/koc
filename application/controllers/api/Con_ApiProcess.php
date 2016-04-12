@@ -60,7 +60,7 @@ class Con_ApiProcess extends MY_Controller {
 
 		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $arrayResult['pid'], $_POST['data'] );
 	}
-
+/*
 	public function requestGuestLogin()
 	{
 		$macaddr = $this->decoded['macaddr'];
@@ -178,7 +178,7 @@ class Con_ApiProcess extends MY_Controller {
 
 		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $arrayResult['pid'], $_POST['data'] );
 	}
-
+*/
 	public function requestAffiliateLogin()
 	{
 		$macaddr = $this->decoded['macaddr'];
@@ -239,6 +239,8 @@ class Con_ApiProcess extends MY_Controller {
 					$this->dbLogin->updateSession( $arrayResult['pid'], $cursession );
 					$arrayResult['cursession'] = $cursession;
 					$this->onSysLogWriteDb( $arrayResult['pid'], '로그인 성공' );
+					$this->dbLog->updateCountry( $arrayResult['pid'], $country );
+					$this->dbPlay->updateCountry( $arrayResult['pid'], $country );
 					if ( $pushkey != '' && $pushkey != null )
 					{
 						if ( !(bool)$this->dbLogin->requestCheckDupPushKey( $arrayResult['pid'], $pushkey ) )
@@ -419,7 +421,7 @@ class Con_ApiProcess extends MY_Controller {
 
 		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $pid, $_POST['data'] );
 	}
-
+/*
 	public function requestLogin()
 	{
 		$id = $this->decoded['id'];
@@ -504,7 +506,7 @@ class Con_ApiProcess extends MY_Controller {
 
 		echo $this->API_RETURN_MESSAGE( $resultCode, $resultText, $arrayResult, $arrayResult['pid'], $_POST['data'] );
 	}
-
+*/
 	public function requestMailList()
 	{
 		$pid = $this->decoded['pid'];
@@ -806,17 +808,6 @@ class Con_ApiProcess extends MY_Controller {
 							$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::ACCESS_EVENT_REWARD_TITLE, $row['evt_target'], $row['evt_value'], MY_Controller::NORMAL_EXPIRE_TERM );
 						}
 					}
-					/* 2015 설맞이 오퍼레이터 지급 이벤트
-					if ( !($this->dbPlay->inventoryExistCheck( $pid )) && date('Ymd') > '20150215' && date('Ymd') < '20150223' )
-					{
-						$this->dbPlay->inventoryProvision( $pid, 'OP01000008' );
-						$arrayResult['addeditemlist'] = 'OP01000008';
-					}
-					else
-					{
-						$arrayResult['addeditemlist'] = null;
-					}
-					*/
 
 					$arrayResult['name'] = $tmpArray['name'];
 					$arrayResult['show_prof'] = $tmpArray['show_prof'];
@@ -856,7 +847,7 @@ class Con_ApiProcess extends MY_Controller {
 					$arrayResult['remain_item'] = $tmpArray;
 
 					$playerReward = $this->dbRef->requestDailyPlayerReward( $pid, $arrayResult['player_level'] )->result_array();
-					/*
+					/* vip 시스템 임시제거
 					$vipReward = $this->dbRef->requestDailyVipReward( $pid, $arrayResult['vip_level'] )->result_array();
 
 					if ( !( empty($vipReward) ) )
@@ -877,22 +868,17 @@ class Con_ApiProcess extends MY_Controller {
 					}
 					*/
 					// 매일매일 패키지 지급 처리
-					$everydayPack = $this->dbPlay->requestEverydayPackageList( $pid )->result_array();
-					if ( !empty( $everydayPack ) )
+					$arrayResult['packinfo']['everydaypack'] = $this->dbPlay->requestEverydayPackageList( $pid )->result_array();
+					if ( !empty( $arrayResult['packinfo']['everydaypack'] ) )
 					{
-						foreach( $everydayPack as $row )
+						foreach( $arrayResult['packinfo']['everydaypack'] as $row )
 						{
 							if ( $row['is_reward'] < 1 )
 							{
 								$mail_id = $this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::PACKAGE_SEND_TITLE, $row['reward_type'], $row['reward_value'], false );
 								$this->dbPlay->requestLoggingEveryDayPackPayment( $pid, $mail_id, $row['idx'], $row['paymentSeq'], $row['product_id'], $row['expire_date'], $row['reward_type'], $row['reward_value'] );
 							}
-							$arrayResult['packinfo']['everydaypack'][] = array( 'product_id' => $row['product_id'], 'expire_date' => $row['expire_date'] );
 						}
-					}
-					else
-					{
-						$arrayResult['packinfo']['everydaypack'] = null;
 					}
 
 					// 첫구매 체크 ( 상품 카테고리가 CASH 인 경우만 체크, 매일매일 패키지(카테고리 : SUBSCRIBE)와 개척자 패키지(카테고리 : LIMITED) 제외 )
@@ -911,15 +897,9 @@ class Con_ApiProcess extends MY_Controller {
 					$arrayResult['packinfo']['daily'] = $this->dbPlay->requestDailyPackageList( $pid )->result_array();
 
 					// 개척자 패키지
-					$limitedPack = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
-					if ( !empty( $limitedPack ) )
-					{
-						$arrayResult['packinfo']['limited'] = $limitedPack;
-					}
-					else
-					{
-						$arrayResult['packinfo']['limited'] = null;
-					}
+					$arrayResult['packinfo']['limited'] = $this->dbPlay->requestLimitedPackageList( $pid )->result_array();
+					$arrayResult['packinfo']['free'] = $this->dbPlay->requestFreeGatcha( $pid )->result_array();
+
 					$arrayRstime = $this->dbPlay->requestBeforeRequestData( $pid )->result_array();
 					if ( empty($arrayRstime) )
 					{
@@ -1409,56 +1389,165 @@ class Con_ApiProcess extends MY_Controller {
 				$this->load->model('admin/Model_Admin', 'dbAdmin');
 				$arrDisInfo = $this->dbAdmin->requestValidDisEventList($arrayProduct[0]['category'], $product)->result_array();
 				$this->dbPlay->onBeginTransaction();
-				if ( empty( $arrDisInfo ) )
-				{
-					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품 구매('.$product.')' );
-				}
-				else
+
+				if ( !empty( $arrDisInfo ) )
 				{
 					if ( $arrDisInfo[0]['evt_paytype'] == 'DIS' )
 					{
-						$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrPayment[0]['payment_type'], floor( $arrPayment[0]['payment'] * (100 - $arrDisInfo[0]['evt_value']) / 100 ), '상품 구매('.$product.')' );
+						$arrayProduct[0]['payment'] = floor( $arrPayment[0]['payment'] * (100 - $arrDisInfo[0]['evt_value']) / 100 );
 					}
 					else
 					{
-						$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrDisInfo[0]['evt_paytype'], $arrDisInfo[0]['evt_value'], '상품 구매('.$product.')' );
+						$arrayProduct[0]['payment_type'] = $arrDisInfo[0]['evt_paytype'];
+						$arrayProduct[0]['payment'] = $arrDisInfo[0]['evt_value'];
 					}
 				}
 
-				// 지급 처리
-				if ( $result )
+				if ( $arrayProduct[0]['termmin'] != null )
 				{
-					$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
-					if ( $arrayResult == null )
+					$arrayLast = $this->dbPlay->requestLastFreeGatcha( $pid, $product )->result_array();
+
+					if ( empty($arrayLast) )
 					{
-						$resultCode = MY_Controller::STATUS_BUYITEM_ITEM_GIVE;
-						$resultText = MY_Controller::MESSAGE_BUYITEM_ITEM_GIVE;
-						$result = (bool)0;
+						if ( $arrayProduct[0]['termcount'] != null )
+						{
+							$group_count = 1;
+						}
+						else
+						{
+							$group_count = null;
+						}
+						$this->dbPlay->requestLoggingFreePack( $pid, $product, $group_count );
+						$arrayProduct[0]['payment_type'] = null;
+						$arrayProduct[0]['payment'] = 0;
+						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '무료뽑기('.$product.')' );
+						$result = boolval(true);
 					}
 					else
 					{
-						if ( $arrayProduct[0]['article_type'] == 'ASST' )
-						{
-							unset($arrayResult['objectarray']);
-						}
+						$exec_datetime = new DateTime( $arrayLast[0]['exec_datetime'] );
+						$cur_datetime = new DateTime( $arrayLast[0]['cur_datetime'] );
+						$diff = $exec_datetime->diff($cur_datetime);
+						$diff_sec = $diff->days * 24 * 60 * 60;
+						$diff_sec += $diff->h * 60 * 60;
+						$diff_sec += $diff->i * 60;
+						$diff_sec += $diff->s;
 
-						$resultCode = MY_Controller::STATUS_API_OK;
-						$resultText = MY_Controller::MESSAGE_API_OK;
-						$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment'] );
+						if ( $arrayProduct[0]['termcount'] != null )
+						{
+							if ( $cur_datetime->format('Y-m-d') != $exec_datetime->format('Y-m-d') )
+							{
+								$arrayLast[0]['group_count'] = 0;
+							}
+
+							if ( $arrayLast[0]['group_count'] >= $arrayProduct[0]['termcount'] )
+							{
+								$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품구매('.$product.')' );
+								if ( $result )
+								{
+									$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
+								}
+								else
+								{
+									$resultCode = MY_Controller::STATUS_BUYITEM_ERROR_METHOD;
+									$resultText = MY_Controller::MESSAGE_BUYITEM_ERROR_METHOD;
+									$arrayResult = null;
+								}
+							}
+							else
+							{
+								if ( $diff_sec > $arrayProduct[0]['termmin'] * $arrayLast[0]['group_count'] * 60 )
+								{
+									$this->dbPlay->requestLoggingFreePack( $pid, $product, ( $arrayLast[0]['group_count'] != null ? $arrayLast[0]['group_count'] + 1 : 1 ) );
+									$arrayProduct[0]['payment_type'] = null;
+									$arrayProduct[0]['payment'] = 0;
+									$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '무료뽑기('.$product.')' );
+									$result = boolval(true);
+								}
+								else
+								{
+									$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품구매('.$product.')' );
+									if ( $result )
+									{
+										$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
+									}
+									else
+									{
+										$resultCode = MY_Controller::STATUS_BUYITEM_ERROR_METHOD;
+										$resultText = MY_Controller::MESSAGE_BUYITEM_ERROR_METHOD;
+										$arrayResult = null;
+									}
+								}
+							}
+						}
+						else
+						{
+							if ( $diff_sec > $arrayProduct[0]['termmin'] * 60 )
+							{
+								$this->dbPlay->requestLoggingFreePack( $pid, $product, null );
+								$arrayProduct[0]['payment_type'] = null;
+								$arrayProduct[0]['payment'] = 0;
+								$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
+								$result = boolval(true);
+							}
+							else
+							{
+								$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품구매('.$product.')' );
+								if ( $result )
+								{
+									$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
+								}
+								else
+								{
+									$resultCode = MY_Controller::STATUS_BUYITEM_ERROR_METHOD;
+									$resultText = MY_Controller::MESSAGE_BUYITEM_ERROR_METHOD;
+									$arrayResult = null;
+								}
+							}
+						}
 					}
 				}
 				else
 				{
+					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrayProduct[0]['payment_type'], $arrayProduct[0]['payment'], '상품구매('.$product.')' );
+					if ( $result )
+					{
+						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '상품구매('.$product.')' );
+					}
+					else
+					{
 						$resultCode = MY_Controller::STATUS_BUYITEM_ERROR_METHOD;
 						$resultText = MY_Controller::MESSAGE_BUYITEM_ERROR_METHOD;
 						$arrayResult = null;
+					}
 				}
+
+				if ( $arrayResult == null )
+				{
+					$resultCode = MY_Controller::STATUS_BUYITEM_ITEM_GIVE;
+					$resultText = MY_Controller::MESSAGE_BUYITEM_ITEM_GIVE;
+					$result = (bool)0;
+				}
+				else
+				{
+					if ( $arrayProduct[0]['article_type'] == 'ASST' )
+					{
+						unset($arrayResult['objectarray']);
+					}
+
+					$resultCode = MY_Controller::STATUS_API_OK;
+					$resultText = MY_Controller::MESSAGE_API_OK;
+					$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment'] );
+				}
+
 				$this->dbPlay->onEndTransaction( $result );
 				if ( $arrayResult != null )
 				{
 					$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
 				}
 			}
+
+			$arrayResult['free'] = $this->dbPlay->requestFreeGatcha( $pid )->result_array();
 		}
 		else
 		{
@@ -2575,7 +2664,9 @@ class Con_ApiProcess extends MY_Controller {
 		}
 
 		$stageInfo = $this->dbRef->getRewardIdFromStage( $pid, $stageid )->result_array()[0];
-		$rid = $stageInfo['reward'];
+		$rid1 = $stageInfo['reward_1'];
+		$rid2 = $stageInfo['reward_2'];
+		$rid3 = $stageInfo['reward_3'];
 		$platformPoints = $stageInfo['platform_points'];
 		if ( $cidArray[0]['idx'] > 0 )
 		{
@@ -2651,7 +2742,10 @@ class Con_ApiProcess extends MY_Controller {
 
 				if ( !( empty( $arrayRewardInfo ) ) )
 				{
-					$arrayProduct = $this->dbRef->randomizeValuePick( $pid, $rid )->result_array()[0];
+					$arrayProduct = $this->dbRef->randomizeValuePick( $pid, $rid1, '1' )->result_array()[0];
+					$arrayProduct = array_merge($arrayProduct, $this->dbRef->randomizeValuePick( $pid, $rid2, '2' )->result_array()[0]);
+					$arrayProduct = array_merge($arrayProduct, $this->dbRef->randomizeValuePick( $pid, $rid3, '3' )->result_array()[0]);
+
 					$this->dbRecord->onBeginTransaction();
 					$this->dbRank->onBeginTransaction();
 					$this->dbPlay->onBeginTransaction();
@@ -2784,10 +2878,12 @@ class Con_ApiProcess extends MY_Controller {
 									if ( array_key_exists('character', $arrayResult) )
 									{
 										$arrayResult['character'][] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
+										$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
 									}
 									else
 									{
 										$arrayResult['character'] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
+										$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
 									}
 								}
 								else if ( $val['article_type'] == 'ITEM' || $val['article_type'] == 'WEPN' || $val['article_type'] == 'BCPC' || $val['article_type'] == 'SKIL' || $val['article_type'] == 'GEAR' )
@@ -2797,10 +2893,12 @@ class Con_ApiProcess extends MY_Controller {
 										if ( array_key_exists('inventory', $arrayResult) )
 										{
 											$arrayResult['inventory'][] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
+											$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
 										}
 										else
 										{
 											$arrayResult['inventory'] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
+											$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
 										}
 									}
 								}
@@ -2815,6 +2913,7 @@ class Con_ApiProcess extends MY_Controller {
 										$arrayResult['assets'] = array( $arrayResult['objectarray'][$key] );
 									}
 								}
+								unset($arrayResult['objectarray'][$key]);
 							}
 							if ( array_key_exists('objectarray', $arrayResult) )
 							{
@@ -2882,13 +2981,7 @@ class Con_ApiProcess extends MY_Controller {
 							}
 						}
 
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-						//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
-//						$result = (bool)$this->dbRecord->updateLoggingRewardStepForPVE( $pid, $logid, $cidArray, $basic_reward_type, $basic_reward_value, $arrayProduct, $arrayResult['rewardobject'], $duration, $grade, $is_clear );
-						$result = (bool)$this->dbRecord->updateLoggingRewardStepForPVE( $pid, $logid, $cidArray, $basic_reward_type, $basic_reward_value, $arrayProduct, array(range($arrayResult['rewardobject'][0], $arrayResult['rewardobject'][2])), $duration, $grade, $is_clear );
+						$result = (bool)$this->dbRecord->updateLoggingRewardStepForPVE( $pid, $logid, $cidArray, $basic_reward_type, $basic_reward_value, $arrayProduct, $arrayResult['rewardobject'], $duration, $grade, $is_clear );
 						unset($arrayResult['rewardobject']);
 						// 랭킹정보 추가 완료
 						$this->dbRank->requestUpdatePVERank( $pid, $stageid, $duration, $grade );
@@ -3652,7 +3745,12 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							foreach( $usePoint as $row )
 							{
-								$result = (bool)$result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $row['payment_type'], $row['payment'], 'PVP아이템 사용('.implode(',', $instant_itemName).')' );
+								//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+								//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+								//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+								//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+								//$result = (bool)$result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $row['payment_type'], $row['payment'], 'PVP아이템 사용('.implode(',', $instant_itemName).')' );
+								$result = (bool)1;
 							}
 						}
 						else
@@ -3662,38 +3760,23 @@ class Con_ApiProcess extends MY_Controller {
 
 						if ( $result )
 						{
-							$this->calcurateEnergy( $pid );
-							if ( $use_cash )
+							//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+							//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+							//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+							//임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시임시
+							//$result = (bool)$result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, 'PVP_POINTS', 1, 'PVP 출격 에너지 사용' );
+							$result = (bool)1;
+							if ( $result )
 							{
-								$result = (bool)$result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, 'CASH_POINTS', MY_Controller::ADDITIONAL_MODE_PVP_PRICE, 'PVP 에너지 구매' );
-								if ( $result )
-								{
-									$resultCode = MY_Controller::STATUS_API_OK;
-									$resultText = MY_Controller::MESSAGE_API_OK;
-									$arrayResult = array( 'logid' => (string)$result2, 'remain_item' => $this->dbPlay->requestItem( $pid )->result_array()[0], 'enemy_info' => $enemy_info );
-								}
-								else
-								{
-									$resultCode = MY_Controller::STATUS_PVP_LACK_CASH;
-									$resultText = MY_Controller::MESSAGE_PVP_LACK_CASH;
-									$arrayResult = null;
-								}
+								$resultCode = MY_Controller::STATUS_API_OK;
+								$resultText = MY_Controller::MESSAGE_API_OK;
+								$arrayResult = array( 'logid' => (string)$result2, 'remain_item' => $this->dbPlay->requestItem( $pid )->result_array()[0], 'enemy_info' => $enemy_info );
 							}
 							else
 							{
-								$result = (bool)$result & (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, 'PVP_POINTS', 1, 'PVP 출격 에너지 사용' );
-								if ( $result )
-								{
-									$resultCode = MY_Controller::STATUS_API_OK;
-									$resultText = MY_Controller::MESSAGE_API_OK;
-									$arrayResult = array( 'logid' => (string)$result2, 'remain_item' => $this->dbPlay->requestItem( $pid )->result_array()[0], 'enemy_info' => $enemy_info );
-								}
-								else
-								{
-									$resultCode = MY_Controller::STATUS_PVP_LACK_PVBPOINT;
-									$resultText = MY_Controller::MESSAGE_PVP_LACK_PVBPOINT;
-									$arrayResult = null;
-								}
+								$resultCode = MY_Controller::STATUS_PVP_LACK_PVBPOINT;
+								$resultText = MY_Controller::MESSAGE_PVP_LACK_PVBPOINT;
+								$arrayResult = null;
 							}
 						}
 						else
@@ -3718,36 +3801,57 @@ class Con_ApiProcess extends MY_Controller {
 						// 로그 문자열 만들기 시작
 						$logString = '1:1대전 시작\n';
 						$logString .= '진행팀 정보 : \n\t아이디 => '.$pid.'\n';
-						if ( $this->decoded['op'] != null && $this->decoded['op'] != '' && $this->decoded['op'] != '0' )
+						if ( array_key_exists('op', $this->decoded) )
 						{
-							$logString .= '\t오퍼레이터 => '.$this->decoded['op'].'\n';
+							if ( $this->decoded['op'] != null && $this->decoded['op'] != '' && $this->decoded['op'] != '0' )
+							{
+								$logString .= '\t오퍼레이터 => '.$this->decoded['op'].'\n';
+							}
 						}
-						if ( $this->decoded['pilot_0'] != null && $this->decoded['pilot_0'] != '' && $this->decoded['pilot_0'] != '0' )
+						if ( array_key_exists('pilot_0', $this->decoded) )
 						{
-							$logString .= '\t파일럿1 => '.$this->decoded['pilot_0'].'\n';
+							if ( $this->decoded['pilot_0'] != null && $this->decoded['pilot_0'] != '' && $this->decoded['pilot_0'] != '0' )
+							{
+								$logString .= '\t파일럿1 => '.$this->decoded['pilot_0'].'\n';
+							}
 						}
-						if ( $this->decoded['pilot_1'] != null && $this->decoded['pilot_1'] != '' && $this->decoded['pilot_1'] != '0' )
+						if ( array_key_exists('pilot_1', $this->decoded) )
 						{
-							$logString .= '\t파일럿2 => '.$this->decoded['pilot_1'].'\n';
+							if ( $this->decoded['pilot_1'] != null && $this->decoded['pilot_1'] != '' && $this->decoded['pilot_1'] != '0' )
+							{
+								$logString .= '\t파일럿2 => '.$this->decoded['pilot_1'].'\n';
+							}
 						}
-						if ( $this->decoded['pilot_2'] != null && $this->decoded['pilot_2'] != '' && $this->decoded['pilot_2'] != '0' )
+						if ( array_key_exists('pilot_2', $this->decoded) )
 						{
-							$logString .= '\t파일럿3 => '.$this->decoded['pilot_2'].'\n';
+							if ( $this->decoded['pilot_2'] != null && $this->decoded['pilot_2'] != '' && $this->decoded['pilot_2'] != '0' )
+							{
+								$logString .= '\t파일럿3 => '.$this->decoded['pilot_2'].'\n';
+							}
 						}
-						if ( $this->decoded['refid_0'] != null && $this->decoded['refid_0'] != '' && $this->decoded['refid_0'] != '0' )
+						if ( array_key_exists('refid_0', $this->decoded) )
 						{
-							$logString .= '\t출격기체1 => +'.$this->decoded['up_grade_0'].' '.$this->decoded['refid_0'].'('.$this->decoded['cid_0'].'),';
-							$logString .= 'lv.'.$this->decoded['lev_0'].', 전략'.$this->decoded['tact_0'].'\n';
+							if ( $this->decoded['refid_0'] != null && $this->decoded['refid_0'] != '' && $this->decoded['refid_0'] != '0' )
+							{
+								$logString .= '\t출격기체1 => +'.$this->decoded['up_grade_0'].' '.$this->decoded['refid_0'].'('.$this->decoded['cid_0'].'),';
+								$logString .= 'lv.'.$this->decoded['lev_0'].', 전략'.$this->decoded['tact_0'].'\n';
+							}
 						}
-						if ( $this->decoded['refid_1'] != null && $this->decoded['refid_1'] != '' && $this->decoded['refid_1'] != '0' )
+						if ( array_key_exists('refid_1', $this->decoded) )
 						{
-							$logString .= '\t출격기체2 => +'.$this->decoded['up_grade_1'].' '.$this->decoded['refid_1'].'('.$this->decoded['cid_1'].'), ';
-							$logString .= 'lv.'.$this->decoded['lev_1'].', 전략'.$this->decoded['tact_1'].'\n';
+							if ( $this->decoded['refid_1'] != null && $this->decoded['refid_1'] != '' && $this->decoded['refid_1'] != '0' )
+							{
+								$logString .= '\t출격기체2 => +'.$this->decoded['up_grade_1'].' '.$this->decoded['refid_1'].'('.$this->decoded['cid_1'].'), ';
+								$logString .= 'lv.'.$this->decoded['lev_1'].', 전략'.$this->decoded['tact_1'].'\n';
+							}
 						}
-						if ( $this->decoded['refid_2'] != null && $this->decoded['refid_2'] != '' && $this->decoded['refid_2'] != '0' )
+						if ( array_key_exists('refid_2', $this->decoded) )
 						{
-							$logString .= '\t출격기체3 => +'.$this->decoded['up_grade_2'].' '.$this->decoded['refid_2'].'('.$this->decoded['cid_2'].'), ';
-							$logString .= 'lv.'.$this->decoded['lev_2'].', 전략'.$this->decoded['tact_2'].'\n';
+							if ( $this->decoded['refid_2'] != null && $this->decoded['refid_2'] != '' && $this->decoded['refid_2'] != '0' )
+							{
+								$logString .= '\t출격기체3 => +'.$this->decoded['up_grade_2'].' '.$this->decoded['refid_2'].'('.$this->decoded['cid_2'].'), ';
+								$logString .= 'lv.'.$this->decoded['lev_2'].', 전략'.$this->decoded['tact_2'].'\n';
+							}
 						}
 
 						$logString .= '상대팀 정보 : \n\t아이디 => '.$enemy_info['pid'].'\n';
@@ -5189,27 +5293,26 @@ class Con_ApiProcess extends MY_Controller {
 				$is_enemy = $rid[0]['is_enemy'];
 				$rid = $rid[0]['reward'];
 
-				$arrayResult['rewardobject'] = $this->dbRef->randomizeValuePick( $pid, $rid )->result_array()[0];
-				$seq = intval(rand() * 3) % 3 + 1;
+				$arrayResult['rewardobject'] = $this->dbRef->randomizeValuePick( $pid, $rid, '1' )->result_array()[0];
 				$this->dbPlay->onBeginTransaction();
 				$this->dbRecord->onBeginTransaction();
 				$this->dbMail->onBeginTransaction();
 
-				$result = (bool)$this->dbRecord->updateExplorationResult( $pid, $exp_group_idx, $exp_idx, $arrayResult['rewardobject']['article_'.$seq.'_value'], $arrayResult['rewardobject']['attach_'.$seq.'_value'] );
+				$result = (bool)$this->dbRecord->updateExplorationResult( $pid, $exp_group_idx, $exp_idx, $arrayResult['rewardobject']['article_1_value'], $arrayResult['rewardobject']['attach_1_value'] );
 				$cexp = $this->dbRef->requestExpExp( $pid, $grade )->result_array()[0]['exp'];
 				$bexp = $this->dbPlay->requestCharacterExp( $pid, $cid )->result_array()[0]['exp'];
 
 				//추가보상이 경험치일 경우
-				if ( $arrayResult['rewardobject']['article_'.$seq.'_value'] == 'EXP_POINTS' )
+				if ( $arrayResult['rewardobject']['article_1_value'] == 'EXP_POINTS' )
 				{
-					$cexp = $cexp + $bexp + $arrayResult['rewardobject']['attach_'.$seq.'_value'];
+					$cexp = $cexp + $bexp + $arrayResult['rewardobject']['attach_1_value'];
 				}
 				else
 				{
 					$cexp = $cexp + $bexp;
 					$rewardInfo = $arrayResult['rewardobject'];
 
-					$result = (bool)$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::EXPLORATION_REWARD_TITLE, $arrayResult['rewardobject']['article_'.$seq.'_value'], $arrayResult['rewardobject']['attach_'.$seq.'_value'], MY_Controller::NORMAL_EXPIRE_TERM );
+					$result = (bool)$this->dbMail->sendMail( $pid, MY_Controller::SENDER_GM, MY_Controller::EXPLORATION_REWARD_TITLE, $arrayResult['rewardobject']['article_1_value'], $arrayResult['rewardobject']['attach_1_value'], MY_Controller::NORMAL_EXPIRE_TERM );
 				}
 				if ( $cexp > MY_Controller::CHAR_EXP_FOR_MAXLEV )
 				{
@@ -5252,25 +5355,25 @@ class Con_ApiProcess extends MY_Controller {
 				{
 					$logString .= '적발견 => 실패\n';
 				}
-				$tmpReward['article_value'] = $arrayResult['rewardobject']['article_'.$seq.'_value'];
-				$tmpReward['attach_value'] = $arrayResult['rewardobject']['attach_'.$seq.'_value'];
-				if ( $arrayResult['rewardobject']['article_'.$seq.'_type'] == 'CHAR' )
+				$tmpReward['article_value'] = $arrayResult['rewardobject']['article_1_value'];
+				$tmpReward['attach_value'] = $arrayResult['rewardobject']['attach_1_value'];
+				if ( $arrayResult['rewardobject']['article_1_type'] == 'CHAR' )
 				{
-					$txtRandReward = $arrayResult['rewardobject']['reward_'.$seq.'_type'];
+					$txtRandReward = $arrayResult['rewardobject']['reward_1_type'];
 				}
-				else if ( $arrayResult['rewardobject']['article_'.$seq.'_type'] == 'SKIL' )
+				else if ( $arrayResult['rewardobject']['article_1_type'] == 'SKIL' )
 				{
-					$txtRandReward = $arrayResult['rewardobject']['reward_'.$seq.'_type'];
+					$txtRandReward = $arrayResult['rewardobject']['reward_1_type'];
 				}
-				else if ( $arrayResult['rewardobject']['article_'.$seq.'_type'] == 'ASST' )
+				else if ( $arrayResult['rewardobject']['article_1_type'] == 'ASST' )
 				{
-					$txtRandReward = $arrayResult['rewardobject']['reward_'.$seq.'_type'];
+					$txtRandReward = $arrayResult['rewardobject']['reward_1_type'];
 				}
 				else
 				{
-					$txtRandReward = $arrayResult['rewardobject']['reward_'.$seq.'_type'];
+					$txtRandReward = $arrayResult['rewardobject']['reward_1_type'];
 				}
-				$txtRandReward .= ' : '.$arrayResult['rewardobject']['attach_'.$seq.'_value'];
+				$txtRandReward .= ' : '.$arrayResult['rewardobject']['attach_1_value'];
 				$logString .= '탐색 보상 => '.$txtRandReward.'\n';
 				// 로그 문자열 만들기 끝
 				$this->onSysLogWriteDb( $pid, $logString );

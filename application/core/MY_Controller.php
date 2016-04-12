@@ -360,6 +360,7 @@ EOF;
 	const TBL_PLAYEREXTRAATTEND = "player_extraattend";
 	const TBL_PLAYERIAP = "player_iap";
 	const TBL_PLAYERENREQ = "player_enreq";
+	const TBL_PLAYERFREEGATCHA_LOG = "player_freegatcha_log";
 
 		//table in koc_ref database
 	const TBL_DATAFILES = "datafiles";
@@ -615,7 +616,6 @@ EOF;
 		parent::__construct();
 		$this->load->library( 'LogW', TRUE );
 
-		define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
 		if ( ENVIRONMENT == 'production' )
 		{
 			error_reporting(E_ALL);
@@ -1264,6 +1264,26 @@ EOF;
 						}
 
 						$wepnCount = $wepnCount - 1;
+					}
+					else
+					{
+						$arrayResult['objectarray'][] = array( 'idx' => 0 );
+					}
+				}
+				else if ( $arrayProduct['article_type'] == 'GEAR' )
+				{
+					$result = (bool)1;
+					if ( $gearCount > 0 )
+					{
+						for ( $i = 0; $i < $arrayProduct['attach_value']; $i++ )
+						{
+							// 인벤토리 정보 업데이트
+							$idx = $this->dbPlay->inventoryProvision( $sid, $arrayProduct['article_value'] );
+							$arrayResult['objectarray'][] = array( 'type' => 'ITEM', 'idx' => $idx, 'value' => $arrayProduct['article_value'], 'expire' => $this->dbPlay->requestInventoryExpire( $sid, $idx )->result_array()[0]['expire'] );
+							$result = $result & (bool)$idx;
+						}
+
+						$gearCount = $gearCount - 1;
 					}
 					else
 					{

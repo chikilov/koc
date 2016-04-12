@@ -334,8 +334,7 @@ class Model_Rank extends MY_Model {
 		$query = "update koc_rank.".$rewardtype."_lastweek set is_reward = ".$result.", reward_datetime = now() where pid = '".$pid."' and weekseq = ( ";
 		if ( $rewardtype == "pvp" )
 		{
-			$query .= "case when dayofweek(date_add(now(), interval -7 day)) < ".MY_Controller::PVP_YEARWEEK_STANDARD." then ";
-			$query .= "yearweek(date_add(now(), interval -14 day), 2) else yearweek(date_add(now(), interval -7 day), 2) end ) ";
+			$query = "update koc_rank.".$rewardtype."_lastday set is_reward = ".$result.", reward_datetime = now() where pid = '".$pid."' and dateseq = date_format(date_add(now(), interval -1 day), '%Y%m%d') ";
 		}
 		else if ( $rewardtype == "pvb" )
 		{

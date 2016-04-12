@@ -110,9 +110,12 @@ class Model_Record extends MY_Model {
 		$query .= "exp_2 = '".$cidArray[2]["exp"]."', ";
 		$query .= "basic_reward_type = '".$basic_reward_type."', ";
 		$query .= "basic_reward_value = '".$basic_reward_value."', ";
-
-		$query .= "random_reward_id = '".$arrayProduct['id']."', ";
-		$query .= "random_reward_pattern = '".$arrayProduct['pattern']."', ";
+		$query .= "random_reward_id_1 = '".$arrayProduct['reward_id_1']."', ";
+		$query .= "random_reward_pattern_1 = '".$arrayProduct['reward_pattern_1']."', ";
+		$query .= "random_reward_id_2 = '".$arrayProduct['reward_id_2']."', ";
+		$query .= "random_reward_pattern_2 = '".$arrayProduct['reward_pattern_2']."', ";
+		$query .= "random_reward_id_3 = '".$arrayProduct['reward_id_3']."', ";
+		$query .= "random_reward_pattern_3 = '".$arrayProduct['reward_pattern_3']."', ";
 		if ( count($random_reward) > 0 )
 		{
 			foreach ( $random_reward as $key => $val )
@@ -121,17 +124,9 @@ class Model_Record extends MY_Model {
 				{
 					$query .= "random".$key."_reward_type = '".$val['reward_type']."', ";
 				}
-				else
-				{
-					$query .= "random".$key."_reward_type = null, ";
-				}
 				if ( array_key_exists('attach_value', $val) )
 				{
 					$query .= "random".$key."_reward_value = '".$val['attach_value']."', ";
-				}
-				else
-				{
-					$query .= "random".$key."_reward_value = null, ";
 				}
 				if ( array_key_exists('idx', $val) )
 				{

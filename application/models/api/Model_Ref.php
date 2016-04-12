@@ -90,7 +90,7 @@ class Model_Ref extends MY_Model {
 	public function requestProductList( $pid, $storeType, $storeVersion, $country_code )
 	{
 		$query = "select a.id, a.alignment_index, a.category, a.retry_id, a.is_retry, a.type, a.value, max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_paytype, null), null)) as evt_paytype, ";
-		$query .= "ifnull( max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_value, null), null)), 0) as evt_value, ";
+		$query .= "ifnull( max(if(d.is_valid, if(now() between d.start_date and d.end_date, d.evt_value, null), null)), 0) as evt_value, a.termmin, a.termcount, ";
 		$query .= "a.bonus, a.payment_type, a.payment as payment_value, a.expiration_time, a.target, a.enable, a.version, a.duration, a.".$storeType." as iapcode ";
 		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a left outer join koc_admin.event_discount as d on a.id = d.evt_target ";
 		$query .= "where ( a.version = 0 or a.version >= ".$storeVersion." ) and a.enable = 1 and a.expiration_time >= now() ";
@@ -132,7 +132,7 @@ class Model_Ref extends MY_Model {
 	public function productVerify( $pid, $storeType, $product, $country_code )
 	{
 		$query = "select a.product_type, a.category, a.type, a.value as attach_value, a.payment_type, a.payment, ";
-		$query .= "a.bonus, b.article_type, b.article_value, a.vip_exp ";
+		$query .= "a.bonus, b.article_type, b.article_value, a.vip_exp, a.termmin, a.termcount ";
 		$query .= "from koc_ref.".MY_Controller::TBL_PRODUCT." as a inner join koc_ref.".MY_Controller::TBL_ARTICLE." as b on a.type = b.article_id ";
 		$query .= "where a.enable = 1 and a.id = '".$product."' ";
 
@@ -185,19 +185,14 @@ class Model_Ref extends MY_Model {
 		return $this->DB_SEL->query($query);
 	}
 
-	public function randomizeValuePick( $pid, $rid )
+	public function randomizeValuePick( $pid, $rid, $seq )
 	{
-		$query = "select d.id, d.pattern, reward_1_type, reward_1_value as attach_1_value, max(if(e.reward_1_type = f.article_id, article_type, null)) as article_1_type, ";
-		$query = "select d.id, 14 as pattern, reward_1_type, reward_1_value as attach_1_value, max(if(e.reward_1_type = f.article_id, article_type, null)) as article_1_type, ";
-		$query .= "max(if(e.reward_1_type = f.article_id, article_value, null)) as article_1_value, reward_2_type, reward_2_value as attach_2_value, ";
-		$query .= "max(if(e.reward_2_type = f.article_id, article_type, null)) as article_2_type, max(if(e.reward_2_type = f.article_id, article_value, null)) as article_2_value, ";
-		$query .= "reward_3_type, reward_3_value as attach_3_value, max(if(e.reward_3_type = f.article_id, article_type, null)) as article_3_type, ";
-		$query .= "max(if(e.reward_3_type = f.article_id, article_value, null)) as article_3_value ";
+		$query = "select d.id as reward_id_".$seq.", d.pattern as reward_pattern_".$seq.", reward_1_type as reward_".$seq."_type, reward_1_value as attach_".$seq."_value, ";
+		$query .= "max(if(e.reward_1_type = f.article_id, article_type, null)) as article_".$seq."_type, max(if(e.reward_1_type = f.article_id, article_value, null)) as article_".$seq."_value ";
 		$query .= "from ( select a.id, a.pattern, b.rand_prob, (if(@min_prob = 0, @min_prob, @min_prob + 1)) as min_prob, (@min_prob := @min_prob + a.probability) as max_prob ";
 		$query .= "from koc_ref.reward as a inner join ( select id, ceil( rand() * sum(probability) ) as rand_prob from koc_ref.reward where id = '".$rid."' ) as b on a.id = b.id, ";
 		$query .= "(select @min_prob:= 0) as c where a.id = '".$rid."' group by a.id, a.pattern ) as d inner join koc_ref.reward as e on d.id = e.id and d.pattern = e.pattern ";
-		$query .= "left outer join koc_ref.article as f on e.reward_1_type = f.article_id or e.reward_2_type = f.article_id or e.reward_3_type = f.article_id ";
-		$query .= "where d.rand_prob between d.min_prob and d.max_prob group by reward_1_type, reward_1_value, reward_2_type, reward_2_value, reward_3_type, reward_3_value ";
+		$query .= "left outer join koc_ref.article as f on e.reward_1_type = f.article_id where d.rand_prob between d.min_prob and d.max_prob group by reward_1_type, reward_1_value ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
@@ -254,7 +249,7 @@ class Model_Ref extends MY_Model {
 
 	public function getRewardIdFromStage( $pid, $stageid )
 	{
-		$query = "select reward, reward_pexp, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
+		$query = "select reward_1, reward_2, reward_3, reward_pexp, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);

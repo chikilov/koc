@@ -94,5 +94,15 @@ class Model_Log extends MY_Model {
 		$this->DB_LOG->query($query);
 		return $this->DB_LOG->affected_rows();
 	}
+
+	public function updateCountry( $pid, $country )
+	{
+		$query = "insert into ".$this->DB_LOG->database.".".MY_Controller::TBL_ACCOUNT." ( pid, country, reg_date ) values ";
+		$query .= "( '".$pid."', '".$country."', now() ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_LOG->query($query);
+		return $this->DB_LOG->affected_rows();
+	}
 }
 ?>

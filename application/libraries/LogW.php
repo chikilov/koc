@@ -12,6 +12,7 @@ class LogW {
 	public function __construct()
 	{
 		$this->dirPrefix = LOGROOT;
+		define('DEFAULTKEY', 'dnflahen20djrspdhrmfoa20djreoqkr');
 	}
 
 	public function sysLogWrite( $m_LogLevel, $pid, $m_LogMessage, $status = '0200' )
@@ -58,7 +59,15 @@ class LogW {
     {
 		$CI =& get_instance();
 		$CI->load->model('api/Model_Log', 'dbLog');
-     	$CI->dbLog->requestErrLog( $pid, $status, $_POST['data'], $called_name, $logcontent );
+		if ( array_key_exists( "data", $_POST ) )
+		{
+			$dataString = $this->NG_DECRYPT( $_POST["data"] );
+		}
+		else
+		{
+			$dataString = 'no data';
+		}
+     	$CI->dbLog->requestErrLog( $pid, $status, $dataString, $called_name, $logcontent );
     }
 
 	public function admLogWrite( $m_LogLevel, $m_LogMessage )
@@ -75,6 +84,88 @@ class LogW {
 			error_log( date( 'Y-m-d H:i:s' ).' : '.$m_LogMessage.PHP_EOL, 3, $logFileName );
 		}
 	}
+
+	public function NG_ENCRYPT( $string, $key = NULL )
+	{
+		$is_enc = true;
+	    if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		{
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" || $_SERVER["HTTP_USER_AGENT"] == "curl/7.43.0")
+			{
+				$is_enc = false;
+			}
+		}
+
+		if ( array_key_exists("HTTP_POSTMAN_TOKEN", $_SERVER) )
+		{
+			$is_enc = false;
+		}
+
+		if ( $is_enc )
+		{
+			$key = $key == NULL ? DEFAULTKEY : $key;
+			return base64_encode(openssl_encrypt($string, "aes-256-cbc", $key, true, str_repeat(chr(0), 16)));
+		}
+		else
+		{
+			return $string;
+		}
+    }
+
+    public function NG_DECRYPT( $encrypted_string, $key = NULL )
+    {
+		$is_enc = true;
+	    if ( array_key_exists( "HTTP_REFERER", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["HTTP_REFERER"], "/pages/admin/" ) || strpos($_SERVER["HTTP_REFERER"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( array_key_exists( "REQUEST_URI", $_SERVER ) )
+		{
+			if ( strpos( $_SERVER["REQUEST_URI"], "/pages/admin/" ) || strpos($_SERVER["REQUEST_URI"], "apiTest.php") )
+			{
+				$is_enc = false;
+			}
+		}
+		if ( array_key_exists("HTTP_USER_AGENT", $_SERVER ) )
+		{
+			if ( $_SERVER["HTTP_USER_AGENT"] == "RPT-HTTPClient/0.3-3E" || $_SERVER["HTTP_USER_AGENT"] == "Apache-HttpClient/4.2.6 (java 1.5)" || $_SERVER["HTTP_USER_AGENT"] == "curl/7.43.0" )
+			{
+				$is_enc = false;
+			}
+		}
+
+		if ( array_key_exists("HTTP_POSTMAN_TOKEN", $_SERVER) )
+		{
+			$is_enc = false;
+		}
+
+		if ( $is_enc )
+		{
+			$key = $key == NULL ? DEFAULTKEY : $key;
+			return openssl_decrypt(base64_decode($encrypted_string), "aes-256-cbc", $key, true, str_repeat(chr(0), 16));
+	    }
+	    else
+	    {
+		    return $encrypted_string;
+	    }
+    }
 }
 
 ?>

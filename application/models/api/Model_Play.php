@@ -1815,27 +1815,6 @@ class Model_Play extends MY_Model {
 	public function requestEnemyForPVP( $pid )
 	{
 		$query = "select pid, show_prof, show_name, prof_img from koc_play.".MY_Controller::TBL_PLAYERBASIC." where pid != '".$pid."' ";
-/*개발 테스트용 소스 시작*/
-		if ( ENVIRONMENT == 'development' || ENVIRONMENT == 'staging' )
-		{
-			if ( $pid == "4" )
-			{
-				$query .= "and pid = '59' ";
-			}
-			else if ( $pid == "59" )
-			{
-				$query .= "and pid = '4' ";
-			}
-			if ( $pid == "93" )
-			{
-				$query .= "and pid = '96' ";
-			}
-			else if ( $pid == "96" )
-			{
-				$query .= "and pid = '93' ";
-			}
-		}
-/*개발 테스트용 소스 끝*/
 		$query .= "order by rand() desc limit 1 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
@@ -1916,6 +1895,36 @@ class Model_Play extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		$this->DB_SEL->query($query);
 		return $this->DB_SEL->affected_rows();
+	}
+
+	public function requestLastFreeGatcha( $pid, $product )
+	{
+		$query = "select group_count, exec_datetime, now() as cur_datetime from koc_play.".MY_Controller::TBL_PLAYERFREEGATCHA_LOG." ";
+		$query .= "where pid = '".$pid."' and product_id = '".$product."' and (group_count is null or (group_count is not null and exec_datetime between concat(left(now(), 10), ' 00:00:00.000') and concat(left(now(), 10), ' 23:59:59.999') )) ";
+		$query .= "order by idx desc limit 1 ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestFreeGatcha( $pid )
+	{
+		$query = "select a.product_id, a.group_count, a.exec_datetime from koc_play.".MY_Controller::TBL_PLAYERFREEGATCHA_LOG." as a ";
+		$query .= "inner join ( select product_id, max(idx) as idx from koc_play.".MY_Controller::TBL_PLAYERFREEGATCHA_LOG." where pid = '".$pid."' group by product_id ) as b on a.idx = b.idx ";
+		$query .= "where pid = '".$pid."' and exec_datetime between concat(left(now(), 10), ' 00:00:00.000') and concat(left(now(), 10), ' 23:59:59.999') ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestLoggingFreePack( $pid, $product, $group_count )
+	{
+		$query = "insert into koc_play.".MY_Controller::TBL_PLAYERFREEGATCHA_LOG." ( pid, product_id, group_count, exec_datetime ) values ";
+		$query .= "( '".$pid."', '".$product."', ".( $group_count ? $group_count : "null" ).", now() ) ";
+
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
 	}
 
 	//for Admin
@@ -2814,6 +2823,23 @@ class Model_Play extends MY_Model {
 		$query = "select pid from koc_account.".MY_Controller::TBL_ACCOUNT." where id = '".$id."' ";
 		$this->DB_SEL->query($query);
 		return $this->DB_SEL->affected_rows();
+	}
+
+	public function updateCountry( $pid, $country )
+	{
+		if ( $db['log']['hostname'] != $db['default_ins']['hostname'] )
+		{
+			$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( pid, country, reg_date ) values ";
+			$query .= "( '".$pid."', '".$country."', now() ) ";
+
+			$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+			$this->DB_INS->query($query);
+			return $this->DB_INS->affected_rows();
+		}
+		else
+		{
+			return true;
+		}
 	}
 }
 ?>

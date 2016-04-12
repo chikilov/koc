@@ -6773,7 +6773,7 @@ class Con_ApiProcess extends MY_Controller {
 							}
 							$this->dbPlay->collectionProvision( $arrayResult['pid'], $row['type'] );
 						}
-						else if ( $row['article_type'] == 'WEPN' || $row['article_type'] == 'BCPC' || $row['article_type'] == 'SKIL' )
+						else if ( $row['article_type'] == 'WEPN' || $row['article_type'] == 'BCPC' || $row['article_type'] == 'SKIL' || $row['article_type'] == 'GEAR' )
 						{
 							for ( $i = 0; $i < $row['value']; $i++ )
 							{

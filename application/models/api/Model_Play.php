@@ -2827,19 +2827,12 @@ class Model_Play extends MY_Model {
 
 	public function updateCountry( $pid, $country )
 	{
-		if ( $db['log']['hostname'] != $db['default_ins']['hostname'] )
-		{
-			$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( pid, country, reg_date ) values ";
-			$query .= "( '".$pid."', '".$country."', now() ) ";
+		$query = "insert into koc_play.".MY_Controller::TBL_ACCOUNT." ( pid, country, reg_date ) values ";
+		$query .= "( '".$pid."', '".$country."', now() ) ";
 
-			$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
-			$this->DB_INS->query($query);
-			return $this->DB_INS->affected_rows();
-		}
-		else
-		{
-			return true;
-		}
+		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
+		$this->DB_INS->query($query);
+		return $this->DB_INS->affected_rows();
 	}
 }
 ?>

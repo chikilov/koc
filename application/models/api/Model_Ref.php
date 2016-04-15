@@ -149,7 +149,7 @@ class Model_Ref extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-
+/*
 	public function randomizeCharacterListPick( $pid, $cid )
 	{
 		$query = "select b.id from koc_ref.".MY_Controller::TBL_GATCHA." as a ";
@@ -184,6 +184,7 @@ class Model_Ref extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
+*/
 
 	public function randomizeValuePick( $pid, $rid, $seq )
 	{
@@ -197,7 +198,7 @@ class Model_Ref extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-
+/*
 	public function randomizeRewardPick( $pid, $rid, $rpattern, $rvalue )
 	{
 		$query = "select id, pattern, seq, reward_type, reward_value as attach_value, d.article_type, d.article_value ";
@@ -246,7 +247,7 @@ class Model_Ref extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );
 		return $this->DB_SEL->query($query);
 	}
-
+*/
 	public function getRewardIdFromStage( $pid, $stageid )
 	{
 		$query = "select reward_1, reward_2, reward_3, reward_pexp, platform_points from koc_ref.".MY_Controller::TBL_STAGE." where id = '".$stageid."' ";
@@ -275,7 +276,7 @@ class Model_Ref extends MY_Model {
 	public function requestUpgradeInfo( $pid, $targetIdx, $sourceIdx )
 	{
 		$query = "select a.step, a.probability, a.payment_type, a.payment, a.incentive, a.reference, ";
-		$query .= "b.up_incentive, c.weapon, c.backpack, c.skill_0, c.skill_1, c.skill_2 ";
+		$query .= "b.up_incentive, c.weapon, c.backpack, c.skill_0, c.skill_1, c.skill_2, c.gear_0, c.gear_1, c.gear_2, c.gear_3, c.gear_4, c.gear_5 ";
 		$query .= "from koc_ref.".MY_Controller::TBL_UPGRADE." as a inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as b ";
 		$query .= "on (a.grade, a.step) = (b.grade, b.up_grade) ";
 		$query .= "inner join koc_play.".MY_Controller::TBL_PLAYERCHARACTER." as c on a.m_grade = c.grade where category = 'CHARACTER' ";
@@ -623,6 +624,13 @@ class Model_Ref extends MY_Model {
 		$query .= "from koc_ref.".MY_Controller::TBL_GATCHA." group by id ) as a ";
 		$query .= "inner join ( select id, reference, probability from koc_ref.".MY_Controller::TBL_GATCHA." ) as b on a.id = b.id ";
 		$query .= "inner join koc_ref.".MY_Controller::TBL_TEXT." as c on concat( 'NG_ARTICLE_', b.reference ) = c.id ";
+
+		return $this->DB_SEL->query($query);
+	}
+
+	public function requestArticleInfo( $article_id )
+	{
+		$query = "select article_id, article_type, article_value, 1 as attach_value from koc_ref.".MY_Controller::TBL_ARTICLE." where article_id = '".$article_id."' ";
 
 		return $this->DB_SEL->query($query);
 	}

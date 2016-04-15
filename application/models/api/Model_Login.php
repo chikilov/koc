@@ -65,7 +65,7 @@ class Model_Login extends MY_Model {
 		$this->DB_LOGIN->query($query);
 		return $this->DB_LOGIN->insert_id();
 	}
-
+/*
 	public function requestGuestJoin( $macaddr, $uuid )
 	{
 		$query = "insert into ".$this->DB_LOGIN->database.".".MY_Controller::TBL_ACCOUNT." ( macaddr, uuid, reg_date ) values (";
@@ -75,7 +75,7 @@ class Model_Login extends MY_Model {
 		$this->DB_LOGIN->query($query);
 		return $this->DB_LOGIN->insert_id();
 	}
-
+*/
 	public function requestDupAffiliateId( $affiliateType, $affiliateId )
 	{
 		$query = "select pid, name, limit_type, limit_start, limit_end, 0 as helpcount ";
@@ -126,7 +126,7 @@ class Model_Login extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
 	}
-
+/*
 	public function requestDupMacaddr( $macaddr )
 	{
 		$query = "select pid, limit_type, limit_start, limit_end, 0 as helpcount ";
@@ -136,7 +136,7 @@ class Model_Login extends MY_Model {
 		$this->logw->sysLogWrite( LOG_NOTICE, "0", "sql : ".$query );
 		return $this->DB_LOGIN->query($query);
 	}
-
+*/
 	public function requestCheckMac( $macaddr )
 	{
 		$query = "select macaddr from ".$this->DB_LOGIN->database.".".MY_Controller::TBL_RESTRICTMACADDR." ";

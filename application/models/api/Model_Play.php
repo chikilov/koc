@@ -100,7 +100,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-
+/*
 	public function updateLoginTimeForFriend( $pid )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERFRIEND." set login_datetime = now() ";
@@ -110,7 +110,7 @@ class Model_Play extends MY_Model {
 		$this->DB_INS->query($query);
 		return $this->DB_INS->affected_rows();
 	}
-
+*/
 	public function updateAffiliateFriendInfo( $pid, $affiliateName, $affiliateProfImg )
 	{
 		$query = "update koc_play.".MY_Controller::TBL_PLAYERFRIEND." set login_datetime = now(), faffiliate_name = '".$affiliateName."',  ";
@@ -541,7 +541,7 @@ class Model_Play extends MY_Model {
 		$query .= "and a.idx != ifnull(b.memb_0, 0) and a.idx != ifnull(b.memb_1, 0) and a.idx != ifnull(b.memb_2, 0) ";
 		$query .= "group by a.idx, a.grade, a.level, a.refid, a.weapon, a.backpack, a.skill_0, a.skill_1, a.skill_2 having count(a.idx) >= 3 ";
 */
-		$query = "select idx, grade, level, refid, weapon, backpack, skill_0, skill_1, skill_2 from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
+		$query = "select idx, grade, level, refid, weapon, backpack, skill_0, skill_1, skill_2, gear_0, gear_1, gear_2, gear_3, gear_4, gear_5 from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and idx in ('".join("', '", $idx)."') ";
 		$query .= "and is_del = 0 and (exp_idx is null or exp_idx < 1) ";
 		$query .= "and idx not in ( select ifnull(memb_0, 0) from koc_play.".MY_Controller::TBL_PLAYERTEAM." where pid = '".$pid."' union ";
@@ -2371,7 +2371,7 @@ class Model_Play extends MY_Model {
 
 	public function requestSynthesizeCharInfo( $pid, $sourceIdx, $targetIdx )
 	{
-		$query = "select weapon, backpack, skill_0, skill_1, skill_2 from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
+		$query = "select weapon, backpack, skill_0, skill_1, skill_2, gear_0, gear_1, gear_2, gear_3, gear_4, gear_5 from koc_play.".MY_Controller::TBL_PLAYERCHARACTER." ";
 		$query .= "where pid = '".$pid."' and  idx in ('".$sourceIdx."', '".$targetIdx."') and is_del = 0 ";
 
 		$this->logw->sysLogWrite( LOG_NOTICE, $pid, "sql : ".$query );

@@ -561,6 +561,8 @@ class Con_ApiProcess extends MY_Controller {
 				$result = (bool)$this->dbMail->mailReceipt( $pid, $idx );
 				//공통처리
 				$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '메일 수령('.$idx.')' );
+				$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+				unset( $arrayResult['rewardobject'] );
 				if ( $arrayResult )
 				{
 					$resultCode = MY_Controller::STATUS_API_OK;
@@ -1530,11 +1532,9 @@ class Con_ApiProcess extends MY_Controller {
 				}
 				else
 				{
-					if ( $arrayProduct[0]['article_type'] == 'ASST' )
-					{
-						unset($arrayResult['objectarray']);
-					}
-
+					//공통처리
+					$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+					unset( $arrayResult['rewardobject'] );
 					$resultCode = MY_Controller::STATUS_API_OK;
 					$resultText = MY_Controller::MESSAGE_API_OK;
 					$arrayResult['payment_info'] = array( 'payment_type' => $arrayProduct[0]['payment_type'], 'payment_value' => $arrayProduct[0]['payment'] );
@@ -2461,6 +2461,9 @@ class Con_ApiProcess extends MY_Controller {
 					$curcash['cash_points'] = 0;
 					$curcash['event_points'] = 0;
 				}
+				//공통처리
+				$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+				unset( $arrayResult['rewardobject'] );
 				$this->dbPlay->requestLogIap( $is_provision, $pid, $sid, $storeType, $product, $country_code, $arrayProduct[0]['payment_type'], $price, $receiptPaymentSeq, $receiptApprovedPaymentNo, $receiptNaverId, $receiptPaymentTime, $curcash['cash_points'].','.$curcash['event_points'], $reasonCode );
 			}
 		}
@@ -2859,8 +2862,8 @@ class Con_ApiProcess extends MY_Controller {
 						}
 
 						$arrayResult = $this->commonUserResourceProvisioning( $randomProduct, $pid, $pid, 'PVE보상 수령' );
-						$arrayResult['playerinfo'] = $playerInfo;
-						$arrayResult['rewardobject'] = $randomProduct;
+						$arrayResult = $this->commonRewardObject( $pid, $arrayResult, $playerInfo, $randomProduct );
+
 						$arrayResult['basicreward'] = array( array( 'article_value' => 'achieve_points', 'attach_value' => intval($platformPoints) ) );
 						$arrayResult['basicreward'][] = array( 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) );
 
@@ -2869,115 +2872,35 @@ class Con_ApiProcess extends MY_Controller {
 							$arrayResult['basicreward'][] = array( 'article_value' => $basic_reward_type, 'attach_value' => intval($basic_reward_value) );
 						}
 
-						if ( array_key_exists('rewardobject', $arrayResult) )
+						$txtRandReward = '';
+						foreach( $arrayResult['rewardobject'] as $key => $val )
 						{
-							foreach( $arrayResult['rewardobject'] as $key => $val )
+							if ( $key > 0 )
 							{
-								if ( $val['article_type'] == 'CHAR' && array_key_exists('objectarray', $arrayResult) && $arrayResult['objectarray'][$key]['idx'] > 0 )
-								{
-									if ( array_key_exists('character', $arrayResult) )
-									{
-										$arrayResult['character'][] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
-										$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
-									}
-									else
-									{
-										$arrayResult['character'] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
-										$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
-									}
-								}
-								else if ( $val['article_type'] == 'ITEM' || $val['article_type'] == 'WEPN' || $val['article_type'] == 'BCPC' || $val['article_type'] == 'SKIL' || $val['article_type'] == 'GEAR' )
-								{
-									if ( array_key_exists('objectarray', $arrayResult) && $arrayResult['objectarray'][$key]['idx'] > 0 )
-									{
-										if ( array_key_exists('inventory', $arrayResult) )
-										{
-											$arrayResult['inventory'][] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
-											$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
-										}
-										else
-										{
-											$arrayResult['inventory'] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
-											$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
-										}
-									}
-								}
-								else
-								{
-									if ( array_key_exists('assets', $arrayResult) )
-									{
-										$arrayResult['assets'][] = $arrayResult['objectarray'][$key];
-									}
-									else
-									{
-										$arrayResult['assets'] = array( $arrayResult['objectarray'][$key] );
-									}
-								}
-								unset($arrayResult['objectarray'][$key]);
+								$txtRandReward .= '; ';
 							}
-							if ( array_key_exists('objectarray', $arrayResult) )
+							// 로그 추가 완료
+							if ( array_key_exists('idx', $val) )
 							{
-								unset($arrayResult['objectarray']);
+								$idx = $val['idx'];
+								$txtRandReward .= $val['reward_type'].', '.$val['attach_value'].', '.$val['idx'];
 							}
-
-							$txtRandReward = '';
-							foreach( $arrayResult['rewardobject'] as $key => $val )
+							else
 							{
-								if ( $key > 0 )
-								{
-									$txtRandReward .= '; ';
-								}
-								// 로그 추가 완료
-								if ( array_key_exists('idx', $val) )
-								{
-									$idx = $val['idx'];
-									$txtRandReward .= $val['reward_type'].', '.$val['attach_value'].', '.$val['idx'];
-								}
-								else
-								{
-									$idx = null;
-									if ( $val['article_type'] == 'CHAR' )
-									{
-										$txtRandReward .= $val['reward_type'];
-									}
-									else if ( $val['article_type'] == 'SKIL' )
-									{
-										$txtRandReward .= $val['reward_type'];
-									}
-									else
-									{
-										$txtRandReward .= $val['reward_type'];
-									}
-									$txtRandReward .= ', '.$val['attach_value'];
-								}
-							}
-						}
-						else
-						{
-							foreach( $arrayResult['rewardobject'] as $key => $val )
-							{
-								if ( $key > 0 )
-								{
-									$txtRandReward .= '; ';
-								}
 								$idx = null;
 								if ( $val['article_type'] == 'CHAR' )
 								{
-									$txtRandReward .= 'NG_ARTICLE_'.$val['reward_type'];
+									$txtRandReward .= $val['reward_type'];
 								}
 								else if ( $val['article_type'] == 'SKIL' )
 								{
-									$txtRandReward .= 'NG_ARTICLE_'.$val['reward_type'];
-								}
-								else if ( $arrayResult['rewardobject']['article_type'] != 'ASST' )
-								{
-									$txtRandReward .= 'NG_ARTICLE_'.$val['reward_type'];
+									$txtRandReward .= $val['reward_type'];
 								}
 								else
 								{
-									$txtRandReward .= 'NG_ARTICLE_'.$val['reward_type'];
+									$txtRandReward .= $val['reward_type'];
 								}
-								$txtRandReward .= ' => '.$val['attach_value'];
+								$txtRandReward .= ', '.$val['attach_value'];
 							}
 						}
 
@@ -4079,26 +4002,6 @@ class Con_ApiProcess extends MY_Controller {
 					$arrDisInfo = $this->dbAdmin->requestValidDisEventList( MY_Controller::UPGRADE_DIS_EVENT_PRODUCT, MY_Controller::UPGRADE_DIS_EVENT_PRODUCT )->result_array();
 
 					$this->dbPlay->onBeginTransaction();
-					if ( $arrPayment[0]['weapon'] != null && $arrPayment[0]['weapon'] != '' )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['weapon'] );
-					}
-					if ( $arrPayment[0]['backpack'] != null && $arrPayment[0]['backpack'] != '' )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['backpack'] );
-					}
-					if ( $arrPayment[0]['skill_0'] != null && $arrPayment[0]['skill_0'] != '' )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_0'] );
-					}
-					if ( $arrPayment[0]['skill_1'] != null && $arrPayment[0]['skill_1'] != '' )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_1'] );
-					}
-					if ( $arrPayment[0]['skill_2'] != null && $arrPayment[0]['skill_2'] != '' )
-					{
-						$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_2'] );
-					}
 					if ( empty( $arrDisInfo ) )
 					{
 						$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $arrPayment[0]['payment_type'], $arrPayment[0]['payment'], '캐릭터 강화' );
@@ -4130,6 +4033,50 @@ class Con_ApiProcess extends MY_Controller {
 							$is_upgrade = (bool)0;
 						}
 						$this->dbPlay->requestUpdateUpgradeInfo( $pid, $targetIdx, $arrPayment[0]['step'] + intval($is_upgrade), $reference, $up_incentive );
+						if ( $arrPayment[0]['weapon'] != null && $arrPayment[0]['weapon'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['weapon'] );
+						}
+						if ( $arrPayment[0]['backpack'] != null && $arrPayment[0]['backpack'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['backpack'] );
+						}
+						if ( $arrPayment[0]['skill_0'] != null && $arrPayment[0]['skill_0'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_0'] );
+						}
+						if ( $arrPayment[0]['skill_1'] != null && $arrPayment[0]['skill_1'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_1'] );
+						}
+						if ( $arrPayment[0]['skill_2'] != null && $arrPayment[0]['skill_2'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['skill_2'] );
+						}
+						if ( $arrPayment[0]['gear_0'] != null && $arrPayment[0]['gear_0'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_0'] );
+						}
+						if ( $arrPayment[0]['gear_1'] != null && $arrPayment[0]['gear_1'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_1'] );
+						}
+						if ( $arrPayment[0]['gear_2'] != null && $arrPayment[0]['gear_2'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_2'] );
+						}
+						if ( $arrPayment[0]['gear_3'] != null && $arrPayment[0]['gear_3'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_3'] );
+						}
+						if ( $arrPayment[0]['gear_4'] != null && $arrPayment[0]['gear_4'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_4'] );
+						}
+						if ( $arrPayment[0]['gear_5'] != null && $arrPayment[0]['gear_5'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $arrPayment[0]['gear_5'] );
+						}
 						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sourceIdx );
 
 						$this->calcurateEnergy( $pid );
@@ -4328,93 +4275,109 @@ class Con_ApiProcess extends MY_Controller {
 
 					$this->dbPlay->onBeginTransaction();
 
-					unset($arrayResult);
 					// 합성은 비용 없음 추후 생길 경우 아래 주석 해제
 					//$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $gatchaPayment_type, $gatchaPayment );
-					$refid = $this->dbRef->randomizeCharacterListPick( $pid, $gatchaValue )->result_array()[0]['id'];
-					if ( $refid )
+					$arrayProduct = $this->dbRef->requestArticleInfo($gatchaValue)->result_array();
+
+					//공통처리
+					$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '캐릭터 합성('.$targetIdx.', '.$sourceIdx.')' );
+					$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+					unset( $arrayResult['rewardobject'] );
+
+					// 팀정보 업데이트
+					$is_change = false;
+					foreach( $aTeamInfo as $key => $val )
 					{
-						$arrayResult['objectarray'] = array( 'value' => $refid );
-
-						// 캐릭터 정보 업데이트
-						$result2 = $this->dbPlay->characterProvision( $pid, $arrayResult['objectarray']['value'] );
-						$result = (bool)$result2;
-						$arrayResult['objectarray'] = $this->dbPlay->requestCharacterIns( $pid, $result2 )->result_array()[0];
-						// 도감 업데이트
-						$this->dbPlay->collectionProvision( $pid, $arrayResult['objectarray']['value'] );
-						// 팀정보 업데이트
-						$is_change = false;
-						foreach( $aTeamInfo as $key => $val )
+						if ( $val == $targetIdx )
 						{
-							if ( $val == $targetIdx )
-							{
-								$aTeamInfo[$key] = $arrayResult['objectarray']['idx'];
-								$is_change = true;
-							}
-							else if ( $val == $sourceIdx )
-							{
-								$aTeamInfo[$key] = 0;
-								$is_change = true;
-							}
-							else if ( $val == null )
-							{
-								$aTeamInfo[$key] = 0;
-							}
+							$aTeamInfo[$key] = $arrayResult['character'][0]['idx'];
+							$is_change = true;
 						}
-						for ( $i = 0; $i < 3; $i++ )
+						else if ( $val == $sourceIdx )
 						{
-							if ( $aTeamInfo[$i.'0'] == 0 )
-							{
-								$aTeamInfo[$i.'0'] = $arrayResult['objectarray']['idx'];
-								if ( $aTeamInfo[$i.'1'] == $arrayResult['objectarray']['idx'] )
-								{
-									$aTeamInfo[$i.'1'] = 0;
-								}
-								else if ( $aTeamInfo[$i.'2'] == $arrayResult['objectarray']['idx'] )
-								{
-									$aTeamInfo[$i.'2'] = 0;
-								}
-							}
+							$aTeamInfo[$key] = 0;
+							$is_change = true;
 						}
-
-						if ( $is_change )
+						else if ( $val == null )
 						{
-							$result = $result & (bool)$this->dbPlay->requestDeployCharacters( $pid, $aTeamInfo );
+							$aTeamInfo[$key] = 0;
 						}
-
-						$arrChar = $this->dbPlay->requestSynthesizeCharInfo( $pid, $sourceIdx, $targetIdx )->result_array();
-						foreach ( $arrChar as $row )
-						{
-							if ( $row['weapon'] != null && $row['weapon'] != '' )
-							{
-								$this->dbPlay->deletePlayerItem( $pid, $row['weapon'] );
-							}
-							if ( $row['backpack'] != null && $row['backpack'] != '' )
-							{
-								$this->dbPlay->deletePlayerItem( $pid, $row['backpack'] );
-							}
-							if ( $row['skill_0'] != null && $row['skill_0'] != '' )
-							{
-								$this->dbPlay->deletePlayerItem( $pid, $row['skill_0'] );
-							}
-							if ( $row['skill_1'] != null && $row['skill_1'] != '' )
-							{
-								$this->dbPlay->deletePlayerItem( $pid, $row['skill_1'] );
-							}
-							if ( $row['skill_2'] != null && $row['skill_2'] != '' )
-							{
-								$this->dbPlay->deletePlayerItem( $pid, $row['skill_2'] );
-							}
-						}
-
-						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sourceIdx );
-						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $targetIdx );
 					}
-					else
+					for ( $i = 0; $i < 3; $i++ )
 					{
-						$result = (bool)0;
+						if ( $aTeamInfo[$i.'0'] == 0 )
+						{
+							$aTeamInfo[$i.'0'] = $arrayResult['character'][0]['idx'];
+							if ( $aTeamInfo[$i.'1'] == $arrayResult['character'][0]['idx'] )
+							{
+								$aTeamInfo[$i.'1'] = 0;
+							}
+							else if ( $aTeamInfo[$i.'2'] == ['character'][0]['idx'] )
+							{
+								$aTeamInfo[$i.'2'] = 0;
+							}
+						}
 					}
+
+					if ( $is_change )
+					{
+						$result = $result & (bool)$this->dbPlay->requestDeployCharacters( $pid, $aTeamInfo );
+					}
+
+					$arrChar = $this->dbPlay->requestSynthesizeCharInfo( $pid, $sourceIdx, $targetIdx )->result_array();
+					foreach ( $arrChar as $row )
+					{
+						if ( $row['weapon'] != null && $row['weapon'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['weapon'] );
+						}
+						if ( $row['backpack'] != null && $row['backpack'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['backpack'] );
+						}
+						if ( $row['skill_0'] != null && $row['skill_0'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['skill_0'] );
+						}
+						if ( $row['skill_1'] != null && $row['skill_1'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['skill_1'] );
+						}
+						if ( $row['skill_2'] != null && $row['skill_2'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['skill_2'] );
+						}
+						if ( $row['gear_0'] != null && $row['gear_0'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_0'] );
+						}
+						if ( $row['gear_1'] != null && $row['gear_1'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_1'] );
+						}
+						if ( $row['gear_2'] != null && $row['gear_2'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_2'] );
+						}
+						if ( $row['gear_3'] != null && $row['gear_3'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_3'] );
+						}
+						if ( $row['gear_4'] != null && $row['gear_4'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_4'] );
+						}
+						if ( $row['gear_5'] != null && $row['gear_5'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_5'] );
+						}
+					}
+
+					$result = (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sourceIdx );
+					$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $targetIdx );
+
 					$this->dbPlay->onEndTransaction( $result );
+
 					if ( $result )
 					{
 						$this->calcurateEnergy( $pid );
@@ -4422,7 +4385,7 @@ class Con_ApiProcess extends MY_Controller {
 						$arrayResult['team'] = $this->dbPlay->requestTeam( $pid )->result_array();
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
-						$this->onSysLogWriteDb( $pid, '합성, 재료기체 '.$targetIdx.', '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득기체 '.$arrayResult['objectarray']['idx'].', '.$arrayResult['objectarray']['value'] );
+						$this->onSysLogWriteDb( $pid, '합성, 재료기체 '.$targetIdx.', '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득기체 '.$arrayResult['character'][0]['idx'].', '.$arrayResult['character'][0]['refid'] );
 					}
 					else
 					{
@@ -4488,33 +4451,21 @@ class Con_ApiProcess extends MY_Controller {
 					// 합성은 비용 없음 추후 생길 경우 아래 주석 해제 - 비용이 발생하여 주석 위치 변경
 					$gatchaPayment = json_decode(MY_Controller::GATCHA_BY_ITEM_GRADE_PAYMENT, true)[$arrayResult[0]['grade']];
 					$gatchaPayment_type = MY_Controller::GATCHA_BY_ITEM_GRADE_PAYMENT_TYPE;
-					//$gatchaPayment = '0';
-					//$gatchaPayment_type = '0';
 
 					$this->dbPlay->onBeginTransaction();
 
-					unset($arrayResult);
 					// 합성은 비용 없음 추후 생길 경우 아래 주석 해제 - 비용이 발생하여 주석 제거
 					$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $gatchaPayment_type, $gatchaPayment, '아이템 합성하기' );
 					if ( $result )
 					{
-						$refid = $this->dbRef->randomizeInventoryListPick( $pid, $gatchaValue )->result_array()[0]['id'];
-						if ( $refid )
-						{
-							$arrayResult['objectarray'] = array( 'value' => $refid );
+						$arrayProduct = $this->dbRef->requestArticleInfo($gatchaValue)->result_array();
 
-							// 아이템 정보 업데이트
-							$result2 = $this->dbPlay->inventoryProvision( $pid, $arrayResult['objectarray']['value'] );
-							$result = (bool)$result2;
-							$arrayResult['objectarray']['idx'] = $result2;
-
-							$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
-							$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $targetIdx );
-						}
-						else
-						{
-							$result = (bool)0;
-						}
+						//공통처리
+						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '아이템 합성('.$targetIdx.', '.$sourceIdx.')' );
+						$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+						unset( $arrayResult['rewardobject'] );
+						$result = (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
+						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $targetIdx );
 					}
 					else
 					{
@@ -4529,7 +4480,7 @@ class Con_ApiProcess extends MY_Controller {
 						$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
-						$this->onSysLogWriteDb( $pid, '합성, 재료아이템 '.$targetIdx.', '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득아이템 '.$arrayResult['objectarray']['idx'].', '.$arrayResult['objectarray']['value'] );
+						$this->onSysLogWriteDb( $pid, '합성, 재료아이템 '.$targetIdx.', '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득아이템 '.$arrayResult['inventory'][0]['idx'].', '.$arrayResult['inventory'][0]['refid'] );
 					}
 					else
 					{
@@ -4580,22 +4531,12 @@ class Con_ApiProcess extends MY_Controller {
 			unset($arrayResult);
 			// 합성은 비용 없음 추후 생길 경우 아래 주석 해제
 			$result = (bool)$this->updatePoint( $pid, MY_Controller::COMMON_USE_CODE, $gatchaPayment_type, $gatchaPayment, '아이템 진화 다시하기' );
-			$refid = $this->dbRef->randomizeInventoryListPick( $pid, $gatchaValue )->result_array()[0]['id'];
-			if ( $refid )
-			{
-				$arrayResult['objectarray'] = array( 'value' => $refid );
-
-				// 아이템 정보 업데이트
-				$result2 = $this->dbPlay->inventoryProvision( $pid, $arrayResult['objectarray']['value'] );
-				$result = $result & (bool)$result2;
-				$arrayResult['objectarray']['idx'] = $result2;
-
-				$result = (bool)$result & (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
-			}
-			else
-			{
-				$result = (bool)0;
-			}
+			$arrayProduct = $this->dbRef->requestArticleInfo($gatchaValue)->result_array();
+			//공통처리
+			$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '아이템 재합성('.$sourceIdx.')' );
+			$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+			unset( $arrayResult['rewardobject'] );
+			$result = (bool)$this->dbPlay->deletePlayerItem( $pid, $sourceIdx );
 			$this->dbPlay->onEndTransaction( $result );
 			if ( $result )
 			{
@@ -4603,7 +4544,7 @@ class Con_ApiProcess extends MY_Controller {
 				$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
 				$resultCode = MY_Controller::STATUS_API_OK;
 				$resultText = MY_Controller::MESSAGE_API_OK;
-				$this->onSysLogWriteDb( $pid, '진화 다시하기, 재료아이템 '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득아이템 '.$arrayResult['objectarray']['idx'].', '.$arrayResult['objectarray']['value'] );
+				$this->onSysLogWriteDb( $pid, '합성 다시하기, 재료아이템 '.$sourceIdx.', 소모비용 '.$gatchaPayment_type.', '.$gatchaPayment.', 획득아이템 '.$arrayResult['inventory'][0]['idx'].', '.$arrayResult['inventory'][0]['refid'] );
 			}
 			else
 			{
@@ -4676,23 +4617,21 @@ class Con_ApiProcess extends MY_Controller {
 				{
 					unset($arrayResult);
 					$this->dbPlay->onBeginTransaction();
-					if ( $arrayEvolutionInfo[0]['e_target'] )
+					if ( array_key_exists('e_target', $arrayEvolutionInfo[0] ) )
 					{
-						$arrayResult['objectarray'] = array( 'value' => $arrayEvolutionInfo[0]['e_target'] );
+						$arrayProduct = $this->dbRef->requestArticleInfo($arrayEvolutionInfo[0]['e_target'])->result_array();
+						//공통처리
+						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '캐릭터 진화('.$sourceIdx.', '.$targetIdx.')' );
+						$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+						unset( $arrayResult['rewardobject'] );
 
-						// 캐릭터 정보 업데이트
-						$result2 = $this->dbPlay->characterProvision( $pid, $arrayResult['objectarray']['value'] );
-						$result = (bool)$result2;
-						$arrayResult['objectarray'] = $arrayResult['objectarray'] = $this->dbPlay->requestCharacterIns( $pid, $result2 )->result_array()[0];;
-						// 도감 업데이트
-						$this->dbPlay->collectionProvision( $pid, $arrayResult['objectarray']['value'] );
 						// 팀정보 업데이트
 						$is_change = false;
 						foreach( $aTeamInfo as $key => $val )
 						{
 							if ( $val == $targetIdx )
 							{
-								$aTeamInfo[$key] = $arrayResult['objectarray']['idx'];
+								$aTeamInfo[$key] = $arrayResult['character'][0]['idx'];
 								$is_change = true;
 							}
 							else if ( $val == $sourceIdx )
@@ -4709,12 +4648,12 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							if ( $aTeamInfo[$i.'0'] == 0 )
 							{
-								$aTeamInfo[$i.'0'] = $arrayResult['objectarray']['idx'];
-								if ( $aTeamInfo[$i.'1'] == $arrayResult['objectarray']['idx'] )
+								$aTeamInfo[$i.'0'] = $arrayResult['character'][0]['idx'];
+								if ( $aTeamInfo[$i.'1'] == $arrayResult['character'][0]['idx'] )
 								{
 									$aTeamInfo[$i.'1'] = 0;
 								}
-								else if ( $aTeamInfo[$i.'2'] == $arrayResult['objectarray']['idx'] )
+								else if ( $aTeamInfo[$i.'2'] == $arrayResult['character'][0]['idx'] )
 								{
 									$aTeamInfo[$i.'2'] = 0;
 								}
@@ -4749,9 +4688,33 @@ class Con_ApiProcess extends MY_Controller {
 							{
 								$this->dbPlay->deletePlayerItem( $pid, $row['skill_2'] );
 							}
+							if ( $row['gear_0'] != null && $row['gear_0'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_0'] );
+							}
+							if ( $row['gear_1'] != null && $row['gear_1'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_1'] );
+							}
+							if ( $row['gear_2'] != null && $row['gear_2'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_2'] );
+							}
+							if ( $row['gear_3'] != null && $row['gear_3'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_3'] );
+							}
+							if ( $row['gear_4'] != null && $row['gear_4'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_4'] );
+							}
+							if ( $row['gear_5'] != null && $row['gear_5'] != '' )
+							{
+								$this->dbPlay->deletePlayerItem( $pid, $row['gear_5'] );
+							}
 						}
 
-						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sourceIdx );
+						$result = (bool)$this->dbPlay->deletePlayerCharacter( $pid, $sourceIdx );
 						$result = (bool)$result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $targetIdx );
 					}
 					else
@@ -4766,7 +4729,7 @@ class Con_ApiProcess extends MY_Controller {
 						$arrayResult['team'] = $this->dbPlay->requestTeam( $pid )->result_array();
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
-						$this->onSysLogWriteDb( $pid, '진화, 재료기체 '.$targetIdx.', '.$sourceIdx.', 획득기체 '.$arrayResult['objectarray']['idx'].', '.$arrayResult['objectarray']['value'] );
+						$this->onSysLogWriteDb( $pid, '진화, 재료기체 '.$targetIdx.', '.$sourceIdx.', 획득기체 '.$arrayResult['character'][0]['idx'].', '.$arrayResult['character'][0]['refid'] );
 					}
 					else
 					{
@@ -4948,10 +4911,6 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$playerInfo = null;
 						}
-
-						$arrayResult = $this->commonUserResourceProvisioning( $arrayPoints, $pid, $pid, '업적보상 수령' );
-						unset($arrayResult['objectarray']);
-
 						$this->calcurateEnergy( $pid );
 						if ( $result )
 						{
@@ -4965,7 +4924,6 @@ class Con_ApiProcess extends MY_Controller {
 							}
 							$resultCode = MY_Controller::STATUS_API_OK;
 							$resultText = MY_Controller::MESSAGE_API_OK;
-							$arrayResult['playerinfo'] = $playerInfo;
 							$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
 							$arrayResult['arrayDailyAchieve'] = $this->dbPlay->requestDailyAchieveList( $pid )->result_array();
 							$arrayResult['arrayAchieve'] = $this->dbPlay->requestAchieveList( $pid )->result_array();
@@ -5069,6 +5027,31 @@ class Con_ApiProcess extends MY_Controller {
 						{
 							$this->dbPlay->deletePlayerItem( $pid, $row['skill_2'] );
 						}
+						if ( $row['gear_0'] != null && $row['gear_0'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_0'] );
+						}
+						if ( $row['gear_1'] != null && $row['gear_1'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_1'] );
+						}
+						if ( $row['gear_2'] != null && $row['gear_2'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_2'] );
+						}
+						if ( $row['gear_3'] != null && $row['gear_3'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_3'] );
+						}
+						if ( $row['gear_4'] != null && $row['gear_4'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_4'] );
+						}
+						if ( $row['gear_5'] != null && $row['gear_5'] != '' )
+						{
+							$this->dbPlay->deletePlayerItem( $pid, $row['gear_5'] );
+						}
+
 						$sellPoint += json_decode(MY_Controller::GAMEPOINTS_PER_CHARACTER_GRADE, true)[$row['grade']];
 						$result = $result & (bool)$this->dbPlay->deletePlayerCharacter( $pid, $row['idx'] );
 						$txtSellInfo .= '코드'.$row['refid'].', 등급:'.$row['grade'].', 레벨:'.$row['level'].', 고유키:'.$row['idx'].'\n';
@@ -6360,10 +6343,18 @@ class Con_ApiProcess extends MY_Controller {
 
 					if ( $result )
 					{
-						$refid = json_decode(MY_Controller::GATCHA_BY_GEAR_GRADE, true)[$type][$parts][$grade];
-						$idx = $this->dbPlay->inventoryProvision( $pid, $refid );
+						$gatchaValue = json_decode(MY_Controller::GATCHA_BY_GEAR_GRADE, true)[$type][$parts][$grade];
+						$arrayProduct = $this->dbRef->requestArticleInfo($gatchaValue)->result_array();
+						$iidString = '';
+						foreach ( $iid as $val ) {
+							$iidString .= ( $iidString == '' ? $val : ', '.$val );
+						}
 
-						$arrayResult['objectarray'] = $this->dbPlay->requestItemInfo( $pid, $idx )->result_array()[0];
+						//공통처리
+						$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '기어 합성('.$iidString.')' );
+						$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+						unset( $arrayResult['rewardobject'] );
+
 						$arrayResult['remain_item'] = $this->dbPlay->requestItem( $pid )->result_array()[0];
 						$resultCode = MY_Controller::STATUS_API_OK;
 						$resultText = MY_Controller::MESSAGE_API_OK;
@@ -6409,9 +6400,12 @@ class Con_ApiProcess extends MY_Controller {
 
 		if ( $pid )
 		{
-			$arrayResult = $this->dbPlay->requestCharacter( $pid, $this->dbPlay->characterProvision( $pid, $cid ) )->result_array()[0];
-			// 도감 업데이트
-			$this->dbPlay->collectionProvision( $pid, $cid );
+			$arrayProduct[] = array( 'attach_value' => 1, 'article_type' => 'CHAR', 'article_value' => $cid );
+			//공통처리
+			$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '캐릭터 강제배포' );
+			$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+			unset( $arrayResult['rewardobject'] );
+
 			$resultCode = MY_Controller::STATUS_API_OK;
 			$resultText = MY_Controller::MESSAGE_API_OK;
 		}
@@ -6432,7 +6426,11 @@ class Con_ApiProcess extends MY_Controller {
 
 		if ( $pid )
 		{
-			$arrayResult['idx'] = $this->dbPlay->inventoryProvision( $pid, $iid );
+			$arrayProduct = $this->dbRef->requestArticleInfo( $iid )->result_array();
+			//공통처리
+			$arrayResult = $this->commonUserResourceProvisioning( $arrayProduct, $pid, $pid, '캐릭터 강제배포' );
+			$arrayResult = $this->commonRewardObject( $pid, $arrayResult, null, $arrayProduct );
+			unset( $arrayResult['rewardobject'] );
 			$resultCode = MY_Controller::STATUS_API_OK;
 			$resultText = MY_Controller::MESSAGE_API_OK;
 		}

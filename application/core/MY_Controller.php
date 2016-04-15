@@ -1389,6 +1389,70 @@ EOF;
 		return $arrayResult;
     }
 
+    function commonRewardObject( $pid, $arrayResult, $playerInfo, $rewardobject )
+    {
+	    if ( $playerInfo != null )
+	    {
+	    	$arrayResult['playerinfo'] = $playerInfo;
+	    }
+
+	    if ( $rewardobject != null )
+	    {
+		    $arrayResult['rewardobject'] = $rewardobject;
+
+			foreach( $arrayResult['rewardobject'] as $key => $val )
+			{
+				if ( ( $val['article_type'] == 'CHAR' || $val['article_type'] == 'CTIK' ) && array_key_exists('objectarray', $arrayResult) && $arrayResult['objectarray'][$key]['idx'] > 0 )
+				{
+					if ( array_key_exists('character', $arrayResult) )
+					{
+						$arrayResult['character'][] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
+						$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
+					}
+					else
+					{
+						$arrayResult['character'] = $this->dbPlay->requestCharacterIns( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
+						$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
+					}
+				}
+				else if ( $val['article_type'] == 'ITEM' || $val['article_type'] == 'WEPN' || $val['article_type'] == 'BCPC' || $val['article_type'] == 'SKIL' || $val['article_type'] == 'GEAR' || $val['article_type'] == 'BTIK' || $val['article_type'] == 'STIK' || $val['article_type'] == 'WTIK' )
+				{
+					if ( array_key_exists('objectarray', $arrayResult) && $arrayResult['objectarray'][$key]['idx'] > 0 )
+					{
+						if ( array_key_exists('inventory', $arrayResult) )
+						{
+							$arrayResult['inventory'][] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array()[0];
+							$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
+						}
+						else
+						{
+							$arrayResult['inventory'] = $this->dbPlay->requestItemInfo( $pid, $arrayResult['objectarray'][$key]['idx'] )->result_array();
+							$arrayResult['rewardobject'][$key]['idx'] = $arrayResult['objectarray'][$key]['idx'];
+						}
+					}
+				}
+				else
+				{
+					if ( array_key_exists('assets', $arrayResult) )
+					{
+						$arrayResult['assets'][] = $arrayResult['objectarray'][$key];
+					}
+					else
+					{
+						$arrayResult['assets'] = array( $arrayResult['objectarray'][$key] );
+					}
+				}
+			}
+		}
+
+		if ( array_key_exists('objectarray', $arrayResult) )
+		{
+			unset($arrayResult['objectarray']);
+		}
+
+	    return $arrayResult;
+    }
+
 	function requestGatcha( $pid, $id )
 	{
 		$this->load->model('admin/Model_Admin', "dbAdmin");
